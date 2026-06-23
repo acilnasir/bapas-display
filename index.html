@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
+    <!-- Memuat Library SheetJS untuk Pembuatan Berkas Excel (.xlsx) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Memuat Library Chart.js (Grafik Dinamis) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -484,7 +486,8 @@
         
         <div class="header-display">
             <div class="header-brand-section">
-                <img id="display-header-logo" src="" style="display: none;" class="header-logo-img" alt="Logo">
+                <!-- PERBAIKAN UTAMA: LOGO TERHUBUNG LANGSUNG SECARA OTOMATIS KE API GOOGLE DRIVE -->
+                <img id="display-header-logo" src="https://lh3.googleusercontent.com/d/1xHFp8MzEzoQ-Ron8SgP38U9D5-1e2M83" class="header-logo-img" alt="Logo Instansi">
                 <div>
                     <h1>BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
                     <p>Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Direktorat Jenderal Pemasyarakatan Jawa Tengah</p>
@@ -634,6 +637,7 @@
         </div>
 
         <div class="admin-grid">
+            <!-- CORESYNC GATEWAY HUB -->
             <div class="admin-card">
                 <h4>Integrasi Jalur API Google Sheets Realtime</h4>
                 <p style="font-size:12px; color:#9ca3af; margin-bottom:10px;">Masukkan URL Web App Apps Script (/exec) yang didapatkan dari Langkah 2:</p>
@@ -649,8 +653,9 @@
             </div>
 
             <div class="admin-card">
-                <h4>Upload Logo Instansi (Atas)</h4>
-                <input type="file" id="admin-logo-file" accept="image/*">
+                <h4>Informasi Logo Atas</h4>
+                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Logo institusi Bapas Kelas II Purwokerto telah **dikunci permanen secara cloud** menggunakan berkas yang Anda sematkan di Google Drive.</p>
+                <p style="font-size:12px; color:var(--accent-green); margin-top:8px; font-weight:bold;">Sistem akan memanggil logo secara langsung tanpa perlu pengunggahan ulang.</p>
             </div>
 
             <div class="admin-card">
@@ -662,6 +667,7 @@
         </div>
     </div>
 
+    <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
         // --- SECURITY MANAGEMENT ---
         const USERNAME_VALID = "adminbapas";
