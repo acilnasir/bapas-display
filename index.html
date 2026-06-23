@@ -1,1836 +1,723 @@
 <!DOCTYPE html>
-
 <html lang="id">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
-
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    
-
-    <style>
-
-        :root {
-
-            --primary-color: #114b5f;
-
-            --secondary-color: #f4d35e;
-
-            --dark-bg: #0a0f1d;
-
-            --panel-bg: #111827;
-
-            --accent-green: #10b981;
-
-            --accent-red: #ef4444;
-
-            --accent-blue: #3b82f6;
-
-            --btn-download: #2563eb;
-
-            --card-bg: #111827;
-
-        }
-
-
-
-        * {
-
-            box-sizing: border-box;
-
-            margin: 0;
-
-            padding: 0;
-
-        }
-
-
-
-        body {
-
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-
-            background-color: #030712;
-
-            color: #f3f4f6;
-
-            overflow-x: hidden;
-
-            position: relative;
-
-        }
-
-
-
-        #main-display-screen {
-
-            width: 100%;
-
-            height: 100vh;
-
-            max-height: 1080px;
-
-            display: grid;
-
-            grid-template-rows: 110px 1fr;
-
-            grid-template-columns: 55% 45%;
-
-            background-color: var(--dark-bg);
-
-            position: relative;
-
-            z-index: 10;
-
-        }
-
-
-
-        #main-display-screen:fullscreen {
-
-            width: 1920px;
-
-            height: 1080px;
-
-            background-color: var(--dark-bg);
-
-        }
-
-
-
-        /* HEADER DISPLAY */
-
-        .header-display {
-
-            grid-column: 1 / span 2;
-
-            background: linear-gradient(90deg, var(--primary-color), #1e293b);
-
-            border-bottom: 4px solid var(--secondary-color);
-
-            padding: 0 40px;
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-
-        }
-
-
-
-        .header-brand-section {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 20px;
-
-        }
-
-
-
-        .header-logo-img {
-
-            height: 75px;
-
-            width: auto;
-
-            object-fit: contain;
-
-        }
-
-
-
-        .header-display h1 {
-
-            font-size: 30px;
-
-            font-weight: 800;
-
-            letter-spacing: 1px;
-
-            text-transform: uppercase;
-
-            color: #ffffff;
-
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-
-        }
-
-
-
-        .header-display p {
-
-            font-size: 16px;
-
-            color: var(--secondary-color);
-
-            margin-top: 4px;
-
-        }
-
-
-
-        /* PANEL KIRI (YOUTUBE DISPLAY + NOMOR ANTRIAN) */
-
-        .left-panel {
-
-            grid-column: 1;
-
-            padding: 25px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            background-color: #0b0f19;
-
-            border-right: 2px solid #1f2937;
-
-            gap: 15px;
-
-        }
-
-
-
-        .video-and-queue-container {
-
-            display: grid;
-
-            grid-template-columns: 1fr;
-
-            grid-template-rows: auto 1fr;
-
-            flex-grow: 1;
-
-            width: 100%;
-
-        }
-
-
-
-        .queue-display-bar {
-
-            grid-row: 1;
-
-            display: grid;
-
-            grid-template-columns: repeat(3, 1fr);
-
-            gap: 12px;
-
-            margin-bottom: 12px;
-
-            width: 100%;
-
-        }
-
-
-
-        .queue-ticket-card {
-
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-
-            border: 2px solid #374151;
-
-            border-radius: 8px;
-
-            padding: 10px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-            justify-content: center;
-
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-
-            position: relative;
-
-            overflow: hidden;
-
-        }
-
-
-
-        .queue-ticket-card::before {
-
-            content: '';
-
-            position: absolute;
-
-            top: 0; left: 0; width: 4px; height: 100%;
-
-        }
-
-        .card-type-a::before { background-color: var(--secondary-color); }
-
-        .card-type-b::before { background-color: var(--accent-blue); }
-
-        .card-type-c::before { background-color: var(--accent-green); }
-
-
-
-        .queue-label {
-
-            font-size: 12px;
-
-            font-weight: 700;
-
-            color: #9ca3af;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
-
-            margin-bottom: 2px;
-
-        }
-
-
-
-        .queue-number-value {
-
-            font-size: 38px;
-
-            font-weight: 900;
-
-            color: #ffffff;
-
-            line-height: 1;
-
-            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-
-        }
-
-
-
-        /* BOX VIDEO YOUTUBE */
-
-        .video-box-container {
-
-            grid-row: 2;
-
-            width: 100%;
-
-            height: 100%;
-
-            background-color: #000000;
-
-            border-radius: 12px 12px 0 0;
-
-            border: 2px solid #374151;
-
-            border-bottom: none;
-
-            overflow: hidden;
-
-            position: relative;
-
-        }
-
-
-
-        #yt-player {
-
-            width: 100%;
-
-            height: 100%;
-
-            border: none;
-
-        }
-
-
-
-        .video-audio-controls {
-
-            width: 100%;
-
-            background-color: #111827;
-
-            border: 2px solid #374151;
-
-            border-top: 1px solid #4b5563;
-
-            border-radius: 0 0 12px 12px;
-
-            padding: 12px 20px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 15px;
-
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-
-        }
-
-
-
-        .audio-btn {
-
-            background-color: #374151;
-
-            color: #fff;
-
-            border: none;
-
-            padding: 6px 14px;
-
-            border-radius: 6px;
-
-            cursor: pointer;
-
-            font-size: 13px;
-
-            font-weight: 600;
-
-            transition: background 0.2s;
-
-        }
-
-
-
-        .audio-btn:hover {
-
-            background-color: #4b5563;
-
-        }
-
-
-
-        .volume-slider-container {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            flex-grow: 1;
-
-            max-width: 300px;
-
-        }
-
-
-
-        .volume-slider {
-
-            width: 100%;
-
-            cursor: pointer;
-
-            accent-color: var(--secondary-color);
-
-        }
-
-
-
-        /* PANEL KANAN (INFOGRAFIS SLIDESHOW) */
-
-        .right-panel {
-
-            grid-column: 2;
-
-            display: grid;
-
-            grid-template-rows: 42% 58%;
-
-            height: 100%;
-
-        }
-
-
-
-        .global-slideshow-box {
-
-            background-color: #0f172a;
-
-            padding: 20px;
-
-            border-bottom: 2px solid #1f2937;
-
-            overflow: hidden;
-
-            display: flex;
-
-            flex-direction: column;
-
-            justify-content: center;
-
-            position: relative;
-
-        }
-
-
-
-        .nav-wrapper-manual {
-
-            display: flex;
-
-            gap: 5px;
-
-            align-items: center;
-
-        }
-
-
-
-        .btn-nav-arrow {
-
-            background-color: rgba(55, 65, 81, 0.8);
-
-            color: #ffffff;
-
-            border: 1px solid #4b5563;
-
-            width: 32px;
-
-            height: 32px;
-
-            border-radius: 6px;
-
-            cursor: pointer;
-
-            font-weight: bold;
-
-            font-size: 14px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            transition: all 0.2s;
-
-        }
-
-
-
-        .btn-nav-arrow:hover {
-
-            background-color: var(--secondary-color);
-
-            color: #000000;
-
-            border-color: var(--secondary-color);
-
-        }
-
-
-
-        .slide-header-flex {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            border-bottom: 1px solid #374151;
-
-            padding-bottom: 5px;
-
-            margin-bottom: 10px;
-
-        }
-
-
-
-        .slide-container {
-
-            display: none;
-
-            width: 100%;
-
-            height: 100%;
-
-            background-color: var(--card-bg);
-
-            border: 1px solid #374151;
-
-            border-radius: 8px;
-
-            padding: 15px 25px;
-
-        }
-
-
-
-        .slide-container.active {
-
-            display: flex;
-
-            flex-direction: column;
-
-            justify-content: space-between;
-
-            animation: fadeIn 0.5s ease-in-out;
-
-        }
-
-
-
-        @keyframes fadeIn {
-
-            from { opacity: 0; } to { opacity: 1; }
-
-        }
-
-
-
-        .slide-title {
-
-            font-size: 15px;
-
-            text-transform: uppercase;
-
-            color: var(--secondary-color);
-
-            font-weight: bold;
-
-            letter-spacing: 0.5px;
-
-        }
-
-
-
-        .slide-content-grid {
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 20px;
-
-            flex-grow: 1;
-
-        }
-
-
-
-        .slide-big-number {
-
-            font-size: 50px;
-
-            font-weight: 800;
-
-            color: #ffffff;
-
-            line-height: 1;
-
-        }
-
-
-
-        .slide-details-list {
-
-            font-size: 14px;
-
-            color: #9ca3af;
-
-            line-height: 1.6;
-
-        }
-
-
-
-        .slide-chart-mini {
-
-            width: 100px;
-
-            height: 100px;
-
-            position: relative;
-
-        }
-
-
-
-        /* PERFORMA PK CAROUSEL */
-
-        .performance-box {
-
-            background-color: #0d1321;
-
-            padding: 25px 30px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            overflow: hidden;
-
-            position: relative;
-
-        }
-
-
-
-        .performance-box h3 {
-
-            font-size: 16px;
-
-            color: var(--secondary-color);
-
-            margin-bottom: 15px;
-
-            text-transform: uppercase;
-
-            border-left: 5px solid var(--primary-color);
-
-            padding-left: 10px;
-
-        }
-
-
-
-        .infographic-carousel-container {
-
-            flex-grow: 1;
-
-            background-color: var(--card-bg);
-
-            border: 2px solid #1f2937;
-
-            border-radius: 12px;
-
-            padding: 15px 20px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            justify-content: space-between;
-
-        }
-
-
-
-        .pk-profile-header {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            border-bottom: 2px solid #374151;
-
-            padding-bottom: 10px;
-
-            margin-bottom: 10px;
-
-        }
-
-
-
-        .pk-name-tag {
-
-            font-size: 22px;
-
-            font-weight: 700;
-
-            color: #ffffff;
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-        }
-
-
-
-        .sync-badge {
-
-            font-size: 11px;
-
-            background-color: rgba(16, 185, 129, 0.2);
-
-            color: var(--accent-green);
-
-            padding: 2px 8px;
-
-            border-radius: 4px;
-
-            font-weight: normal;
-
-        }
-
-
-
-        .pk-index-tag {
-
-            background-color: var(--primary-color);
-
-            padding: 4px 12px;
-
-            border-radius: 20px;
-
-            font-size: 12px;
-
-            font-weight: bold;
-
-            color: var(--secondary-color);
-
-        }
-
-
-
-        .charts-flex-grid {
-
-            display: grid;
-
-            grid-template-columns: 1fr 1fr;
-
-            gap: 20px;
-
-            align-items: center;
-
-            justify-items: center;
-
-            flex-grow: 1;
-
-        }
-
-
-
-        .chart-card-wrapper {
-
-            width: 100%;
-
-            display: flex;
-
-            flex-direction: column;
-
-            align-items: center;
-
-            position: relative;
-
-        }
-
-
-
-        .chart-container-canvas {
-
-            width: 145px;
-
-            height: 145px;
-
-            position: relative;
-
-        }
-
-
-
-        .chart-center-text {
-
-            position: absolute;
-
-            top: 55%;
-
-            left: 50%;
-
-            transform: translate(-50%, -50%);
-
-            font-size: 20px;
-
-            font-weight: 800;
-
-            color: #ffffff;
-
-        }
-
-
-
-        .chart-legend-info {
-
-            margin-top: 10px;
-
-            font-size: 13px;
-
-            width: 100%;
-
-            display: flex;
-
-            justify-content: space-around;
-
-            background-color: rgba(0, 0, 0, 0.2);
-
-            padding: 6px;
-
-            border-radius: 6px;
-
-        }
-
-
-
-        .legend-item { display: flex; align-items: center; gap: 6px; }
-
-        .dot-green { width: 10px; height: 10px; background-color: var(--accent-green); border-radius: 50%; }
-
-        .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
-
-        .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
-
-
-
-        /* FLOATING UTILITY CONTROLS */
-
-        .bottom-trigger-control-zone {
-
-            position: fixed;
-
-            bottom: 15px;
-
-            right: 25px;
-
-            z-index: 99999;
-
-            display: flex;
-
-            gap: 15px;
-
-            align-items: center;
-
-        }
-
-        .btn-trigger-public {
-
-            background: #1f2937;
-
-            color: #d1d5db;
-
-            border: 2px solid #4b5563;
-
-            font-size: 13px;
-
-            font-weight: 700;
-
-            padding: 8px 16px;
-
-            border-radius: 6px;
-
-            cursor: pointer;
-
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-
-            transition: all 0.2s ease-in-out;
-
-        }
-
-        .btn-trigger-public:hover {
-
-            color: var(--secondary-color);
-
-            background: #111827;
-
-            border-color: var(--secondary-color);
-
-            transform: translateY(-2px);
-
-        }
-
-    </style>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --primary-color: #114b5f;
+      --secondary-color: #f4d35e;
+      --dark-bg: #0a0f1d;
+      --panel-bg: #111827;
+      --accent-green: #10b981;
+      --accent-red: #ef4444;
+      --accent-blue: #3b82f6;
+      --btn-download: #2563eb;
+      --card-bg: #111827;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #030712;
+      color: #f3f4f6;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    #main-display-screen {
+      width: 100%;
+      height: 100vh;
+      max-height: 1080px;
+      display: grid;
+      grid-template-rows: 110px 1fr;
+      grid-template-columns: 55% 45%;
+      background-color: var(--dark-bg);
+      position: relative;
+      z-index: 10;
+    }
+
+    #main-display-screen:fullscreen {
+      width: 1920px;
+      height: 1080px;
+      background-color: var(--dark-bg);
+    }
+
+    /* HEADER DISPLAY */
+    .header-display {
+      grid-column: 1 / span 2;
+      background: linear-gradient(90deg, var(--primary-color), #1e293b);
+      border-bottom: 4px solid var(--secondary-color);
+      padding: 0 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    .header-brand-section {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .header-logo-img {
+      height: 75px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .header-display h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+    }
+
+    .header-display p {
+      font-size: 16px;
+      color: var(--secondary-color);
+      margin-top: 4px;
+    }
+
+    /* PANEL KIRI */
+    .left-panel {
+      grid-column: 1;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      background-color: #0b0f19;
+      border-right: 2px solid #1f2937;
+      gap: 15px;
+    }
+
+    .video-and-queue-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      flex-grow: 1;
+      width: 100%;
+    }
+
+    .queue-display-bar {
+      grid-row: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+      width: 100%;
+    }
+
+    .queue-ticket-card {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2px solid #374151;
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .queue-ticket-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+    }
+    .card-type-a::before { background-color: var(--secondary-color); }
+    .card-type-b::before { background-color: var(--accent-blue); }
+    .card-type-c::before { background-color: var(--accent-green); }
+
+    .queue-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
+
+    .queue-number-value {
+      font-size: 38px;
+      font-weight: 900;
+      color: #ffffff;
+      line-height: 1;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    /* BOX VIDEO YOUTUBE */
+    .video-box-container {
+      grid-row: 2;
+      width: 100%;
+      height: 100%;
+      background-color: #000000;
+      border-radius: 12px 12px 0 0;
+      border: 2px solid #374151;
+      border-bottom: none;
+      overflow: hidden;
+      position: relative;
+    }
+
+    #yt-player {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .video-audio-controls {
+      width: 100%;
+      background-color: #111827;
+      border: 2px solid #374151;
+      border-top: 1px solid #4b5563;
+      border-radius: 0 0 12px 12px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .audio-btn {
+      background-color: #374151;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    .audio-btn:hover { background-color: #4b5563; }
+
+    .volume-slider-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-grow: 1;
+      max-width: 300px;
+    }
+
+    .volume-slider { width: 100%; cursor: pointer; accent-color: var(--secondary-color); }
+
+    /* PANEL KANAN */
+    .right-panel {
+      grid-column: 2;
+      display: grid;
+      grid-template-rows: 42% 58%;
+      height: 100%;
+    }
+
+    .global-slideshow-box {
+      background-color: #0f172a;
+      padding: 20px;
+      border-bottom: 2px solid #1f2937;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+    }
+
+    .nav-wrapper-manual { display: flex; gap: 5px; align-items: center; }
+
+    .btn-nav-arrow {
+      background-color: rgba(55, 65, 81, 0.8);
+      color: #ffffff;
+      border: 1px solid #4b5563;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-nav-arrow:hover { background-color: var(--secondary-color); color: #000000; border-color: var(--secondary-color); }
+
+    .slide-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 5px; margin-bottom: 10px; }
+
+    .slide-container { display: none; width: 100%; height: 100%; background-color: var(--card-bg); border: 1px solid #374151; border-radius: 8px; padding: 15px 25px; }
+    .slide-container.active { display: flex; flex-direction: column; justify-content: space-between; animation: fadeIn 0.5s ease-in-out; }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .slide-title { font-size: 15px; text-transform: uppercase; color: var(--secondary-color); font-weight: bold; letter-spacing: 0.5px; }
+    .slide-content-grid { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-grow: 1; }
+    .slide-big-number { font-size: 50px; font-weight: 800; color: #ffffff; line-height: 1; }
+    .slide-details-list { font-size: 14px; color: #9ca3af; line-height: 1.6; }
+    .slide-chart-mini { width: 100px; height: 100px; position: relative; }
+
+    /* PERFORMA PK */
+    .performance-box { background-color: #0d1321; padding: 25px 30px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+    .performance-box h3 { font-size: 16px; color: var(--secondary-color); margin-bottom: 15px; text-transform: uppercase; border-left: 5px solid var(--primary-color); padding-left: 10px; }
+
+    .infographic-carousel-container { flex-grow: 1; background-color: var(--card-bg); border: 2px solid #1f2937; border-radius: 12px; padding: 15px 20px; display: flex; flex-direction: column; justify-content: space-between; }
+    .pk-profile-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #374151; padding-bottom: 10px; margin-bottom: 10px; }
+    .pk-name-tag { font-size: 22px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 10px; }
+    .sync-badge { font-size: 11px; background-color: rgba(16, 185, 129, 0.2); color: var(--accent-green); padding: 2px 8px; border-radius: 4px; font-weight: normal; }
+    .pk-index-tag { background-color: var(--primary-color); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--secondary-color); }
+    .charts-flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; justify-items: center; flex-grow: 1; }
+    .chart-card-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; }
+    .chart-container-canvas { width: 145px; height: 145px; position: relative; }
+    .chart-center-text { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 800; color: #ffffff; }
+    .chart-legend-info { margin-top: 10px; font-size: 13px; width: 100%; display: flex; justify-content: space-around; background-color: rgba(0, 0, 0, 0.2); padding: 6px; border-radius: 6px; }
+    .legend-item { display: flex; align-items: center; gap: 6px; }
+    .dot-green { width: 10px; height: 10px; background-color: var(--accent-green); border-radius: 50%; }
+    .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
+    .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
+
+    /* FLOATING CONTROLS */
+    .bottom-trigger-control-zone { position: fixed; bottom: 15px; right: 25px; z-index: 99999; display: flex; gap: 15px; align-items: center; }
+    .btn-trigger-public { background: #1f2937; color: #d1d5db; border: 2px solid #4b5563; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: all 0.2s ease-in-out; }
+    .btn-trigger-public:hover { color: var(--secondary-color); background: #111827; border-color: var(--secondary-color); transform: translateY(-2px); }
+  </style>
 </head>
-
 <body>
-
-
-
-    <div id="main-display-screen">
-
-        
-
-        <div class="header-display">
-
-            <div class="header-brand-section">
-
-                <img id="display-header-logo" src="https://lh3.googleusercontent.com/d/1xHFp8MzEzoQ-Ron8SgP38U9D5-1e2M83" class="header-logo-img" alt="Logo Instansi">
-
-                <div>
-
-                    <h1>BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
-
-                    <p>Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Direktorat Jenderal Pemasyarakatan Jawa Tengah</p>
-
-                </div>
-
-            </div>
-
-            <div style="text-align: right;">
-
-                <div id="live-clock" style="font-size: 26px; font-weight: 800;">00:00:00</div>
-
-                <div style="font-size: 13px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
-
-            </div>
-
+  <div id="main-display-screen">
+    <div class="header-display">
+      <div class="header-brand-section">
+        <img id="display-header-logo" src="https://lh3.googleusercontent.com/d/1xHFp8MzEzoQ-Ron8SgP38U9D5-1e2M83" class="header-logo-img" alt="Logo Instansi">
+        <div>
+          <h1>BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
+          <p>Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Direktorat Jenderal Pemasyarakatan Jawa Tengah</p>
         </div>
-
-
-
-        <div class="left-panel">
-
-            <div class="video-and-queue-container">
-
-                
-
-                <div class="queue-display-bar">
-
-                    <div class="queue-ticket-card card-type-a">
-
-                        <div class="queue-label">Antrian A</div>
-
-                        <div class="queue-number-value" id="num-antrian-a">A-000</div>
-
-                    </div>
-
-                    <div class="queue-ticket-card card-type-b">
-
-                        <div class="queue-label">Antrian B</div>
-
-                        <div class="queue-number-value" id="num-antrian-b">B-000</div>
-
-                    </div>
-
-                    <div class="queue-ticket-card card-type-c">
-
-                        <div class="queue-label">Antrian C</div>
-
-                        <div class="queue-number-value" id="num-antrian-c">C-000</div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="video-box-container">
-
-                    <div id="yt-player"></div>
-
-                    <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan YouTube...</div>
-
-                </div>
-
-            </div>
-
-            
-
-            <div class="video-audio-controls">
-
-                <div style="display: flex; gap: 8px;">
-
-                    <button class="audio-btn" id="btn-play-pause" onclick="togglePlayPause()">⏸ Pause</button>
-
-                    <button class="audio-btn" id="btn-mute" onclick="toggleMute()">🔊 Unmute / Suara</button>
-
-                </div>
-
-                <div class="volume-slider-container">
-
-                    <span style="font-size: 12px; color: #9ca3af;">Volume:</span>
-
-                    <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
-
-                    <span style="font-size: 12px; font-weight: bold;" id="volume-text">80%</span>
-
-                </div>
-
-                <button class="audio-btn" onclick="nextVideoManual()">⏭ Lewati</button>
-
-            </div>
-
-        </div>
-
-
-
-        <div class="right-panel">
-
-            
-
-            <div class="global-slideshow-box">
-
-                
-
-                <div class="slide-container active" id="slide-global-1">
-
-                    <div class="slide-header-flex">
-
-                        <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
-
-                        <div class="nav-wrapper-manual">
-
-                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
-
-                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
-
-                        </div>
-
-                    </div>
-
-                    <div class="slide-content-grid">
-
-                        <div class="slide-details-list">
-
-                            <div class="slide-big-number" id="lbl-g-litmas-persen">0%</div>
-
-                            <p style="margin-top: 5px;">Litmas Selesai: <b id="lbl-g-litmas-ok" style="color:var(--accent-green)">0</b> Dokumen</p>
-
-                            <p>Litmas Belum Selesai: <b id="lbl-g-litmas-no" style="color:var(--accent-red)">0</b> Dokumen</p>
-
-                        </div>
-
-                        <div class="slide-chart-mini"><canvas id="chartGLitmas"></canvas></div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="slide-container" id="slide-global-2">
-
-                    <div class="slide-header-flex">
-
-                        <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
-
-                        <div class="nav-wrapper-manual">
-
-                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
-
-                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
-
-                        </div>
-
-                    </div>
-
-                    <div class="slide-content-grid">
-
-                        <div class="slide-details-list">
-
-                            <div class="slide-big-number" id="lbl-g-klien-persen">0%</div>
-
-                            <p style="margin-top: 5px;">Klien Sudah Melapor: <b id="lbl-g-klien-ok" style="color:var(--accent-green)">0</b> Orang</p>
-
-                            <p>Klien Belum Melapor: <b id="lbl-g-klien-no" style="color:var(--accent-red)">0</b> Orang</p>
-
-                        </div>
-
-                        <div class="slide-chart-mini"><canvas id="chartGKlien"></canvas></div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="slide-container" id="slide-global-3">
-
-                    <div class="slide-header-flex">
-
-                        <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
-
-                        <div class="nav-wrapper-manual">
-
-                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
-
-                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
-
-                        </div>
-
-                    </div>
-
-                    <div class="slide-content-grid">
-
-                        <div class="slide-details-list">
-
-                            <div class="slide-big-number" id="lbl-g-anggaran-persen">0%</div>
-
-                            <p style="margin-top: 8px; color:#e5e7eb;" id="lbl-g-anggaran-pagu">Pagu Alokasi: Rp 0</p>
-
-                            <p style="color:#e5e7eb;" id="lbl-g-anggaran-realisasi">Total Realisasi: Rp 0</p>
-
-                        </div>
-
-                        <div class="slide-chart-mini"><canvas id="chartGAnggaran"></canvas></div>
-
-                    </div>
-
-                </div>
-
-
-
-                <div class="slide-container" id="slide-global-4">
-
-                    <div class="slide-header-flex">
-
-                        <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
-
-                        <div class="nav-wrapper-manual">
-
-                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
-
-                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
-
-                        </div>
-
-                    </div>
-
-                    <div class="slide-content-grid">
-
-                        <div class="slide-details-list">
-
-                            <div class="slide-big-number" id="lbl-g-hadir-persen">0%</div>
-
-                            <div style="margin-top: 5px; display: grid; grid-template-columns: 1fr 1fr; gap-x: 15px; font-size: 13px;">
-
-                                <p>Hadir Fisik: <b id="lbl-g-hadir-riil" style="color:var(--accent-green)">0</b></p>
-
-                                <p>Izin Resmi: <b id="lbl-g-peg-izin" style="color:var(--secondary-color)">0</b></p>
-
-                                <p>Cuti Tahunan: <b id="lbl-g-peg-cuti" style="color:var(--accent-blue)">0</b></p>
-
-                                <p>Dinas Luar: <b id="lbl-g-peg-dl" style="color:#a855f7;">0</b></p>
-
-                            </div>
-
-                        </div>
-
-                        <div class="slide-chart-mini"><canvas id="chartGPegawai"></canvas></div>
-
-                    </div>
-
-                </div>
-
-
-
-            </div>
-
-
-
-            <div class="performance-box">
-
-                <h3>STATISTIK PERFORMA PEMBIMBING KEMASYARAKATAN (PK)</h3>
-
-                
-
-                <div class="infographic-carousel-container" id="carousel-box">
-
-                    <div class="pk-profile-header">
-
-                        <div class="pk-name-tag">
-
-                            <span id="infografis-nama">MEMUAT DATA...</span>
-
-                            <span class="sync-badge" id="sync-status-text" style="color: var(--accent-green); background: rgba(16, 185, 129, 0.2);">Cloud Active</span>
-
-                        </div>
-
-                        
-
-                        <div class="nav-wrapper-manual">
-
-                            <button class="btn-nav-arrow" onclick="navigatePKManual(-1)">◀</button>
-
-                            <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
-
-                            <button class="btn-nav-arrow" onclick="navigatePKManual(1)">▶</button>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <div class="charts-flex-grid">
-
-                        <div class="chart-card-wrapper">
-
-                            <span style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#9ca3af;">Penyelesaian Litmas</span>
-
-                            <div class="chart-container-canvas">
-
-                                <canvas id="chartLitmas"></canvas>
-
-                                <div class="chart-center-text" id="text-persen-litmas">0%</div>
-
-                            </div>
-
-                            <div class="chart-legend-info">
-
-                                <div class="legend-item"><span class="dot-green"></span> Selesai: <b id="lbl-litmas-ok" style="color:var(--accent-green)">0</b></div>
-
-                                <div class="legend-item"><span class="dot-red"></span> Belum: <b id="lbl-litmas-no" style="color:var(--accent-red)">0</b></div>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <div class="chart-card-wrapper">
-
-                            <span style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#9ca3af;">Kepatuhan Wajib Lapor Klien</span>
-
-                            <div class="chart-container-canvas">
-
-                                <canvas id="chartKlien"></canvas>
-
-                                <div class="chart-center-text" id="text-persen-klien">0%</div>
-
-                            </div>
-
-                            <div class="chart-legend-info">
-
-                                <div class="legend-item"><span class="dot-green"></span> Sudah: <b id="lbl-klien-ok" style="color:var(--accent-green)">0</b></div>
-
-                                <div class="legend-item"><span class="dot-red"></span> Belum: <b id="lbl-klien-no" style="color:var(--accent-red)">0</b></div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
+      </div>
+      <div style="text-align: right;">
+        <div id="live-clock" style="font-size: 26px; font-weight: 800;">00:00:00</div>
+        <div style="font-size: 13px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
+      </div>
     </div>
 
-
-
-    <div class="bottom-trigger-control-zone" id="public-control-area">
-
-        <button class="btn-trigger-public" onclick="openFullscreen()">📺 Layar Penuh (TV Monitor)</button>
-
+    <div class="left-panel">
+      <div class="video-and-queue-container">
+        <div class="queue-display-bar">
+          <div class="queue-ticket-card card-type-a">
+            <div class="queue-label">Antrian A</div>
+            <div class="queue-number-value" id="num-antrian-a">A-000</div>
+          </div>
+          <div class="queue-ticket-card card-type-b">
+            <div class="queue-label">Antrian B</div>
+            <div class="queue-number-value" id="num-antrian-b">B-000</div>
+          </div>
+          <div class="queue-ticket-card card-type-c">
+            <div class="queue-label">Antrian C</div>
+            <div class="queue-number-value" id="num-antrian-c">C-000</div>
+          </div>
+        </div>
+        <div class="video-box-container">
+          <div id="yt-player"></div>
+          <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan YouTube...</div>
+        </div>
+      </div>
+      <div class="video-audio-controls">
+        <div style="display: flex; gap: 8px;">
+          <button class="audio-btn" id="btn-play-pause" onclick="togglePlayPause()">⏸ Pause</button>
+          <button class="audio-btn" id="btn-mute" onclick="toggleMute()">🔊 Unmute / Suara</button>
+        </div>
+        <div class="volume-slider-container">
+          <span style="font-size: 12px; color: #9ca3af;">Volume:</span>
+          <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
+          <span style="font-size: 12px; font-weight: bold;" id="volume-text">80%</span>
+        </div>
+        <button class="audio-btn" onclick="nextVideoManual()">⏭ Lewati</button>
+      </div>
     </div>
 
+    <div class="right-panel">
+      <div class="global-slideshow-box">
+        <div class="slide-container active" id="slide-global-1">
+          <div class="slide-header-flex">
+            <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
+            <div class="nav-wrapper-manual">
+              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
+              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+            </div>
+          </div>
+          <div class="slide-content-grid">
+            <div class="slide-details-list">
+              <div class="slide-big-number" id="lbl-g-litmas-persen">0%</div>
+              <p style="margin-top: 5px;">Litmas Selesai: <b id="lbl-g-litmas-ok" style="color:var(--accent-green)">0</b> Dokumen</p>
+              <p>Litmas Belum Selesai: <b id="lbl-g-litmas-no" style="color:var(--accent-red)">0</b> Dokumen</p>
+            </div>
+            <div class="slide-chart-mini"><canvas id="chartGLitmas"></canvas></div>
+          </div>
+        </div>
 
+        <div class="slide-container" id="slide-global-2">
+          <div class="slide-header-flex">
+            <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
+            <div class="nav-wrapper-manual">
+              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
+              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+            </div>
+          </div>
+          <div class="slide-content-grid">
+            <div class="slide-details-list">
+              <div class="slide-big-number" id="lbl-g-klien-persen">0%</div>
+              <p style="margin-top: 5px;">Klien Sudah Melapor: <b id="lbl-g-klien-ok" style="color:var(--accent-green)">0</b> Orang</p>
+              <p>Klien Belum Melapor: <b id="lbl-g-klien-no" style="color:var(--accent-red)">0</b> Orang</p>
+            </div>
+            <div class="slide-chart-mini"><canvas id="chartGKlien"></canvas></div>
+          </div>
+        </div>
 
-    <script>
+        <div class="slide-container" id="slide-global-3">
+          <div class="slide-header-flex">
+            <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
+            <div class="nav-wrapper-manual">
+              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
+              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+            </div>
+          </div>
+          <div class="slide-content-grid">
+            <div class="slide-details-list">
+              <div class="slide-big-number" id="lbl-g-anggaran-persen">0%</div>
+              <p style="margin-top: 8px; color:#e5e7eb;" id="lbl-g-anggaran-pagu">Pagu Alokasi: Rp 0</p>
+              <p style="color:#e5e7eb;" id="lbl-g-anggaran-realisasi">Total Realisasi: Rp 0</p>
+            </div>
+            <div class="slide-chart-mini"><canvas id="chartGAnggaran"></canvas></div>
+          </div>
+        </div>
 
-        // --- KONFIGURASI LINK PERMANEN ---
+        <div class="slide-container" id="slide-global-4">
+          <div class="slide-header-flex">
+            <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
+            <div class="nav-wrapper-manual">
+              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
+              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+            </div>
+          </div>
+          <div class="slide-content-grid">
+            <div class="slide-details-list">
+              <div class="slide-big-number" id="lbl-g-hadir-persen">0%</div>
+              <div style="margin-top: 5px; display: grid; grid-template-columns: 1fr 1fr; gap-x: 15px; font-size: 13px;">
+                <p>Hadir Fisik: <b id="lbl-g-hadir-riil" style="color:var(--accent-green)">0</b></p>
+                <p>Izin Resmi: <b id="lbl-g-peg-izin" style="color:var(--secondary-color)">0</b></p>
+                <p>Cuti Tahunan: <b id="lbl-g-peg-cuti" style="color:var(--accent-blue)">0</b></p>
+                <p>Dinas Luar: <b id="lbl-g-peg-dl" style="color:#a855f7;">0</b></p>
+              </div>
+            </div>
+            <div class="slide-chart-mini"><canvas id="chartGPegawai"></canvas></div>
+          </div>
+        </div>
+      </div>
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
+      <div class="performance-box">
+        <h3>STATISTIK PERFORMA PEMBIMBING KEMASYARAKATAN (PK)</h3>
+        <div class="infographic-carousel-container" id="carousel-box">
+          <div class="pk-profile-header">
+            <div class="pk-name-tag">
+              <span id="infografis-nama">MEMUAT DATA...</span>
+              <span class="sync-badge" id="sync-status-text" style="color: var(--accent-green); background: rgba(16, 185, 129, 0.2);">Cloud Active</span>
+            </div>
+            <div class="nav-wrapper-manual">
+              <button class="btn-nav-arrow" onclick="navigatePKManual(-1)">◀</button>
+              <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
+              <button class="btn-nav-arrow" onclick="navigatePKManual(1)">▶</button>
+            </div>
+          </div>
+          <div class="charts-flex-grid">
+            <div class="chart-card-wrapper">
+              <span style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#9ca3af;">Penyelesaian Litmas</span>
+              <div class="chart-container-canvas">
+                <canvas id="chartLitmas"></canvas>
+                <div class="chart-center-text" id="text-persen-litmas">0%</div>
+              </div>
+              <div class="chart-legend-info">
+                <div class="legend-item"><span class="dot-green"></span> Selesai: <b id="lbl-litmas-ok" style="color:var(--accent-green)">0</b></div>
+                <div class="legend-item"><span class="dot-red"></span> Belum: <b id="lbl-litmas-no" style="color:var(--accent-red)">0</b></div>
+              </div>
+            </div>
+            <div class="chart-card-wrapper">
+              <span style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#9ca3af;">Kepatuhan Wajib Lapor Klien</span>
+              <div class="chart-container-canvas">
+                <canvas id="chartKlien"></canvas>
+                <div class="chart-center-text" id="text-persen-klien">0%</div>
+              </div>
+              <div class="chart-legend-info">
+                <div class="legend-item"><span class="dot-green"></span> Sudah: <b id="lbl-klien-ok" style="color:var(--accent-green)">0</b></div>
+                <div class="legend-item"><span class="dot-red"></span> Belum: <b id="lbl-klien-no" style="color:var(--accent-red)">0</b></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <div class="bottom-trigger-control-zone" id="public-control-area">
+    <button class="btn-trigger-public" onclick="openFullscreen()">📺 Layar Penuh (TV Monitor)</button>
+  </div>
 
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
 
-        // --- CLOCK & FULLSCREEN ---
+    setInterval(() => { document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('id-ID'); }, 1000);
+    
+    function openFullscreen() {
+      const el = document.getElementById("main-display-screen");
+      if (el.requestFullscreen) el.requestFullscreen();
+      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+    }
 
-        setInterval(() => { document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('id-ID'); }, 1000);
+    let ytPlayerObj = null;
+    let isYtApiReady = false;
+    let localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"]; 
+    let currentQueueIndex = 0;
 
-        function openFullscreen() {
+    function onYouTubeIframeAPIReady() {
+      isYtApiReady = true;
+      playVideoFromLocalQueue();
+    }
 
-            const el = document.getElementById("main-display-screen");
+    window.addEventListener('DOMContentLoaded', () => {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      fetchDataFromAppsScriptAPI(SCRIPT_URL);
+      setInterval(() => { fetchDataFromAppsScriptAPI(SCRIPT_URL); }, 25000);
+    });
 
-            if (el.requestFullscreen) el.requestFullscreen();
+    function playVideoFromLocalQueue() {
+      if (!isYtApiReady || localVideoQueue.length === 0) return;
+      if (currentQueueIndex >= localVideoQueue.length) currentQueueIndex = 0;
+      
+      const currentUrl = localVideoQueue[currentQueueIndex];
+      let videoId = "jrXNVlQJpW0";
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = currentUrl.match(regExp);
+      if (match && match[2].length === 11) videoId = match[2];
 
-            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-
-        }
-
-
-
-        // --- YOUTUBE PLAYLIST QUEUE ENGINE ---
-
-        let ytPlayerObj = null;
-
-        let isYtApiReady = false;
-
-        let localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"]; 
-
-        let currentQueueIndex = 0;
-
-
-
-        function onYouTubeIframeAPIReady() {
-
-            isYtApiReady = true;
-
-            playVideoFromLocalQueue();
-
-        }
-
-
-
-        window.addEventListener('DOMContentLoaded', () => {
-
-            const tag = document.createElement('script');
-
-            tag.src = "https://www.youtube.com/iframe_api";
-
-            const firstScriptTag = document.getElementsByTagName('script')[0];
-
-            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
-            
-
-            // Inisialisasi Data Otomatis
-
-            fetchDataFromAppsScriptAPI(SCRIPT_URL);
-
-            setInterval(() => { fetchDataFromAppsScriptAPI(SCRIPT_URL); }, 25000);
-
+      if (ytPlayerObj) {
+        ytPlayerObj.loadVideoById({ videoId: videoId });
+      } else {
+        ytPlayerObj = new YT.Player('yt-player', {
+          videoId: videoId,
+          playerVars: { 
+            'autoplay': 1, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'iv_load_policy': 3, 'origin': window.location.origin 
+          },
+          events: {
+            'onReady': (e) => { e.target.mute(); e.target.playVideo(); updateQueueIndicator(); },
+            'onStateChange': (e) => { 
+              if (e.data === 0) { currentQueueIndex++; playVideoFromLocalQueue(); } 
+              if (e.data === -1 || e.data === 5) e.target.playVideo(); 
+            },
+            'onError': (e) => { currentQueueIndex++; playVideoFromLocalQueue(); }
+          }
         });
-
-
-
-        function playVideoFromLocalQueue() {
-
-            if (!isYtApiReady || localVideoQueue.length === 0) return;
-
-            if (currentQueueIndex >= localVideoQueue.length) currentQueueIndex = 0;
-
-            
-
-            const currentUrl = localVideoQueue[currentQueueIndex];
-
-            let videoId = "jrXNVlQJpW0";
-
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-
-            const match = currentUrl.match(regExp);
-
-            if (match && match[2].length === 11) videoId = match[2];
-
-
-
-            if (ytPlayerObj) {
-
-                ytPlayerObj.loadVideoById({ videoId: videoId });
-
-            } else {
-
-                ytPlayerObj = new YT.Player('yt-player', {
-
-                    videoId: videoId,
-
-                    playerVars: { 
-
-                        'autoplay': 1, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'iv_load_policy': 3, 'origin': window.location.origin 
-
-                    },
-
-                    events: {
-
-                        'onReady': (e) => { e.target.mute(); e.target.playVideo(); updateQueueIndicator(); },
-
-                        'onStateChange': (e) => { 
-
-                            if (e.data === 0) { currentQueueIndex++; playVideoFromLocalQueue(); } 
-
-                            if (e.data === -1 || e.data === 5) e.target.playVideo(); 
-
-                        },
-
-                        'onError': (e) => { currentQueueIndex++; playVideoFromLocalQueue(); }
-
-                    }
-
-                });
-
-            }
-
-        }
-
-
-
-        function updateQueueIndicator() {
-
-            document.getElementById('video-title-indicator').textContent = `Memutar Video [${currentQueueIndex + 1}/${localVideoQueue.length}]`;
-
-        }
-
-
-
-        function nextVideoManual() { if(localVideoQueue.length <= 1) return; currentQueueIndex++; playVideoFromLocalQueue(); }
-
-        function togglePlayPause() { if (!ytPlayerObj) return; if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; } else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; } }
-
-        function toggleMute() { if (!ytPlayerObj) return; const btn = document.getElementById('btn-mute'); if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; } else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; } }
-
-        function setVolume(v) { if (ytPlayerObj) ytPlayerObj.setVolume(v); }
-
-
-
-        // --- CHART INITIALIZATION ---
-
-        const miniChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'70%' };
-
-        const mainChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'73%' };
-
-
-
-        const cGLitmas = new Chart(document.getElementById('chartGLitmas'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
-
-        const cGKlien = new Chart(document.getElementById('chartGKlien'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
-
-        const cGAnggaran = new Chart(document.getElementById('chartGAnggaran'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#3b82f6','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
-
-        const cGPegawai = new Chart(document.getElementById('chartGPegawai'), { type:'doughnut', data:{datasets:[{data:[0,100,0,0],backgroundColor:['#10b981','#f4d35e','#3b82f6','#a855f7'],borderWidth:0}]}, options:miniChartOpts });
-
-
-
-        const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
-
-        const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
-
-
-
-        // --- CAROUSEL ROTATION LOGIC ---
-
-        let dbPK = [];
-
-        let idxSlideG = 1;
-
-        let idxPK = 0;
-
-        let pauseGlobalTimer = 0;
-
-        let pausePKTimer = 0;
-
-
-
-        setInterval(() => {
-
-            if (pauseGlobalTimer > 0) { pauseGlobalTimer--; return; }
-
-            changeGlobalSlideNext();
-
-        }, 8000);
-
-
-
-        setInterval(() => {
-
-            if (dbPK.length === 0 || pausePKTimer > 0) { pausePKTimer--; return; }
-
-            idxPK = (idxPK + 1) % dbPK.length;
-
-            renderIndividualPK();
-
-        }, 6000);
-
-
-
-        function changeGlobalSlideNext() {
-
-            document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
-
-            idxSlideG = (idxSlideG % 4) + 1;
-
-            const el = document.getElementById(`slide-global-${idxSlideG}`);
-
-            if(el) el.classList.add('active');
-
-        }
-
-
-
-        function navigateGlobalSlide(direction) {
-
-            pauseGlobalTimer = 15; 
-
-            idxSlideG = idxSlideG + direction;
-
-            if (idxSlideG > 4) idxSlideG = 1;
-
-            if (idxSlideG < 1) idxSlideG = 4;
-
-            document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
-
-            const el = document.getElementById(`slide-global-${idxSlideG}`);
-
-            if(el) el.classList.add('active');
-
-        }
-
-
-
-        function navigatePKManual(direction) {
-
-            if (dbPK.length === 0) return;
-
-            pausePKTimer = 15; 
-
-            idxPK = idxPK + direction;
-
-            if (idxPK >= dbPK.length) idxPK = 0;
-
-            if (idxPK < 0) idxPK = dbPK.length - 1;
-
-            renderIndividualPK();
-
-        }
-
-
-
-        // --- AUDIO NOTIFICATION ---
-
-        let cacheLastAntrian = { A: "", B: "", C: "" };
-
-        function triggerChimeAndVoice(nomorAntrian, namaLoket) {
-
-            try {
-
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-                let osc1 = audioCtx.createOscillator();
-
-                let gain1 = audioCtx.createGain();
-
-                osc1.type = 'sine'; osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime);
-
-                gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
-
-                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-
-                osc1.connect(gain1); gain1.connect(audioCtx.destination);
-
-                osc1.start(); osc1.stop(audioCtx.currentTime + 0.4);
-
-                setTimeout(() => {
-
-                    let osc2 = audioCtx.createOscillator();
-
-                    let gain2 = audioCtx.createGain();
-
-                    osc2.type = 'sine'; osc2.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-
-                    gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
-
-                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-
-                    osc2.connect(gain2); gain2.connect(audioCtx.destination);
-
-                    osc2.start(); osc2.stop(audioCtx.currentTime + 0.5);
-
-                }, 150);
-
-                setTimeout(() => {
-
-                    let nomorDieja = nomorAntrian.split("").join(" ").replace(/-/g, ""); 
-
-                    let utterance = new SpeechSynthesisUtterance(`Nomor antrean, ${nomorDieja}, silahkan menuju ke ${namaLoket}`);
-
-                    utterance.lang = 'id-ID'; 
-
-                    utterance.rate = 0.82; 
-
-                    window.speechSynthesis.speak(utterance);
-
-                }, 750); 
-
-            } catch(e) { console.error("Audio Context Error: ", e); }
-
-        }
-
-
-
-        // --- SYNC API ---
-
-        function fetchDataFromAppsScriptAPI(apiUrl) {
-
-            document.getElementById('sync-status-text').textContent = "Syncing...";
-
-            fetch(apiUrl)
-
-                .then(res => res.json())
-
-                .then(jsonResponse => {
-
-                    if(jsonResponse.status !== "success") return;
-
-                    
-
-                    if (jsonResponse.videos && jsonResponse.videos.length > 0) {
-
-                        localVideoQueue = jsonResponse.videos;
-
-                        updateQueueIndicator();
-
-                    }
-
-
-
-                    if (jsonResponse.antrian) {
-
-                        const {A, B, C} = jsonResponse.antrian;
-
-                        if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== A && A !== "000") triggerChimeAndVoice(A, jsonResponse.antrian_loket?.A || "Ruang Pelayanan");
-
-                        if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== B && B !== "000") triggerChimeAndVoice(B, jsonResponse.antrian_loket?.B || "Ruang Pelayanan");
-
-                        if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== C && C !== "000") triggerChimeAndVoice(C, jsonResponse.antrian_loket?.C || "Ruang Pelayanan");
-
-                        cacheLastAntrian = { A, B, C };
-
-                        document.getElementById('num-antrian-a').textContent = A;
-
-                        document.getElementById('num-antrian-b').textContent = B;
-
-                        document.getElementById('num-antrian-c').textContent = C;
-
-                    }
-
-
-
-                    dbPK = jsonResponse.data_pk;
-
-                    const globalData = jsonResponse.global;
-
-                    if(globalData.anggaran) {
-
-                        const {pagu, realisasi} = globalData.anggaran;
-
-                        document.getElementById('lbl-g-anggaran-persen').textContent = (pagu > 0 ? ((realisasi / pagu) * 100).toFixed(1) : 0) + "%";
-
-                        document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
-
-                        document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + realisasi.toLocaleString('id-ID');
-
-                        cGAnggaran.data.datasets[0].data = [realisasi, pagu - realisasi > 0 ? pagu - realisasi : 0]; cGAnggaran.update();
-
-                    }
-
-
-
-                    if(globalData.pegawai) {
-
-                        const {hadir, cuti, izin, dl} = globalData.pegawai;
-
-                        const totalP = hadir + cuti + izin + dl;
-
-                        document.getElementById('lbl-g-hadir-persen').textContent = (totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0) + "%";
-
-                        document.getElementById('lbl-g-hadir-riil').textContent = hadir;
-
-                        document.getElementById('lbl-g-peg-cuti').textContent = cuti;
-
-                        document.getElementById('lbl-g-peg-izin').textContent = izin;
-
-                        document.getElementById('lbl-g-peg-dl').textContent = dl;
-
-                        cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
-
-                    }
-
-
-
-                    calculateAndRenderGlobalTotals();
-
-                    if(dbPK.length > 0) renderIndividualPK();
-
-                    document.getElementById('sync-status-text').textContent = "Live Realtime";
-
-                })
-
-                .catch(err => { document.getElementById('sync-status-text').textContent = "API Error"; });
-
-        }
-
-
-
-        function calculateAndRenderGlobalTotals() {
-
-            let totalLitmasOk = 0, totalLitmasNo = 0, totalKlienOk = 0, totalKlienNo = 0;
-
-            dbPK.forEach(p => { totalLitmasOk += p.litmasOk; totalLitmasNo += p.litmasNo; totalKlienOk += p.klienOk; totalKlienNo += p.klienNo; });
-
-            const sumLitmas = totalLitmasOk + totalLitmasNo;
-
-            document.getElementById('lbl-g-litmas-persen').textContent = (sumLitmas > 0 ? ((totalLitmasOk / sumLitmas) * 100).toFixed(0) : 0) + "%";
-
-            document.getElementById('lbl-g-litmas-ok').textContent = totalLitmasOk;
-
-            document.getElementById('lbl-g-litmas-no').textContent = totalLitmasNo;
-
-            cGLitmas.data.datasets[0].data = [totalLitmasOk, totalLitmasNo]; cGLitmas.update();
-
-            const sumKlien = totalKlienOk + totalKlienNo;
-
-            document.getElementById('lbl-g-klien-persen').textContent = (sumKlien > 0 ? ((totalKlienOk / sumKlien) * 100).toFixed(0) : 0) + "%";
-
-            document.getElementById('lbl-g-klien-ok').textContent = totalKlienOk;
-
-            document.getElementById('lbl-g-klien-no').textContent = totalKlienNo;
-
-            cGKlien.data.datasets[0].data = [totalKlienOk, totalKlienNo]; cGKlien.update();
-
-        }
-
-
-
-        function renderIndividualPK() {
-
-            if(dbPK.length === 0) return;
-
-            const current = dbPK[idxPK % dbPK.length];
-
-            document.getElementById('infografis-nama').textContent = current.nama;
-
-            document.getElementById('infografis-index').textContent = `PK [${(idxPK % dbPK.length) + 1}/${dbPK.length}]`;
-
-            const totL = current.litmasOk + current.litmasNo;
-
-            document.getElementById('text-persen-litmas').textContent = (totL > 0 ? ((current.litmasOk / totL) * 100).toFixed(0) : 0) + "%";
-
-            document.getElementById('lbl-litmas-ok').textContent = current.litmasOk;
-
-            document.getElementById('lbl-litmas-no').textContent = current.litmasNo;
-
-            cLitmas.data.datasets[0].data = [current.litmasOk, current.litmasNo]; cLitmas.update();
-
-            const totK = current.klienOk + current.klienNo;
-
-            document.getElementById('text-persen-klien').textContent = (totK > 0 ? ((current.klienOk / totK) * 100).toFixed(0) : 0) + "%";
-
-            document.getElementById('lbl-klien-ok').textContent = current.klienOk;
-
-            document.getElementById('lbl-klien-no').textContent = current.klienNo;
-
-            cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
-
-        }
-
-
-
-        window.addEventListener('click', () => { window.speechSynthesis.getVoices(); }, { once: true });
-
-    </script>
-
+      }
+    }
+
+    function updateQueueIndicator() {
+      document.getElementById('video-title-indicator').textContent = `Memutar Video [${currentQueueIndex + 1}/${localVideoQueue.length}]`;
+    }
+
+    function nextVideoManual() { if(localVideoQueue.length <= 1) return; currentQueueIndex++; playVideoFromLocalQueue(); }
+    
+    function togglePlayPause() { 
+      if (!ytPlayerObj) return; 
+      if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; } 
+      else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; } 
+    }
+    
+    function toggleMute() { 
+      if (!ytPlayerObj) return; 
+      const btn = document.getElementById('btn-mute'); 
+      if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; } 
+      else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; } 
+    }
+    
+    function setVolume(v) { if (ytPlayerObj) ytPlayerObj.setVolume(v); }
+
+    const miniChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'70%' };
+    const mainChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'73%' };
+
+    const cGLitmas = new Chart(document.getElementById('chartGLitmas'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
+    const cGKlien = new Chart(document.getElementById('chartGKlien'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
+    const cGAnggaran = new Chart(document.getElementById('chartGAnggaran'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#3b82f6','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
+    const cGPegawai = new Chart(document.getElementById('chartGPegawai'), { type:'doughnut', data:{datasets:[{data:[0,100,0,0],backgroundColor:['#10b981','#f4d35e','#3b82f6','#a855f7'],borderWidth:0}]}, options:miniChartOpts });
+    const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
+    const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
+
+    let dbPK = [];
+    let idxSlideG = 1;
+    let idxPK = 0;
+    let pauseGlobalTimer = 0;
+    let pausePKTimer = 0;
+
+    setInterval(() => {
+      if (pauseGlobalTimer > 0) { pauseGlobalTimer--; return; }
+      changeGlobalSlideNext();
+    }, 8000);
+
+    setInterval(() => {
+      if (dbPK.length === 0 || pausePKTimer > 0) { pausePKTimer--; return; }
+      idxPK = (idxPK + 1) % dbPK.length;
+      renderIndividualPK();
+    }, 6000);
+
+    function changeGlobalSlideNext() {
+      document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
+      idxSlideG = (idxSlideG % 4) + 1;
+      const el = document.getElementById(`slide-global-${idxSlideG}`);
+      if(el) el.classList.add('active');
+    }
+
+    function navigateGlobalSlide(direction) {
+      pauseGlobalTimer = 15; 
+      idxSlideG = idxSlideG + direction;
+      if (idxSlideG > 4) idxSlideG = 1;
+      if (idxSlideG < 1) idxSlideG = 4;
+      document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
+      const el = document.getElementById(`slide-global-${idxSlideG}`);
+      if(el) el.classList.add('active');
+    }
+
+    function navigatePKManual(direction) {
+      if (dbPK.length === 0) return;
+      pausePKTimer = 15; 
+      idxPK = idxPK + direction;
+      if (idxPK >= dbPK.length) idxPK = 0;
+      if (idxPK < 0) idxPK = dbPK.length - 1;
+      renderIndividualPK();
+    }
+
+    let cacheLastAntrian = { A: "", B: "", C: "" };
+    function triggerChimeAndVoice(nomorAntrian, namaLoket) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc1 = audioCtx.createOscillator();
+        let gain1 = audioCtx.createGain();
+        osc1.type = 'sine'; osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime);
+        gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+        osc1.connect(gain1); gain1.connect(audioCtx.destination);
+        osc1.start(); osc1.stop(audioCtx.currentTime + 0.4);
+        setTimeout(() => {
+          let osc2 = audioCtx.createOscillator();
+          let gain2 = audioCtx.createGain();
+          osc2.type = 'sine'; osc2.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+          gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+          osc2.connect(gain2); gain2.connect(audioCtx.destination);
+          osc2.start(); osc2.stop(audioCtx.currentTime + 0.5);
+        }, 150);
+        setTimeout(() => {
+          let nomorDieja = nomorAntrian.split("").join(" ").replace(/-/g, ""); 
+          let utterance = new SpeechSynthesisUtterance(`Nomor antrean, ${nomorDieja}, silahkan menuju ke ${namaLoket}`);
+          utterance.lang = 'id-ID'; 
+          utterance.rate = 0.82; 
+          window.speechSynthesis.speak(utterance);
+        }, 750); 
+      } catch(e) { console.error("Audio Context Error: ", e); }
+    }
+
+    function fetchDataFromAppsScriptAPI(apiUrl) {
+      document.getElementById('sync-status-text').textContent = "Syncing...";
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(jsonResponse => {
+          if(jsonResponse.status !== "success") return;
+          
+          if (jsonResponse.videos && jsonResponse.videos.length > 0) {
+            localVideoQueue = jsonResponse.videos;
+            updateQueueIndicator();
+          }
+
+          if (jsonResponse.antrian) {
+            const {A, B, C} = jsonResponse.antrian;
+            if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== A && A !== "000") triggerChimeAndVoice(A, jsonResponse.antrian_loket?.A || "Ruang Pelayanan");
+            if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== B && B !== "000") triggerChimeAndVoice(B, jsonResponse.antrian_loket?.B || "Ruang Pelayanan");
+            if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== C && C !== "000") triggerChimeAndVoice(C, jsonResponse.antrian_loket?.C || "Ruang Pelayanan");
+            cacheLastAntrian = { A, B, C };
+            document.getElementById('num-antrian-a').textContent = A;
+            document.getElementById('num-antrian-b').textContent = B;
+            document.getElementById('num-antrian-c').textContent = C;
+          }
+
+          dbPK = jsonResponse.data_pk;
+          const globalData = jsonResponse.global;
+          if(globalData.anggaran) {
+            const {pagu, realisasi} = globalData.anggaran;
+            document.getElementById('lbl-g-anggaran-persen').textContent = (pagu > 0 ? ((realisasi / pagu) * 100).toFixed(1) : 0) + "%";
+            document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
+            document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + realisasi.toLocaleString('id-ID');
+            cGAnggaran.data.datasets[0].data = [realisasi, pagu - realisasi > 0 ? pagu - realisasi : 0]; cGAnggaran.update();
+          }
+
+          if(globalData.pegawai) {
+            const {hadir, cuti, izin, dl} = globalData.pegawai;
+            const totalP = hadir + cuti + izin + dl;
+            document.getElementById('lbl-g-hadir-persen').textContent = (totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0) + "%";
+            document.getElementById('lbl-g-hadir-riil').textContent = hadir;
+            document.getElementById('lbl-g-peg-cuti').textContent = cuti;
+            document.getElementById('lbl-g-peg-izin').textContent = izin;
+            document.getElementById('lbl-g-peg-dl').textContent = dl;
+            cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
+          }
+
+          calculateAndRenderGlobalTotals();
+          if(dbPK.length > 0) renderIndividualPK();
+          document.getElementById('sync-status-text').textContent = "Live Realtime";
+        })
+        .catch(err => { document.getElementById('sync-status-text').textContent = "API Error"; });
+    }
+
+    function calculateAndRenderGlobalTotals() {
+      let totalLitmasOk = 0, totalLitmasNo = 0, totalKlienOk = 0, totalKlienNo = 0;
+      dbPK.forEach(p => { totalLitmasOk += p.litmasOk; totalLitmasNo += p.litmasNo; totalKlienOk += p.klienOk; totalKlienNo += p.klienNo; });
+      const sumLitmas = totalLitmasOk + totalLitmasNo;
+      document.getElementById('lbl-g-litmas-persen').textContent = (sumLitmas > 0 ? ((totalLitmasOk / sumLitmas) * 100).toFixed(0) : 0) + "%";
+      document.getElementById('lbl-g-litmas-ok').textContent = totalLitmasOk;
+      document.getElementById('lbl-g-litmas-no').textContent = totalLitmasNo;
+      cGLitmas.data.datasets[0].data = [totalLitmasOk, totalLitmasNo]; cGLitmas.update();
+      const sumKlien = totalKlienOk + totalKlienNo;
+      document.getElementById('lbl-g-klien-persen').textContent = (sumKlien > 0 ? ((totalKlienOk / sumKlien) * 100).toFixed(0) : 0) + "%";
+      document.getElementById('lbl-g-klien-ok').textContent = totalKlienOk;
+      document.getElementById('lbl-g-klien-no').textContent = totalKlienNo;
+      cGKlien.data.datasets[0].data = [totalKlienOk, totalKlienNo]; cGKlien.update();
+    }
+
+    function renderIndividualPK() {
+      if(dbPK.length === 0) return;
+      const current = dbPK[idxPK % dbPK.length];
+      document.getElementById('infografis-nama').textContent = current.nama;
+      document.getElementById('infografis-index').textContent = `PK [${(idxPK % dbPK.length) + 1}/${dbPK.length}]`;
+      const totL = current.litmasOk + current.litmasNo;
+      document.getElementById('text-persen-litmas').textContent = (totL > 0 ? ((current.litmasOk / totL) * 100).toFixed(0) : 0) + "%";
+      document.getElementById('lbl-litmas-ok').textContent = current.litmasOk;
+      document.getElementById('lbl-litmas-no').textContent = current.litmasNo;
+      cLitmas.data.datasets[0].data = [current.litmasOk, current.litmasNo]; cLitmas.update();
+      const totK = current.klienOk + current.klienNo;
+      document.getElementById('text-persen-klien').textContent = (totK > 0 ? ((current.klienOk / totK) * 100).toFixed(0) : 0) + "%";
+      document.getElementById('lbl-klien-ok').textContent = current.klienOk;
+      document.getElementById('lbl-klien-no').textContent = current.klienNo;
+      cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
+    }
+
+    window.addEventListener('click', () => { window.speechSynthesis.getVoices(); }, { once: true });
+  </script>
 </body>
-
-</html> 
-
+</html>
