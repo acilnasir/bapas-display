@@ -475,6 +475,16 @@
         .btn-action-panel:hover {
             background-color: #1a657f;
         }
+
+        .yt-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding-right: 4px;
+        }
     </style>
 </head>
 <body>
@@ -511,6 +521,7 @@
                     <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
                     <span style="font-size: 12px; font-weight: bold;" id="volume-text">80%</span>
                 </div>
+                <button class="audio-btn" onclick="nextVideoManual()">⏭ Lewati</button>
             </div>
         </div>
 
@@ -633,10 +644,11 @@
 
         <div class="admin-grid">
             <div class="admin-card">
-                <h4>1. Tautan Video YouTube (1 Video Utama)</h4>
-                <label>Masukkan Link Video YouTube:</label>
-                <input type="text" id="txt-yt-url" placeholder="Contoh: https://www.youtube.com/watch?v=jrXNVlQJpW0">
-                <button type="button" class="btn-action-panel" onclick="saveAndLoadYouTube()">📺 Simpan & Putar Video</button>
+                <h4>1. Tautan Antrean Video YouTube</h4>
+                <div class="yt-input-container" id="yt-inputs-wrapper">
+                    </div>
+                <button type="button" class="btn-action-panel" style="background:#374151; margin-bottom:8px;" onclick="tambahKolomVideoInput('')">➕ Tambah Kolom Video</button>
+                <button type="button" class="btn-action-panel" onclick="saveAndLoadYouTubeQueue()">📺 Simpan Antrean Video</button>
             </div>
 
             <div class="admin-card">
@@ -644,7 +656,6 @@
                 <label>Tautan URL Utama Google Sheet:</label>
                 <input type="text" id="txt-gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
                 <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheet()">🔗 Hubungkan Google Sheet</button>
-                
                 <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadLocalTemplateExcel()">📥 Download Template Struktur Sheet</button>
             </div>
 
@@ -681,7 +692,7 @@
                 panelAdmin.style.display = "block"; 
                 tombolKontrolPublik.style.display = "none";
                 document.getElementById('txt-gsheet-url').value = localStorage.getItem("gsheet_url_bapas") || "";
-                document.getElementById('txt-yt-url').value = localStorage.getItem("yt_url_bapas") || "";
+                renderAdminVideoInputs();
                 alert("Login Berhasil!");
                 panelAdmin.scrollIntoView({ behavior: 'smooth' });
             } else {
@@ -712,15 +723,83 @@
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
         }
 
+        // --- LOGO HANDLING ---
+        document.getElementById('admin-logo-file').addEventListener('change', function() {
+            if (this.files[0]) {
+                const img = document.getElementById('display-header-logo');
+                img.src = URL.createObjectURL(this.files[0]);
+                img.style.display = 'block';
+            }
+        });
+
         // ===================================================================
-        // --- 1 VIDEO CLEAN YOUTUBE PLAYER CONFIGURATION -------------------
+        // --- LOCAL QUEUE MULTI-VIDEO YOUTUBE ENGINE -------------------------
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
+        let localVideoQueue = [];
+        let currentQueueIndex = 0;
+
+        // Render form input link video dinamis di panel admin
+        function renderAdminVideoInputs() {
+            const wrapper = document.getElementById('yt-inputs-wrapper');
+            wrapper.innerHTML = "";
+            
+            let savedQueue = JSON.parse(localStorage.getItem("yt_local_queue_bapas"));
+            if(!savedQueue || savedQueue.length === 0) {
+                savedQueue = [
+                    "https://www.youtube.com/watch?v=jrXNVlQJpW0",
+                    "",
+                    ""
+                ];
+            }
+            savedQueue.forEach((url) => tambahKolomVideoInput(url));
+        }
+
+        function tambahKolomVideoInput(valueString) {
+            const wrapper = document.getElementById('yt-inputs-wrapper');
+            const index = wrapper.children.length + 1;
+            
+            const div = document.createElement('div');
+            div.style.display = "flex";
+            div.style.gap = "5px";
+            div.style.marginBottom = "5px";
+            
+            div.innerHTML = `
+                <input type="text" class="cls-yt-input" placeholder="Video ${index}" value="${valueString}">
+                <button type="button" style="background:#ef4444; color:white; border:none; padding:0 10px; border-radius:6px; cursor:pointer;" onclick="this.parentElement.remove()">X</button>
+            `;
+            wrapper.appendChild(div);
+        }
+
+        function saveAndLoadYouTubeQueue() {
+            const inputElements = document.querySelectorAll('.cls-yt-input');
+            const newQueue = [];
+            
+            inputElements.forEach(el => {
+                const val = el.value.trim();
+                if(val) newQueue.push(val);
+            });
+
+            if(newQueue.length === 0) { alert("Harap isi minimal 1 link video!"); return; }
+            
+            localStorage.setItem("yt_local_queue_bapas", JSON.stringify(newQueue));
+            localVideoQueue = newQueue;
+            currentQueueIndex = 0;
+            
+            playVideoFromLocalQueue();
+            alert("Antrean video berhasil disimpan dan dimuat ulang!");
+        }
 
         function onYouTubeIframeAPIReady() {
             isYtApiReady = true;
-            loadInitialYouTubeVideo();
+            const savedQueue = JSON.parse(localStorage.getItem("yt_local_queue_bapas"));
+            if(savedQueue && savedQueue.length > 0) {
+                localVideoQueue = savedQueue;
+            } else {
+                localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"];
+            }
+            playVideoFromLocalQueue();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -728,50 +807,68 @@
             tag.src = "https://www.youtube.com/iframe_api";
             const firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            renderAdminVideoInputs();
         });
 
-        function loadInitialYouTubeVideo() {
-            const savedYtUrl = localStorage.getItem("yt_url_bapas") || "https://www.youtube.com/watch?v=jrXNVlQJpW0"; 
-            buildYouTubePlayer(savedYtUrl);
-        }
-
-        function saveAndLoadYouTube() {
-            const ytUrl = document.getElementById('txt-yt-url').value.trim();
-            if(!ytUrl) { alert("Harap isi link YouTube!"); return; }
-            localStorage.setItem("yt_url_bapas", ytUrl);
-            buildYouTubePlayer(ytUrl);
-            alert("Video YouTube Berhasil Diperbarui!");
-        }
-
-        function buildYouTubePlayer(urlStr) {
-            if (!isYtApiReady) return;
+        function playVideoFromLocalQueue() {
+            if (!isYtApiReady || localVideoQueue.length === 0) return;
             
-            let videoId = "jrXNVlQJpW0"; // Fallback default
+            if (currentQueueIndex >= localVideoQueue.length) {
+                currentQueueIndex = 0; // Mengulang antrean kembali dari awal
+            }
             
-            // Ekstraksi ID Video Tunggal dari berbagai macam pola link YouTube
+            const currentUrl = localVideoQueue[currentQueueIndex];
+            let videoId = "jrXNVlQJpW0";
+            
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = urlStr.match(regExp);
+            const match = currentUrl.match(regExp);
             if (match && match[2].length === 11) {
                 videoId = match[2];
             }
 
-            if (ytPlayerObj) ytPlayerObj.destroy();
+            if (ytPlayerObj) {
+                ytPlayerObj.loadVideoById({ videoId: videoId });
+            } else {
+                ytPlayerObj = new YT.Player('yt-player', {
+                    videoId: videoId,
+                    playerVars: {
+                        'autoplay': 1,
+                        'controls': 0,
+                        'rel': 0,
+                        'modestbranding': 1,
+                        'iv_load_policy': 3
+                    },
+                    events: {
+                        'onReady': (e) => {
+                            e.target.mute();
+                            e.target.playVideo();
+                            updateQueueIndicator();
+                        },
+                        'onStateChange': onPlayerStateChange
+                    }
+                });
+            }
+        }
 
-            ytPlayerObj = new YT.Player('yt-player', {
-                videoId: videoId,
-                playerVars: {
-                    'autoplay': 1,
-                    'controls': 0, // Bersih tanpa tombol kontrol YouTube
-                    'rel': 0,
-                    'loop': 1,
-                    'playlist': videoId, // Diperlukan agar loop video tunggal berfungsi
-                    'modestbranding': 1
-                },
-                events: {
-                    'onReady': (e) => { e.target.mute(); e.target.playVideo(); document.getElementById('video-title-indicator').textContent = "Memutar Informasi Layanan Bapas"; },
-                    'onStateChange': (e) => { if (e.data === -1 || e.data === 5) e.target.playVideo(); }
-                }
-            });
+        function onPlayerStateChange(event) {
+            // Kode 0 bermakna video telah SELESAI diputar (YT.PlayerState.ENDED)
+            if (event.data === 0) {
+                currentQueueIndex++;
+                playVideoFromLocalQueue();
+            }
+            if (event.data === -1 || event.data === 5) {
+                event.target.playVideo();
+            }
+        }
+
+        function updateQueueIndicator() {
+            document.getElementById('video-title-indicator').textContent = `Memutar Video [${currentQueueIndex + 1}/${localVideoQueue.length}]`;
+        }
+
+        function nextVideoManual() {
+            if(localVideoQueue.length <= 1) return;
+            currentQueueIndex++;
+            playVideoFromLocalQueue();
         }
 
         function togglePlayPause() {
@@ -820,7 +917,7 @@
         }, 6000);
 
         // ===================================================================
-        // --- 100% INDONESIAN REGIONAL GOOGLE SHEETS LIVE REALTIME ENGINE ---
+        // --- 100% SINKRONISASI GOOGLE SHEETS LIVE REALTIME PARSER -----------
         // ===================================================================
         function saveAndConnectGSheet() {
             const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
@@ -833,7 +930,6 @@
             localStorage.setItem("gsheet_id_bapas", matches[1]);
             
             fetchDataFromGoogleSheets(matches[1]);
-            alert("Tautan Google Sheet Berhasil Disimpan!");
         }
 
         function fetchDataFromGoogleSheets(sheetId) {
@@ -841,14 +937,12 @@
             document.getElementById('sync-status-text').textContent = "Syncing...";
             document.getElementById('sync-status-text').style.color = "#f4d35e";
 
-            // Menggunakan Token acak waktu (Cache Buster) agar data diperbarui instan tanpa jeda
             const cacheBuster = new Date().getTime();
             const liveCsvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=0&x=${cacheBuster}`;
 
             fetch(liveCsvUrl)
                 .then(res => { if(!res.ok) throw new Error("Gagal mengunduh sheet."); return res.text(); })
                 .then(csvText => {
-                    // IMPLEMENTASI FIX: Memotong data menggunakan REGEX yang mengenali Pemisah Koma (,) sekaligus Titik Koma (;) regional Indonesia
                     const rows = csvText.split("\n").map(row => {
                         return row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
                     });
@@ -867,7 +961,6 @@
                         }
 
                         if(!parsingGlobalZone) {
-                            // Bagian 1: Data PK Individual
                             dbPK.push({
                                 nama: String(r[1]).replace(/"/g, "").trim(),
                                 litmasOk: parseInt(r[2]) || 0,
@@ -876,7 +969,6 @@
                                 klienOk: parseInt(r[5]) || 0
                             });
                         } else {
-                            // Bagian 2: Data Anggaran & Kehadiran Global
                             if(cellZero.includes("ANGGARAN")) {
                                 const pagu = parseFloat(r[1]) || 0;
                                 const real = parseFloat(r[2]) || 0;
@@ -965,7 +1057,7 @@
             cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
         }
 
-        // --- FITUR DOWNLOAD TEMPLATE STRUKTUR BARU ---
+        // --- EXCEL DOWNLOAD TEMPLATE STRUKTUR ---
         function downloadLocalTemplateExcel() {
             const csvContent = "data:text/csv;charset=utf-8," 
                 + "No;Nama PK;Litmas Selesai;Litmas Belum Selesai;Klien Belum Melapor;Klien Sudah Melapor\n"
@@ -984,7 +1076,7 @@
             document.body.removeChild(link);
         }
 
-        // LOOP INTERNAL DATA REFRESH (Panggil setiap 25 detik sekali ke server Cloud Google Drive)
+        // AUTO INITIAL REFRESH (Panggil setiap 25 detik sekali)
         const cachedId = localStorage.getItem("gsheet_id_bapas") || "1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c";
         if(cachedId) {
             fetchDataFromGoogleSheets(cachedId);
