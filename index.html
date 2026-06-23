@@ -2,111 +2,86 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <title>Display Bapas Purwokerto</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        :root { --primary-color: #114b5f; --secondary-color: #f4d35e; --dark-bg: #0a0f1d; --accent-green: #10b981; --accent-blue: #3b82f6; --card-bg: #111827; }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: #030712; color: #f3f4f6; overflow: hidden; }
-        
-        #main-display-screen { width: 100vw; height: 100vh; display: grid; grid-template-rows: 110px 1fr; grid-template-columns: 55% 45%; }
-        .header-display { grid-column: 1 / span 2; background: linear-gradient(90deg, var(--primary-color), #1e293b); border-bottom: 4px solid var(--secondary-color); padding: 0 40px; display: flex; justify-content: space-between; align-items: center; }
-        .header-logo-img { height: 75px; width: auto; object-fit: contain; }
-        
-        .left-panel { grid-column: 1; padding: 25px; display: flex; flex-direction: column; gap: 15px; border-right: 2px solid #1f2937; }
-        .queue-display-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-        .queue-ticket-card { background: #1e293b; border-radius: 8px; padding: 15px; text-align: center; border: 2px solid #374151; }
-        .queue-number-value { font-size: 38px; font-weight: 900; color: white; }
-        
-        .video-box-container { flex-grow: 1; background: #000; border-radius: 12px; border: 2px solid #374151; overflow: hidden; position: relative; }
-        #yt-player { width: 100%; height: 100%; border: none; }
-        
-        .right-panel { grid-column: 2; display: grid; grid-template-rows: 45% 55%; }
-        .slide-container { display: none; padding: 25px; }
-        .slide-container.active { display: flex; flex-direction: column; }
-        .nav-wrapper { display: flex; gap: 10px; margin-bottom: 10px; }
-        .btn-nav { background: #374151; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; }
+        :root { --primary: #114b5f; --secondary: #f4d35e; }
+        body { background: #030712; color: #fff; font-family: sans-serif; overflow: hidden; }
+        #main-display { width: 100vw; height: 100vh; display: grid; grid-template-rows: 100px 1fr; grid-template-columns: 55% 45%; }
+        .header { grid-column: 1 / span 2; background: var(--primary); display: flex; align-items: center; padding: 0 40px; justify-content: space-between; }
+        .queue-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 20px; }
+        .card { background: #1e293b; padding: 20px; text-align: center; border-radius: 8px; }
+        .val { font-size: 30px; font-weight: bold; color: var(--secondary); }
     </style>
 </head>
 <body>
 
-    <div id="main-display-screen">
-        <div class="header-display">
-            <div style="display:flex; align-items:center; gap:20px;">
-                <img src="https://lh3.googleusercontent.com/d/1xHFp8MzEzoQ-Ron8SgP38U9D5-1e2M83" class="header-logo-img" alt="Logo">
-                <h1>BAPAS KELAS II PURWOKERTO</h1>
-            </div>
-            <div id="live-clock" style="font-size: 24px; font-weight: bold;">00:00:00</div>
+<div id="main-display">
+    <div class="header">
+        <h1>BAPAS KELAS II PURWOKERTO</h1>
+        <div id="clock">00:00:00</div>
+    </div>
+    
+    <div class="left-panel">
+        <div class="queue-bar">
+            <div class="card"><div>Antrian A</div><div id="num-a" class="val">-</div></div>
+            <div class="card"><div>Antrian B</div><div id="num-b" class="val">-</div></div>
+            <div class="card"><div>Antrian C</div><div id="num-c" class="val">-</div></div>
         </div>
-
-        <div class="left-panel">
-            <div class="queue-display-bar">
-                <div class="queue-ticket-card"><div class="queue-label">Antrian A</div><div class="queue-number-value" id="num-antrian-a">-</div></div>
-                <div class="queue-ticket-card"><div class="queue-label">Antrian B</div><div class="queue-number-value" id="num-antrian-b">-</div></div>
-                <div class="queue-ticket-card"><div class="queue-label">Antrian C</div><div class="queue-number-value" id="num-antrian-c">-</div></div>
-            </div>
-            <div class="video-box-container"><div id="yt-player"></div></div>
-        </div>
-
-        <div class="right-panel">
-            <div class="global-slideshow-box" id="slideshow">
-                <div class="slide-container active" id="slide-1">
-                    <div class="nav-wrapper"><button class="btn-nav" onclick="changeSlide(-1)">◀</button><button class="btn-nav" onclick="changeSlide(1)">▶</button></div>
-                    <div class="slide-title">STATISTIK KINERJA</div>
-                    <div id="slide-content" style="font-size:40px; font-weight:bold;">Memuat Data...</div>
-                </div>
-            </div>
-            <div class="performance-box" id="pk-box">
-                <h3>PERFORMA PEMBIMBING KEMASYARAKATAN</h3>
-                <div id="pk-content">Memuat Data PK...</div>
-            </div>
+        <div id="video-container" style="padding:20px; height: 60vh;">
+            <div id="yt-player"></div>
         </div>
     </div>
 
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
-        let cacheLastAntrian = {A:"", B:"", C:""};
+    <div class="right-panel" style="padding: 20px;">
+        <div id="data-display" style="font-size: 20px;">Menunggu data dari Cloud...</div>
+    </div>
+</div>
 
-        function fetchData() {
-            fetch(API_URL)
-                .then(res => res.json())
-                .then(data => {
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
+    let lastAntrian = {A:"", B:"", C:""};
+
+    function fetchData() {
+        fetch(API_URL)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
                     // Update Antrian
-                    if (data.antrian) {
-                        document.getElementById('num-antrian-a').textContent = data.antrian.A;
-                        document.getElementById('num-antrian-b').textContent = data.antrian.B;
-                        document.getElementById('num-antrian-c').textContent = data.antrian.C;
-                        
-                        // Notifikasi Suara
-                        if(cacheLastAntrian.A !== data.antrian.A && data.antrian.A !== "000") playVoice(data.antrian.A, data.antrian_loket.A);
-                        cacheLastAntrian = data.antrian;
-                    }
-                });
-        }
+                    document.getElementById('num-a').textContent = data.antrian.A;
+                    document.getElementById('num-b').textContent = data.antrian.B;
+                    document.getElementById('num-c').textContent = data.antrian.C;
 
-        function playVoice(nomor, loket) {
-            let text = `Nomor antrean ${nomor.split("").join(" ")} menuju ke ${loket}`;
-            let msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'id-ID';
-            window.speechSynthesis.speak(msg);
-        }
+                    // Notifikasi Suara
+                    if(lastAntrian.A !== data.antrian.A && data.antrian.A !== "000") playVoice(data.antrian.A, data.antrian_loket.A);
+                    lastAntrian = data.antrian;
 
-        // Jalankan fetch otomatis setiap 25 detik
-        setInterval(fetchData, 25000);
-        fetchData();
-        
-        // Inisialisasi Jam
-        setInterval(() => { document.getElementById('live-clock').textContent = new Date().toLocaleTimeString(); }, 1000);
-        
-        // Inisialisasi YouTube API
-        function onYouTubeIframeAPIReady() {
-            new YT.Player('yt-player', { videoId: 'jrXNVlQJpW0', playerVars: { 'autoplay': 1, 'mute': 1 } });
-        }
-        let tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
-        document.body.appendChild(tag);
-    </script>
+                    // Update Tampilan Data Kinerja (Menampilkan data ke elemen right-panel)
+                    let html = `<h3>Ringkasan Kinerja</h3><pre>${JSON.stringify(data.global, null, 2)}</pre>`;
+                    document.getElementById('data-display').innerHTML = html;
+                }
+            })
+            .catch(err => console.error("Gagal ambil data:", err));
+    }
+
+    function playVoice(nomor, loket) {
+        let text = `Nomor antrean ${nomor.split("").join(" ")} silahkan menuju ke ${loket}`;
+        let msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'id-ID';
+        window.speechSynthesis.speak(msg);
+    }
+
+    // Interval Sinkronisasi
+    setInterval(fetchData, 25000);
+    fetchData();
+    setInterval(() => { document.getElementById('clock').textContent = new Date().toLocaleTimeString(); }, 1000);
+
+    // Load YouTube
+    let tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
+    document.body.appendChild(tag);
+    function onYouTubeIframeAPIReady() {
+        new YT.Player('yt-player', { videoId: 'jrXNVlQJpW0', playerVars: { 'autoplay': 1, 'mute': 1 } });
+    }
+</script>
 </body>
 </html>
