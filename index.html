@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
-    <!-- Memuat Library SheetJS untuk Pembuatan Berkas Excel (.xlsx) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- Memuat Library Chart.js (Grafik Dinamis) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -192,6 +190,45 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
+            position: relative;
+        }
+
+        /* STYLING TOMBOL NAVIGASI MANUAL */
+        .nav-wrapper-manual {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .btn-nav-arrow {
+            background-color: rgba(55, 65, 81, 0.8);
+            color: #ffffff;
+            border: 1px solid #4b5563;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .btn-nav-arrow:hover {
+            background-color: var(--secondary-color);
+            color: #000000;
+            border-color: var(--secondary-color);
+        }
+
+        .slide-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         .slide-container {
@@ -220,9 +257,6 @@
             text-transform: uppercase;
             color: var(--secondary-color);
             font-weight: bold;
-            border-bottom: 1px solid #374151;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
             letter-spacing: 0.5px;
         }
 
@@ -368,7 +402,7 @@
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
         .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* FLOATING PUBLIC CONTROLS */
+        /* FLOATING UTILITY CONTROLS */
         .bottom-trigger-control-zone {
             position: fixed;
             bottom: 15px;
@@ -486,7 +520,6 @@
         
         <div class="header-display">
             <div class="header-brand-section">
-                <!-- PERBAIKAN UTAMA: LOGO TERHUBUNG LANGSUNG SECARA OTOMATIS KE API GOOGLE DRIVE -->
                 <img id="display-header-logo" src="https://lh3.googleusercontent.com/d/1xHFp8MzEzoQ-Ron8SgP38U9D5-1e2M83" class="header-logo-img" alt="Logo Instansi">
                 <div>
                     <h1>BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
@@ -524,7 +557,13 @@
             <div class="global-slideshow-box">
                 
                 <div class="slide-container active" id="slide-global-1">
-                    <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
+                    <div class="slide-header-flex">
+                        <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
+                        <div class="nav-wrapper-manual">
+                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
+                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+                        </div>
+                    </div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
                             <div class="slide-big-number" id="lbl-g-litmas-persen">0%</div>
@@ -536,7 +575,13 @@
                 </div>
 
                 <div class="slide-container" id="slide-global-2">
-                    <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
+                    <div class="slide-header-flex">
+                        <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
+                        <div class="nav-wrapper-manual">
+                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
+                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+                        </div>
+                    </div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
                             <div class="slide-big-number" id="lbl-g-klien-persen">0%</div>
@@ -548,7 +593,13 @@
                 </div>
 
                 <div class="slide-container" id="slide-global-3">
-                    <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
+                    <div class="slide-header-flex">
+                        <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
+                        <div class="nav-wrapper-manual">
+                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
+                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+                        </div>
+                    </div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
                             <div class="slide-big-number" id="lbl-g-anggaran-persen">0%</div>
@@ -560,7 +611,13 @@
                 </div>
 
                 <div class="slide-container" id="slide-global-4">
-                    <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
+                    <div class="slide-header-flex">
+                        <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
+                        <div class="nav-wrapper-manual">
+                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
+                            <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+                        </div>
+                    </div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
                             <div class="slide-big-number" id="lbl-g-hadir-persen">0%</div>
@@ -586,7 +643,12 @@
                             <span id="infografis-nama">MEMUAT DATA...</span>
                             <span class="sync-badge" id="sync-status-text" style="color: var(--accent-green); background: rgba(16, 185, 129, 0.2);">Cloud Active</span>
                         </div>
-                        <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
+                        
+                        <div class="nav-wrapper-manual">
+                            <button class="btn-nav-arrow" onclick="navigatePKManual(-1)">◀</button>
+                            <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
+                            <button class="btn-nav-arrow" onclick="navigatePKManual(1)">▶</button>
+                        </div>
                     </div>
 
                     <div class="charts-flex-grid">
@@ -637,10 +699,9 @@
         </div>
 
         <div class="admin-grid">
-            <!-- CORESYNC GATEWAY HUB -->
             <div class="admin-card">
                 <h4>Integrasi Jalur API Google Sheets Realtime</h4>
-                <p style="font-size:12px; color:#9ca3af; margin-bottom:10px;">Masukkan URL Web App Apps Script (/exec) yang didapatkan dari Langkah 2:</p>
+                <p style="font-size:12px; color:#9ca3af; margin-bottom:10px;">Masukkan URL Web App Apps Script (/exec):</p>
                 <input type="text" id="txt-gsheet-url" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:12px;">
                 <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheetGateway()">🔗 Hubungkan Realtime Cloud</button>
                 <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadPureExcelTemplate()">📥 Download Template Struktur (.xlsx)</button>
@@ -667,7 +728,6 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
         // --- SECURITY MANAGEMENT ---
         const USERNAME_VALID = "adminbapas";
@@ -722,7 +782,7 @@
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
-        let localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"]; // Fallback video
+        let localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"]; 
         let currentQueueIndex = 0;
 
         function onYouTubeIframeAPIReady() {
@@ -793,23 +853,66 @@
         const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
         const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
 
-        // --- CAROUSEL DISPLAY TIMERS ---
+        // --- CAROUSEL DISPLAY LOGIC & TIMERS ---
         let dbPK = [];
         let idxSlideG = 1;
         let idxPK = 0;
+        
+        let pauseGlobalTimer = 0;
+        let pausePKTimer = 0;
 
+        // Auto-rotation Slide Global (Setiap 8 detik)
         setInterval(() => {
-            document.querySelectorAll('.slide-container').forEach(s => s.classList.remove('active'));
-            idxSlideG = (idxSlideG % 4) + 1;
-            const el = document.getElementById(`slide-global-${idxSlideG}`);
-            if(el) el.classList.add('active');
+            if (pauseGlobalTimer > 0) {
+                pauseGlobalTimer--;
+                return;
+            }
+            changeGlobalSlideNext();
         }, 8000);
 
+        // Auto-rotation Slide Performa PK (Setiap 6 detik)
         setInterval(() => {
-            if(dbPK.length === 0) return;
+            if (dbPK.length === 0 || pausePKTimer > 0) {
+                pausePKTimer--;
+                return;
+            }
             idxPK = (idxPK + 1) % dbPK.length;
             renderIndividualPK();
         }, 6000);
+
+        // Fungsi Perubahan Slide Global
+        function changeGlobalSlideNext() {
+            document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
+            idxSlideG = (idxSlideG % 4) + 1;
+            const el = document.getElementById(`slide-global-${idxSlideG}`);
+            if(el) el.classList.add('active');
+        }
+
+        // ===================================================================
+        // --- LOGIK MANAJEMEN NAVIGASI MANUAL (STRATEGIS) -------------------
+        // ===================================================================
+        function navigateGlobalSlide(direction) {
+            pauseGlobalTimer = 15; // Menghentikan perputaran otomatis selama 15 detik
+            
+            idxSlideG = idxSlideG + direction;
+            if (idxSlideG > 4) idxSlideG = 1;
+            if (idxSlideG < 1) idxSlideG = 4;
+
+            document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
+            const el = document.getElementById(`slide-global-${idxSlideG}`);
+            if(el) el.classList.add('active');
+        }
+
+        function navigatePKManual(direction) {
+            if (dbPK.length === 0) return;
+            pausePKTimer = 15; // Menghentikan rotasi otomatis profil PK selama 15 detik
+
+            idxPK = idxPK + direction;
+            if (idxPK >= dbPK.length) idxPK = 0;
+            if (idxPK < 0) idxPK = dbPK.length - 1;
+
+            renderIndividualPK();
+        }
 
         // ===================================================================
         // --- REALTIME WEB-APP API INTERACTION GATEWAY ----------------------
@@ -839,7 +942,6 @@
                         const oldFirstVideo = localVideoQueue[0];
                         localVideoQueue = jsonResponse.videos;
                         updateQueueIndicator();
-                        // Jika video pertama berubah, langsung muat paksa video baru
                         if(oldFirstVideo !== localVideoQueue[0]) playVideoFromLocalQueue();
                     }
 
