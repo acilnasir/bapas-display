@@ -304,27 +304,29 @@
         </div>
       </div>
       <div style="text-align: right;">
-        <div id="live-date" style="font-size: 16px; font-weight: 600; margin-bottom: 5px;"></div>
-        <div id="live-clock" style="font-size: 26px; font-weight: 800;">00:00:00</div>
-        <script>
-function updateDateTime() {
-    const now = new Date();
+        <div id="date-time-container" style="display: flex; gap: 15px; font-size: 20px; font-weight: 600; align-items: center;">
+          <div id="live-date"></div>
+          <div id="live-clock">00:00:00</div>
+        </div>
+       <script>
+        function updateDateTime() {
+        const now = new Date();
     
-    // Konfigurasi format tanggal
-    const options = { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' };
-    const dateString = now.toLocaleDateString('id-ID', options);
+    // Format: "Hari, dd mmm yyyy"
+    const dateOptions = { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' };
+    const dateString = now.toLocaleDateString('id-ID', dateOptions);
     
-    // Menampilkan jam
+    // Format: Jam
     const timeString = now.toLocaleTimeString('id-ID', { hour12: false });
     
-    // Update elemen HTML
+    // Update ke elemen HTML
     document.getElementById('live-date').innerText = dateString;
     document.getElementById('live-clock').innerText = timeString;
 }
 
-// Jalankan fungsi setiap detik
+// Jalankan setiap detik
 setInterval(updateDateTime, 1000);
-updateDateTime(); // Jalankan sekali saat load
+updateDateTime(); 
 </script>
         <div style="font-size: 13px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
       </div>
