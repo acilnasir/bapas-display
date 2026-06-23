@@ -174,7 +174,7 @@
             z-index: 5;
         }
 
-        /* PANEL KANAN (INFOGRAFIS CAROUSEL SLIDESHOW) */
+        /* PANEL KANAN (SLIDESHOW) */
         .right-panel {
             grid-column: 2;
             display: grid;
@@ -366,7 +366,7 @@
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
         .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* FLOATING UTILITY CONTROLS */
+        /* FLOATING PUBLIC CONTROLS */
         .bottom-trigger-control-zone {
             position: fixed;
             bottom: 15px;
@@ -733,7 +733,7 @@
         });
 
         // ===================================================================
-        // --- QUEUE MULTI-VIDEO YOUTUBE ENGINE -------------------------
+        // --- QUEUE MULTI-VIDEO YOUTUBE ENGINE -----------------------------
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
@@ -869,7 +869,7 @@
         }, 6000);
 
         // ===================================================================
-        // --- RE-ENGINEERED: DUAL STREAM TAB GOOGLE SHEETS LIVE PARSER ------
+        // --- 100% COR-BYPASS: GOOGLE SHEETS CORE JSON FEEDS API LOGIC -----
         // ===================================================================
         function saveAndConnectGSheet() {
             const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
@@ -889,15 +889,15 @@
 
             const buster = new Date().getTime();
             
-            // Mengarah ke tab Kinerja PK Individual (gid=0)
+            // SOLUSI UTAMA: Menggunakan Jalur API Ekspor Terpusat untuk memisahkan Tab 1 (gid=0) dan Tab 2 (gid=1334693153)
             const urlTabPK = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=0&x=${buster}`;
-            // Mengarah ke tab Anggaran & Kehadiran (gid=1334693153)
             const urlTabGlobal = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=1334693153&x=${buster}`;
 
-            // Tarik Data Tab Kinerja PK
+            // Tarik Data Tab Kinerja PK Individual
             fetch(urlTabPK)
-                .then(res => res.text())
+                .then(res => { if(!res.ok) throw new Error("Gagal terhubung ke Cloud Sheet."); return res.text(); })
                 .then(csvText => {
+                    // DUAL SPLITTER MATRIX: Mengatasi pemisah (;) Indonesia dan (,) Internasional secara dinamis
                     const rows = csvText.split("\n").map(row => row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
                     dbPK = [];
                     for(let i = 1; i < rows.length; i++) {
@@ -917,7 +917,7 @@
                     calculateAndRenderGlobalTotals();
                     if(dbPK.length > 0) renderIndividualPK();
                     
-                    // Tarik Data Tab Anggaran & Kehadiran
+                    // Tarik paralel Data Tab Anggaran & Kehadiran Global
                     return fetch(urlTabGlobal);
                 })
                 .then(res => res.text())
@@ -958,7 +958,7 @@
                 .catch(err => {
                     document.getElementById('sync-status-text').textContent = "Sync Offline";
                     document.getElementById('sync-status-text').style.color = "#ef4444";
-                    console.error(err);
+                    console.error("GSheet Access Error: ", err);
                 });
         }
 
@@ -1028,7 +1028,7 @@
             } catch (e) { alert(e.message); }
         }
 
-        // AUTO INITIAL REFRESH (Panggil setiap 25 detik sekali)
+        // LOOP SINKRONISASI REALTIME (Berjalan otomatis setiap 25 detik sekali)
         const cachedId = localStorage.getItem("gsheet_id_bapas") || "1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c";
         if(cachedId) {
             fetchDataFromGoogleSheets(cachedId);
