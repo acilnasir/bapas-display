@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
+    <!-- Memuat Library SheetJS (Membaca Excel) dan Chart.js (Grafik Dinamis) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -15,6 +16,7 @@
             --panel-bg: #111827;
             --accent-green: #10b981;
             --accent-red: #ef4444;
+            --accent-blue: #3b82f6;
             --btn-download: #2563eb;
             --card-bg: #111827;
         }
@@ -174,35 +176,87 @@
             z-index: 5;
         }
 
-        /* PANEL KANAN (SLIDE & INFOGRAFIS PK BERGANTIAN) */
+        /* PANEL KANAN (INFOGRAFIS SLIDESHOW GLOBAL & INDIVIDUAL CAROUSEL) */
         .right-panel {
             grid-column: 2;
             display: grid;
-            grid-template-rows: 35% 65%;
+            grid-template-rows: 42% 58%;
             height: 100%;
         }
 
-        .slide-box {
+        .global-slideshow-box {
             background-color: #0f172a;
             padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             border-bottom: 2px solid #1f2937;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .slide-box img {
+        .slide-container {
+            display: none;
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            background-color: var(--card-bg);
+            border: 1px solid #374151;
             border-radius: 8px;
+            padding: 15px 25px;
         }
 
-        /* INFOGRAFIS CAROUSEL PERFORMA PK */
+        .slide-container.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        .slide-title {
+            font-size: 15px;
+            text-transform: uppercase;
+            color: var(--secondary-color);
+            font-weight: bold;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .slide-content-grid {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        .slide-big-number {
+            font-size: 50px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .slide-details-list {
+            font-size: 14px;
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+
+        .slide-chart-mini {
+            width: 100px;
+            height: 100px;
+            position: relative;
+        }
+
+        /* BAWAH: INDIVIDUAL CAROUSEL PERFORMA PK */
         .performance-box {
             background-color: #0d1321;
-            padding: 30px;
+            padding: 25px 30px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -210,9 +264,9 @@
         }
 
         .performance-box h3 {
-            font-size: 18px;
+            font-size: 16px;
             color: var(--secondary-color);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-transform: uppercase;
             border-left: 5px solid var(--primary-color);
             padding-left: 10px;
@@ -223,11 +277,10 @@
             background-color: var(--card-bg);
             border: 2px solid #1f2937;
             border-radius: 12px;
-            padding: 20px;
+            padding: 15px 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: all 0.5s ease-in-out;
         }
 
         .pk-profile-header {
@@ -235,12 +288,12 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #374151;
-            padding-bottom: 12px;
-            margin-bottom: 15px;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
         }
 
         .pk-name-tag {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: #ffffff;
         }
@@ -249,7 +302,7 @@
             background-color: var(--primary-color);
             padding: 4px 12px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             color: var(--secondary-color);
         }
@@ -272,8 +325,8 @@
         }
 
         .chart-container-canvas {
-            width: 170px;
-            height: 170px;
+            width: 145px;
+            height: 145px;
             position: relative;
         }
 
@@ -282,28 +335,28 @@
             top: 55%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: #ffffff;
-            text-align: center;
         }
 
         .chart-legend-info {
-            margin-top: 15px;
-            font-size: 14px;
+            margin-top: 10px;
+            font-size: 13px;
             width: 100%;
             display: flex;
             justify-content: space-around;
             background-color: rgba(0, 0, 0, 0.2);
-            padding: 8px;
+            padding: 6px;
             border-radius: 6px;
         }
 
         .legend-item { display: flex; align-items: center; gap: 6px; }
         .dot-green { width: 10px; height: 10px; background-color: var(--accent-green); border-radius: 50%; }
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
+        .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* PERBAIKAN: Tombol Kontrol Umum (Fullscreen & Login) di Bagian Bawah Layar */
+        /* AREA TOMBOL KONTROL MONITOR PERMANEN */
         .bottom-trigger-control-zone {
             position: absolute;
             bottom: 8px;
@@ -314,12 +367,12 @@
             align-items: center;
         }
         .btn-trigger-public {
-            background: rgba(31, 41, 55, 0.6);
-            color: #9ca3af;
-            border: 1px solid #374151;
+            background: rgba(31, 41, 55, 0.7);
+            color: #d1d5db;
+            border: 1px solid #4b5563;
             font-size: 12px;
             font-weight: 600;
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 4px;
             cursor: pointer;
             transition: all 0.2s;
@@ -365,12 +418,16 @@
             color: white;
             font-size: 13px;
             font-weight: bold;
-            padding: 10px 14px;
+            padding: 12px 14px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
             width: 100%;
             margin-top: 15px;
+            transition: background 0.2s;
+        }
+        .btn-download-template:hover {
+            background-color: #1d4ed8;
         }
 
         .admin-grid {
@@ -417,13 +474,13 @@
             width: 100%;
             transition: background 0.2s;
         }
-        .btn-action-panel:hover {
-            background-color: #1a657f;
-        }
     </style>
 </head>
 <body>
 
+    <!-- =================================================================== -->
+    <!-- PANEL DISPLAY MONITOR UTAMA                                         -->
+    <!-- =================================================================== -->
     <div id="main-display-screen">
         
         <div class="header-display">
@@ -461,13 +518,69 @@
         </div>
 
         <div class="right-panel">
-            <div class="slide-box">
-                <div id="slide-placeholder-text" style="color: #4b5563;">
-                    <p style="font-size: 18px; font-weight: bold; color: var(--secondary-color);">PROFIL STRUKTUR & LAYANAN BAPAS</p>
+            
+            <!-- ATAS: SLIDESHOW INFOGRAFIS GLOBAL -->
+            <div class="global-slideshow-box">
+                
+                <!-- Slide 1: Total Litmas Global -->
+                <div class="slide-container active" id="slide-global-1">
+                    <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
+                    <div class="slide-content-grid">
+                        <div class="slide-details-list">
+                            <div class="slide-big-number" id="lbl-g-litmas-persen">82%</div>
+                            <p style="margin-top: 5px;">Litmas Selesai: <b id="lbl-g-litmas-ok" style="color:var(--accent-green)">35</b> Dokumen</p>
+                            <p>Litmas Belum Selesai: <b id="lbl-g-litmas-no" style="color:var(--accent-red)">8</b> Dokumen</p>
+                        </div>
+                        <div class="slide-chart-mini"><canvas id="chartGLitmas"></canvas></div>
+                    </div>
                 </div>
-                <img id="display-slide-img" src="" style="display: none;" alt="Slide Profil">
+
+                <!-- Slide 2: Total Kepatuhan Wajib Lapor Klien Global -->
+                <div class="slide-container" id="slide-global-2">
+                    <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
+                    <div class="slide-content-grid">
+                        <div class="slide-details-list">
+                            <div class="slide-big-number" id="lbl-g-klien-persen">94%</div>
+                            <p style="margin-top: 5px;">Klien Sudah Melapor: <b id="lbl-g-klien-ok" style="color:var(--accent-green)">105</b> Orang</p>
+                            <p>Klien Belum Melapor: <b id="lbl-g-klien-no" style="color:var(--accent-red)">6</b> Orang</p>
+                        </div>
+                        <div class="slide-chart-mini"><canvas id="chartGKlien"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Realisasi Anggaran Instansi -->
+                <div class="slide-container" id="slide-global-3">
+                    <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
+                    <div class="slide-content-grid">
+                        <div class="slide-details-list">
+                            <div class="slide-big-number" id="lbl-g-anggaran-persen">52.4%</div>
+                            <p style="margin-top: 8px; color:#e5e7eb;" id="lbl-g-anggaran-pagu">Pagu Alokasi: Rp 0</p>
+                            <p style="color:#e5e7eb;" id="lbl-g-anggaran-realisasi">Total Realisasi: Rp 0</p>
+                        </div>
+                        <div class="slide-chart-mini"><canvas id="chartGAnggaran"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Status Kehadiran Pegawai Harian -->
+                <div class="slide-container" id="slide-global-4">
+                    <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
+                    <div class="slide-content-grid">
+                        <div class="slide-details-list">
+                            <div class="slide-big-number" id="lbl-g-hadir-persen">100%</div>
+                            <div style="margin-top: 5px; display: grid; grid-template-columns: 1fr 1fr; gap-x: 15px; font-size: 13px;">
+                                <p>Hadir Fisik: <b id="lbl-g-peg-hadir" style="color:var(--accent-green)">0</b></p>
+                                <p>Izin Resmi: <b id="lbl-g-peg-izin" style="color:var(--secondary-color)">0</b></p>
+                                <p>Cuti Tahunan: <b id="lbl-g-peg-cuti" style="color:var(--accent-blue)">0</b></p>
+                                <p>Dinas Luar: <b id="lbl-g-peg-dl" style="color:#a855f7;">0</b></p>
+                            </div>
+                        </div>
+                        <div class="slide-chart-mini"><canvas id="chartGPegawai"></canvas></div>
+                    </div>
+                </div>
+
             </div>
 
+            <!-- BAWAH: INDIVIDUAL CAROUSEL KINERJA PER-PK -->
             <div class="performance-box">
                 <h3>STATISTIK PERFORMA PEMBIMBING KEMASYARAKATAN (PK)</h3>
                 
@@ -479,7 +592,7 @@
 
                     <div class="charts-flex-grid">
                         <div class="chart-card-wrapper">
-                            <span style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color:#9ca3af;">Penyelesaian Litmas</span>
+                            <span style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#9ca3af;">Penyelesaian Litmas</span>
                             <div class="chart-container-canvas">
                                 <canvas id="chartLitmas"></canvas>
                                 <div class="chart-center-text" id="text-persen-litmas">0%</div>
@@ -491,7 +604,7 @@
                         </div>
 
                         <div class="chart-card-wrapper">
-                            <span style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color:#9ca3af;">Kepatuhan Wajib Lapor Klien</span>
+                            <span style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#9ca3af;">Kepatuhan Wajib Lapor Klien</span>
                             <div class="chart-container-canvas">
                                 <canvas id="chartKlien"></canvas>
                                 <div class="chart-center-text" id="text-persen-klien">0%</div>
@@ -506,18 +619,22 @@
             </div>
         </div>
 
+        <!-- TOMBOL KONTROL MONITOR PERMANEN (UMUM) -->
         <div class="bottom-trigger-control-zone" id="public-control-area">
-            <button class="btn-trigger-public" onclick="openFullscreen()">📺 Layar Penuh (Full Screen)</button>
+            <button class="btn-trigger-public" onclick="openFullscreen()">📺 Aktifkan Layar Penuh (TV Monitor)</button>
             <button class="btn-trigger-public" onclick="aksesLoginAdmin()">🔐 Panel Admin</button>
         </div>
 
     </div>
 
+    <!-- =================================================================== -->
+    <!-- PANEL PENGATURAN ADMIN -->
+    <!-- =================================================================== -->
     <div class="admin-panel" id="control-panel-section">
         <div class="admin-header">
             <div>
                 <h2>PANEL UTAMA PENGENDALI MEDIA DISPLAY (MODE TERKUNCI)</h2>
-                <p style="color: #9ca3af; font-size: 14px;">Hak akses terverifikasi. Perubahan Anda akan langsung sinkron ke monitor atas.</p>
+                <p style="color: #9ca3af; font-size: 14px;">Akses terverifikasi. Unggah database kompilasi instansi Anda di bawah ini.</p>
             </div>
             <div>
                 <button class="btn-logout" onclick="keluarAdmin();">🔒 Keluar & Kunci Admin</button>
@@ -532,132 +649,91 @@
             </div>
 
             <div class="admin-card">
-                <h4>2. Gambar Slide Profil Instansi</h4>
-                <input type="file" id="admin-slide-files" accept="image/*" multiple>
-                <div class="file-list-preview" id="slide-queue-preview">Slide: Teks bawaan</div>
-            </div>
-
-            <div class="admin-card">
-                <h4>3. Database Kinerja PK (*.xlsx)</h4>
+                <h4>2. Database Terpadu Bapas (*.xlsx)</h4>
                 <input type="file" id="admin-excel-file" accept=".xlsx, .xls">
-                <button type="button" class="btn-download-template" onclick="generateAndDownloadTemplate()">📥 Download Template Excel</button>
+                
+                <!-- PERBAIKAN UTAMA: TRIGGER DOWNLOAD FIX VIA LOCAL BLOB GEN -->
+                <button type="button" class="btn-download-template" onclick="generateAndDownloadTemplateFix()">📥 Download Template Kombinasi Excel</button>
             </div>
 
             <div class="admin-card">
-                <h4>4. Upload Logo Instansi (Atas)</h4>
+                <h4>3. Upload Logo Instansi (Atas)</h4>
                 <input type="file" id="admin-logo-file" accept="image/*">
             </div>
 
             <div class="admin-card">
-                <h4>5. Keamanan: Ubah Password Admin</h4>
-                <label>Password Saat Ini:</label>
+                <h4>4. Keamanan: Ubah Password Admin</h4>
                 <input type="password" id="txt-pass-lama" placeholder="Password lama">
-                
-                <label>Password Baru:</label>
                 <input type="password" id="txt-pass-baru" placeholder="Minimal 6 karakter">
-                
                 <button type="button" class="btn-action-panel" onclick="prosesGantiPassword()">Simpan Password Baru</button>
             </div>
         </div>
     </div>
 
+    <!-- =================================================================== -->
+    <!-- CORE JAVASCRIPT LOGIC ENGINE -->
+    <!-- =================================================================== -->
     <script>
-        // --- AUTENTIKASI ADMIN & INITIALIZATION PASSWORD ---
+        // --- SECURITY MANAGEMENT ---
         const USERNAME_VALID = "adminbapas";
-        
         if (!localStorage.getItem("admin_password_bapas")) {
             localStorage.setItem("admin_password_bapas", "purwokerto123");
         }
-        
         const panelAdmin = document.getElementById('control-panel-section');
         const tombolKontrolPublik = document.getElementById('public-control-area');
 
         function aksesLoginAdmin() {
             const inputUser = prompt("Masukkan Username Petugas Bapas:");
-            if (inputUser === null) return; 
-
+            if (!inputUser) return;
             const inputPass = prompt("Masukkan Password Pengaman:");
-            if (inputPass === null) return;
+            if (!inputPass) return;
 
-            const currentValidPassword = localStorage.getItem("admin_password_bapas");
-
-            if (inputUser === USERNAME_VALID && inputPass === currentValidPassword) {
+            if (inputUser === USERNAME_VALID && inputPass === localStorage.getItem("admin_password_bapas")) {
                 panelAdmin.style.display = "block"; 
-                tombolKontrolPublik.style.display = "none"; // Sembunyikan tombol fullscreen & login publik saat panel admin aktif
-                alert("Login Berhasil! Selamat bekerja di Panel Kendali Bapas Kelas II Purwokerto.");
+                tombolKontrolPublik.style.display = "none";
+                alert("Login Berhasil!");
                 panelAdmin.scrollIntoView({ behavior: 'smooth' });
             } else {
-                alert("Gagal! Username atau Password salah. Akses ditolak.");
+                alert("Salah! Akses ditolak.");
             }
         }
 
         function prosesGantiPassword() {
-            const currentValidPassword = localStorage.getItem("admin_password_bapas");
             const passLama = document.getElementById('txt-pass-lama').value;
             const passBaru = document.getElementById('txt-pass-baru').value;
-
-            if (passLama === "" || passBaru === "") {
-                alert("Harap isi kolom password lama dan baru!");
-                return;
-            }
-
-            if (passLama !== currentValidPassword) {
-                alert("Gagal! Verifikasi 'Password Saat Ini' salah.");
-                return;
-            }
-
-            if (passBaru.length < 6) {
-                alert("Gagal! Demi keamanan, password baru minimal harus 6 karakter.");
-                return;
-            }
-
+            if (passLama !== localStorage.getItem("admin_password_bapas")) { alert("Password lama salah!"); return; }
+            if (passBaru.length < 6) { alert("Minimal 6 karakter!"); return; }
             localStorage.setItem("admin_password_bapas", passBaru);
-            document.getElementById('txt-pass-lama').value = "";
-            document.getElementById('txt-pass-baru').value = "";
-            alert("Sukses! Password admin berhasil diperbarui.");
+            alert("Password berhasil diperbarui!");
         }
 
         function keluarAdmin() {
             panelAdmin.style.display = "none"; 
-            tombolKontrolPublik.style.display = "flex"; // Memunculkan kembali tombol publik di layar utama
-            window.scrollTo({ top: 0, behavior: 'smooth' }); 
-            alert("Anda telah keluar dari Panel Kendali Admin.");
+            tombolKontrolPublik.style.display = "flex";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- 1. JAM DIGITAL ---
+        // --- CLOCK & FULLSCREEN ---
         setInterval(() => { document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('id-ID'); }, 1000);
-
-        // --- 2. FULLSCREEN MODE PUBLIK (BISA DIAKSES KAPANPUN) ---
         function openFullscreen() {
             const el = document.getElementById("main-display-screen");
             if (el.requestFullscreen) el.requestFullscreen();
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-            else if (el.msRequestFullscreen) el.msRequestFullscreen();
         }
 
-        // --- FEATURE: UPLOAD LOGO HANDLING ---
-        const logoInput = document.getElementById('admin-logo-file');
-        const headerLogoImg = document.getElementById('display-header-logo');
-
-        logoInput.addEventListener('change', function() {
-            const file = this.files[0];
-            if (file) {
-                headerLogoImg.src = URL.createObjectURL(file);
-                headerLogoImg.style.display = 'block';
+        // --- LOGO HANDLING ---
+        document.getElementById('admin-logo-file').addEventListener('change', function() {
+            if (this.files[0]) {
+                const img = document.getElementById('display-header-logo');
+                img.src = URL.createObjectURL(this.files[0]);
+                img.style.display = 'block';
             }
         });
 
-        // --- 3. MULTI-VIDEO PLAYLIST & AUDIO CONTROL INTERACTION ---
+        // --- PLAYLIST VIDEO ---
         const videoInput = document.getElementById('admin-video-files');
         const videoPlayer = document.getElementById('display-video');
-        const videoTitle = document.getElementById('video-title-indicator');
-        const btnMute = document.getElementById('btn-mute');
-        const btnPlayPause = document.getElementById('btn-play-pause');
-        const volText = document.getElementById('volume-text');
-        
-        let videoPlaylist = [];
-        let currentVideoIdx = 0;
-
+        let videoPlaylist = [], currentVideoIdx = 0;
         videoPlayer.volume = 0.8;
 
         videoInput.addEventListener('change', function() {
@@ -668,131 +744,56 @@
                 playPlaylistVideo(currentVideoIdx);
             }
         });
-
-        function playPlaylistVideo(index) {
-            if (videoPlaylist.length > 0 && index < videoPlaylist.length) {
-                videoPlayer.src = URL.createObjectURL(videoPlaylist[index]);
-                videoTitle.textContent = `Memutar [${index + 1}/${videoPlaylist.length}]: ${videoPlaylist[index].name}`;
-                btnPlayPause.textContent = "⏸ Pause";
-                
-                videoPlayer.play().catch(e => {
-                    videoPlayer.muted = true;
-                    btnMute.textContent = "🔇 Unmute";
-                    videoPlayer.play();
-                });
+        function playPlaylistVideo(idx) {
+            if (videoPlaylist[idx]) {
+                videoPlayer.src = URL.createObjectURL(videoPlaylist[idx]);
+                document.getElementById('video-title-indicator').textContent = `Memutar [${idx + 1}/${videoPlaylist.length}]: ${videoPlaylist[idx].name}`;
+                videoPlayer.play().catch(() => { videoPlayer.muted = true; videoPlayer.play(); });
             }
         }
-
         videoPlayer.addEventListener('ended', () => {
-            if (videoPlaylist.length > 0) {
-                currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length;
-                playPlaylistVideo(currentVideoIdx);
-            }
+            if (videoPlaylist.length > 0) { currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length; playPlaylistVideo(currentVideoIdx); }
         });
+        function togglePlayPause() { videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause(); }
+        function toggleMute() { videoPlayer.muted = !videoPlayer.muted; }
+        function setVolume(v) { videoPlayer.volume = v; document.getElementById('volume-text').textContent = Math.round(v*100)+"%"; }
+        function nextVideoManual() { if(videoPlaylist.length > 1) { currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length; playPlaylistVideo(currentVideoIdx); } }
 
-        function togglePlayPause() {
-            if (videoPlayer.paused) {
-                videoPlayer.play();
-                btnPlayPause.textContent = "⏸ Pause";
-            } else {
-                videoPlayer.pause();
-                btnPlayPause.textContent = "▶ Play";
-            }
-        }
+        // --- CHART INITIALIZATION ---
+        const miniChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'70%' };
+        const mainChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'73%' };
 
-        function toggleMute() {
-            if (videoPlayer.muted) {
-                videoPlayer.muted = false;
-                btnMute.textContent = "🔊 Mute";
-            } else {
-                videoPlayer.muted = true;
-                btnMute.textContent = "🔇 Unmute";
-            }
-        }
+        const cGLitmas = new Chart(document.getElementById('chartGLitmas'), { type:'doughnut', data:{datasets:[{data:[82,18],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:miniChartOpts });
+        const cGKlien = new Chart(document.getElementById('chartGKlien'), { type:'doughnut', data:{datasets:[{data:[94,6],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:miniChartOpts });
+        const cGAnggaran = new Chart(document.getElementById('chartGAnggaran'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#3b82f6','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
+        const cGPegawai = new Chart(document.getElementById('chartGPegawai'), { type:'doughnut', data:{datasets:[{data:[100,0,0,0],backgroundColor:['#10b981','#f4d35e','#3b82f6','#a855f7'],borderWidth:0}]}, options:miniChartOpts });
 
-        function setVolume(value) {
-            videoPlayer.volume = value;
-            volText.textContent = Math.round(value * 100) + "%";
-            if (value == 0) {
-                btnMute.textContent = "🔇 Unmute";
-                videoPlayer.muted = true;
-            } else {
-                btnMute.textContent = "🔊 Mute";
-                videoPlayer.muted = false;
-            }
-        }
+        const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
+        const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
 
-        function nextVideoManual() {
-            if (videoPlaylist.length > 1) {
-                currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length;
-                playPlaylistVideo(currentVideoIdx);
-            }
-        }
-
-        // --- 4. SLIDESHOW PROFIL ---
-        const slideInput = document.getElementById('admin-slide-files');
-        const slideImg = document.getElementById('display-slide-img');
-        let slideUrls = [], currentSlideIdx = 0, slideTimer = null;
-
-        slideInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                clearInterval(slideTimer);
-                slideUrls = Array.from(this.files).map(file => URL.createObjectURL(file));
-                document.getElementById('slide-placeholder-text').style.display = 'none';
-                slideImg.style.display = 'block';
-                currentSlideIdx = 0;
-                runSlideShow();
-                slideTimer = setInterval(runSlideShow, 6000);
-            }
-        });
-        function runSlideShow() {
-            if(slideUrls.length > 0) {
-                slideImg.src = slideUrls[currentSlideIdx];
-                currentSlideIdx = (currentSlideIdx + 1) % slideUrls.length;
-            }
-        }
-
-        // --- 5. INITIALIZE CHART.JS ---
-        const chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            cutout: '73%',
-        };
-
-        const ctxLitmas = document.getElementById('chartLitmas').getContext('2d');
-        const chartLitmasObj = new Chart(ctxLitmas, {
-            type: 'doughnut',
-            data: {
-                labels: ['Selesai', 'Belum'],
-                datasets: [{ data: [0, 0], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }]
-            },
-            options: chartOptions
-        });
-
-        const ctxKlien = document.getElementById('chartKlien').getContext('2d');
-        const chartKlienObj = new Chart(ctxKlien, {
-            type: 'doughnut',
-            data: {
-                labels: ['Sudah', 'Belum'],
-                datasets: [{ data: [0, 0], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }]
-            },
-            options: chartOptions
-        });
-
-        // --- 6. EXCEL PARSING & INFOGRAPHICS CAROUSEL SYSTEM ---
-        let parsedDatabasePK = [];
-        let currentPKCarouselIdx = 0;
-        let carouselTimer = null;
-
-        parsedDatabasePK = [
+        // --- DATABASE CAROUSEL ENGINE ---
+        let dbPK = [
             { nama: "Eko Susilo, S.H.", litmasOk: 12, litmasNo: 3, klienNo: 2, klienOk: 45 },
             { nama: "Dwi Lestari, S.Sos.", litmasOk: 8, litmasNo: 0, klienNo: 0, klienOk: 32 },
             { nama: "Tri Haryanto, S.H.", litmasOk: 15, litmasNo: 5, klienNo: 4, klienOk: 28 }
         ];
-        
-        startCarouselInterval();
 
+        let idxSlideG = 1;
+        let idxPK = 0;
+
+        setInterval(() => {
+            document.querySelectorAll('.slide-container').forEach(s => s.classList.remove('active'));
+            idxSlideG = (idxSlideG % 4) + 1;
+            document.getElementById(`slide-global-${idxSlideG}`).classList.add('active');
+        }, 8000);
+
+        setInterval(() => {
+            if(dbPK.length === 0) return;
+            idxPK = (idxPK + 1) % dbPK.length;
+            renderIndividualPK();
+        }, 6000);
+
+        // --- EXCEL FILE LOADER ---
         document.getElementById('admin-excel-file').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -801,82 +802,170 @@
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
-                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: 0 });
-                processExcelDatabase(jsonData);
+                
+                const wsPK = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonPK = XLSX.utils.sheet_to_json(wsPK, { header: 1, defval: 0 });
+                parseSheetPK(jsonPK);
+
+                if (workbook.SheetNames.length > 1) {
+                    const wsGlobal = workbook.Sheets[workbook.SheetNames[1]];
+                    const jsonGlobal = XLSX.utils.sheet_to_json(wsGlobal, { header: 1, defval: 0 });
+                    parseSheetGlobal(jsonGlobal);
+                }
+                
+                calculateAndRenderGlobalTotals();
+                idxPK = 0;
+                renderIndividualPK();
+                alert("Sukses! Seluruh Database Kompilasi Berhasil Diperbarui.");
             };
             reader.readAsArrayBuffer(file);
         });
 
-        function processExcelDatabase(data) {
-            parsedDatabasePK = [];
+        function parseSheetPK(data) {
+            dbPK = [];
             for (let i = 0; i < data.length; i++) {
-                const row = data[i];
-                if (!row[0] || row[1] === "Nama PK" || String(row[0]).includes("No")) continue;
-
-                parsedDatabasePK.push({
-                    nama: row[1],
-                    litmasOk: parseInt(row[2]) || 0,
-                    litmasNo: parseInt(row[3]) || 0,
-                    klienNo: parseInt(row[4]) || 0,
-                    klienOk: parseInt(row[5]) || 0
-                });
-            }
-
-            if (parsedDatabasePK.length > 0) {
-                currentPKCarouselIdx = 0;
-                startCarouselInterval();
-                alert(`Sukses memuat ${parsedDatabasePK.length} Personel PK!`);
+                const r = data[i];
+                if (!r[0] || r[1] === "Nama PK" || String(r[0]).includes("No")) continue;
+                dbPK.push({ nama: r[1], litmasOk: parseInt(r[2])||0, litmasNo: parseInt(r[3])||0, klienNo: parseInt(r[4])||0, klienOk: parseInt(r[5])||0 });
             }
         }
 
-        function startCarouselInterval() {
-            clearInterval(carouselTimer);
-            updateInfographicView();
-            carouselTimer = setInterval(() => {
-                currentPKCarouselIdx = (currentPKCarouselIdx + 1) % parsedDatabasePK.length;
-                updateInfographicView();
-            }, 7000);
+        function parseSheetGlobal(data) {
+            const pagu = parseFloat(data[1][1]) || 0;
+            const real = parseFloat(data[1][2]) || 0;
+            const persenAngg = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
+
+            document.getElementById('lbl-g-anggaran-persen').textContent = persenAngg + "%";
+            document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: " + pagu.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+            document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: " + real.toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+            
+            cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0];
+            cGAnggaran.update();
+
+            const hadir = parseInt(data[4][1]) || 0;
+            const cuti = parseInt(data[4][2]) || 0;
+            const izin = parseInt(data[4][3]) || 0;
+            const dl = parseInt(data[4][4]) || 0;
+            const totalPeg = hadir + cuti + izin + dl;
+            const persenHadir = totalPeg > 0 ? ((hadir / totalPeg) * 100).toFixed(0) : 0;
+
+            document.getElementById('lbl-g-hadir-persen').textContent = persenHadir + "%";
+            document.getElementById('lbl-g-hadir-persen').textContent = persenHadir + "%";
+            document.getElementById('lbl-g-hadir-persen').textContent = persenHadir + "%";
+            document.getElementById('lbl-g-peg-hadir').textContent = hadir;
+            document.getElementById('lbl-g-peg-cuti').textContent = cuti;
+            document.getElementById('lbl-g-peg-izin').textContent = izin;
+            document.getElementById('lbl-g-peg-dl').textContent = dl;
+
+            cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl];
+            cGPegawai.update();
         }
 
-        function updateInfographicView() {
-            if (parsedDatabasePK.length === 0) return;
+        function calculateAndRenderGlobalTotals() {
+            let totalLitmasOk = 0, totalLitmasNo = 0, totalKlienOk = 0, totalKlienNo = 0;
+            dbPK.forEach(p => {
+                totalLitmasOk += p.litmasOk; totalLitmasNo += p.litmasNo;
+                totalKlienOk += p.klienOk; totalKlienNo += p.klienNo;
+            });
 
-            const currentData = parsedDatabasePK[currentPKCarouselIdx];
-            document.getElementById('infografis-nama').textContent = currentData.nama;
-            document.getElementById('infografis-index').textContent = `PK [${currentPKCarouselIdx + 1}/${parsedDatabasePK.length}]`;
+            const sumLitmas = totalLitmasOk + totalLitmasNo;
+            const pLitmas = sumLitmas > 0 ? ((totalLitmasOk / sumLitmas) * 100).toFixed(0) : 0;
+            document.getElementById('lbl-g-litmas-persen').textContent = pLitmas + "%";
+            document.getElementById('lbl-g-litmas-ok').textContent = totalLitmasOk;
+            document.getElementById('lbl-g-litmas-no').textContent = totalLitmasNo;
+            cGLitmas.data.datasets[0].data = [totalLitmasOk, totalLitmasNo]; cGLitmas.update();
 
-            const totalLitmas = currentData.litmasOk + currentData.litmasNo;
-            const persenLitmas = totalLitmas > 0 ? ((currentData.litmasOk / totalLitmas) * 100).toFixed(0) : 0;
-            document.getElementById('text-persen-litmas').textContent = persenLitmas + "%";
-            document.getElementById('lbl-litmas-ok').textContent = currentData.litmasOk;
-            document.getElementById('lbl-litmas-no').textContent = currentData.litmasNo;
-
-            chartLitmasObj.data.datasets[0].data = [currentData.litmasOk, currentData.litmasNo];
-            chartLitmasObj.update();
-
-            const totalKlien = currentData.klienOk + currentData.klienNo;
-            const persenKlien = totalKlien > 0 ? ((currentData.klienOk / totalKlien) * 100).toFixed(0) : 0;
-            document.getElementById('text-persen-klien').textContent = persenKlien + "%";
-            document.getElementById('lbl-klien-ok').textContent = currentData.klienOk;
-            document.getElementById('lbl-klien-no').textContent = currentData.klienNo;
-
-            chartKlienObj.data.datasets[0].data = [currentData.klienOk, currentData.klienNo];
-            chartKlienObj.update();
+            const sumKlien = totalKlienOk + totalKlienNo;
+            const pKlien = sumKlien > 0 ? ((totalKlienOk / sumKlien) * 100).toFixed(0) : 0;
+            document.getElementById('lbl-g-klien-persen').textContent = pKlien + "%";
+            document.getElementById('lbl-g-klien-ok').textContent = totalKlienOk;
+            document.getElementById('lbl-g-klien-no').textContent = totalKlienNo;
+            cGKlien.data.datasets[0].data = [totalKlienOk, totalKlienNo]; cGKlien.update();
         }
 
-        // --- 7. GEN TEMPLATE EXCEL ---
-        function generateAndDownloadTemplate() {
-            const templateData = [
-                ["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],
-                [1, "Eko Susilo, S.H.", 12, 3, 2, 45],
-                [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32]
-            ];
-            const ws = XLSX.utils.aoa_to_sheet(templateData);
-            ws['!cols'] = [{ wch: 6 }, { wch: 30 }, { wch: 18 }, { wch: 22 }, { wch: 22 }, { wch: 22 }];
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Kinerja PK");
-            XLSX.writeFile(wb, "Template_Database_Performa_PK_Purwokerto.xlsx");
+        function renderIndividualPK() {
+            if(dbPK.length === 0) return;
+            const current = dbPK[idxPK];
+            document.getElementById('infografis-nama').textContent = current.nama;
+            document.getElementById('infografis-index').textContent = `PK [${idxPK + 1}/${dbPK.length}]`;
+
+            const totL = current.litmasOk + current.litmasNo;
+            const pL = totL > 0 ? ((current.litmasOk / totL) * 100).toFixed(0) : 0;
+            document.getElementById('text-persen-litmas').textContent = pL + "%";
+            document.getElementById('lbl-litmas-ok').textContent = current.litmasOk;
+            document.getElementById('lbl-litmas-no').textContent = current.litmasNo;
+            cLitmas.data.datasets[0].data = [current.litmasOk, current.litmasNo]; cLitmas.update();
+
+            const totK = current.klienOk + current.klienNo;
+            const pK = totK > 0 ? ((current.klienOk / totK) * 100).toFixed(0) : 0;
+            document.getElementById('text-persen-klien').textContent = pK + "%";
+            document.getElementById('lbl-klien-ok').textContent = current.klienOk;
+            document.getElementById('lbl-klien-no').textContent = current.klienNo;
+            cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
+        }
+
+        calculateAndRenderGlobalTotals();
+        renderIndividualPK();
+
+        // ===================================================================
+        // --- PERBAIKAN TOTAL: RE-ENGINEERING DOWNLOAD EXCEL ENGINE ----------
+        // ===================================================================
+        function generateAndDownloadTemplateFix() {
+            try {
+                const wb = XLSX.utils.book_new();
+                
+                // DATA SHEET 1
+                const dataPK = [
+                    ["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],
+                    [1, "Eko Susilo, S.H.", 12, 3, 2, 45],
+                    [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32],
+                    [3, "Tri Haryanto, S.H.", 15, 5, 4, 28]
+                ];
+                const ws1 = XLSX.utils.aoa_to_sheet(dataPK);
+                ws1['!cols'] = [{wch:6}, {wch:30}, {wch:18}, {wch:22}, {wch:22}, {wch:22}];
+                XLSX.utils.book_append_sheet(wb, ws1, "Kinerja PK Individual");
+
+                // DATA SHEET 2
+                const dataGlobal = [
+                    ["KATEGORI DATA", "PARAMETER A (PAGU / HADIR)", "PARAMETER B (REALISASI / CUTI)", "PARAMETER C (IZIN)", "PARAMETER D (DINAS LUAR)"],
+                    ["ANGGARAN (Rp)", 250000000, 131000000, 0, 0], 
+                    ["", "", "", "", ""],
+                    ["KEHADIRAN PEGAWAI", "Hadir Fisik", "Cuti Resmi", "Izin Sakit/Alasan Sah", "Dinas Luar (DL)"],
+                    ["JUMLAH (ORANG)", 38, 2, 1, 4]
+                ];
+                const ws2 = XLSX.utils.aoa_to_sheet(dataGlobal);
+                ws2['!cols'] = [{wch:22}, {wch:28}, {wch:28}, {wch:25}, {wch:25}];
+                XLSX.utils.book_append_sheet(wb, ws2, "Anggaran & Kehadiran");
+
+                // Konversi data workbook menjadi biner array tingkat rendah
+                const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+                // Fungsi helper memetakan biner menjadi struktur memori array buffer
+                function s2ab(s) {
+                    const buf = new ArrayBuffer(s.length);
+                    const view = new Uint8Array(buf);
+                    for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+                    return buf;
+                }
+
+                // Membuat objek download link buatan di browser
+                const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "Template_Database_Terpadu_Bapas_Purwokerto.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                
+                // Bersihkan memori browser setelah mengunduh
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 100);
+
+            } catch (error) {
+                alert("Kesalahan Teknis Gagal Mendownload: " + error.message);
+            }
         }
     </script>
 </body>
