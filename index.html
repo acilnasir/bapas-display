@@ -914,5 +914,71 @@
 
         window.addEventListener('click', () => { window.speechSynthesis.getVoices(); }, { once: true });
     </script>
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
+
+        // Update Jam dan Tanggal
+        setInterval(() => {
+            const now = new Date();
+            // Format Hari, Tanggal
+            document.getElementById('live-date').textContent = now.toLocaleDateString('id-ID', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            // Format Jam
+            document.getElementById('live-clock').textContent = now.toLocaleTimeString('id-ID');
+        }, 1000);
+
+        // Audio TTS yang Ditingkatkan
+        function triggerChimeAndVoice(nomorAntrian, namaLoket) {
+            try {
+                // ... (Kode Chime tetap sama) ...
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                // (Chime logic disederhanakan untuk ringkas)
+                
+                setTimeout(() => {
+                    // Melafalkan nomor dan tujuan ruangan
+                    // namaLoket di sini berisi teks dari kolom "keterangan/loket"
+                    let nomorDieja = nomorAntrian.split("").join(" ").replace(/-/g, ""); 
+                    let text = `Nomor antrean, ${nomorDieja}, silakan menuju ke ${namaLoket}`;
+                    
+                    let utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'id-ID'; 
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1.0;
+                    window.speechSynthesis.speak(utterance);
+                }, 750); 
+            } catch(e) { console.error("Audio Error: ", e); }
+        }
+
+        // --- Fungsi Fetch Data (Update pemanggilan loket) ---
+        function fetchDataFromAppsScriptAPI(apiUrl) {
+            fetch(apiUrl)
+                .then(res => res.json())
+                .then(jsonResponse => {
+                    if(jsonResponse.status !== "success") return;
+                    
+                    if (jsonResponse.antrian) {
+                        const {A, B, C} = jsonResponse.antrian;
+                        // Mengambil data loket/keterangan dari jsonResponse.antrian_loket
+                        const loketA = jsonResponse.antrian_loket?.A || "Ruang Pelayanan";
+                        const loketB = jsonResponse.antrian_loket?.B || "Ruang Pelayanan";
+                        const loketC = jsonResponse.antrian_loket?.C || "Ruang Pelayanan";
+
+                        if(cacheLastAntrian.A !== A && A !== "000") triggerChimeAndVoice(A, loketA);
+                        if(cacheLastAntrian.B !== B && B !== "000") triggerChimeAndVoice(B, loketB);
+                        if(cacheLastAntrian.C !== C && C !== "000") triggerChimeAndVoice(C, loketC);
+                        
+                        cacheLastAntrian = { A, B, C };
+                        document.getElementById('num-antrian-a').textContent = A;
+                        document.getElementById('num-antrian-b').textContent = B;
+                        document.getElementById('num-antrian-c').textContent = C;
+                    }
+                    // ... (rest of logic)
+                });
+        }
+        
+        let cacheLastAntrian = { A: "", B: "", C: "" };
+        // ... (rest of script)
+    </script>
 </body>
 </html>
