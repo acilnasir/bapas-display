@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
+    <!-- Memuat Library SheetJS untuk Pembuatan Berkas Excel (.xlsx) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Memuat Library Chart.js (Grafik Dinamis) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -102,7 +104,6 @@
             gap: 15px;
         }
 
-        /* SUSUNAN STRUKTUR UP-LOWER (VIDEO & ANTRIAN COMPONENT) */
         .video-and-queue-container {
             display: grid;
             grid-template-columns: 1fr;
@@ -111,7 +112,6 @@
             width: 100%;
         }
 
-        /* WIDGET PANEL ANTRIAN KANAN ATAS VIDEO */
         .queue-display-bar {
             grid-row: 1;
             display: grid;
@@ -222,18 +222,6 @@
             width: 100%;
             cursor: pointer;
             accent-color: var(--secondary-color);
-        }
-
-        .playlist-indicator {
-            position: absolute;
-            bottom: 15px;
-            left: 15px;
-            background-color: rgba(0, 0, 0, 0.75);
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 13px;
-            border: 1px solid var(--secondary-color);
-            z-index: 5;
         }
 
         /* PANEL KANAN (INFOGRAFIS SLIDESHOW) */
@@ -555,10 +543,6 @@
             font-size: 13px;
         }
 
-        input[type="password"], input[type="text"] {
-            margin-bottom: 12px;
-        }
-
         .btn-action-panel {
             background-color: var(--primary-color);
             color: white;
@@ -596,6 +580,7 @@
         <div class="left-panel">
             <div class="video-and-queue-container">
                 
+                <!-- ROW DISPLAY ANTRIAN PELAYANAN -->
                 <div class="queue-display-bar">
                     <div class="queue-ticket-card card-type-a">
                         <div class="queue-label">Antrian A</div>
@@ -611,6 +596,7 @@
                     </div>
                 </div>
 
+                <!-- BOX YOUTUBE STREAM PLAYER -->
                 <div class="video-box-container">
                     <div id="yt-player"></div>
                     <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan YouTube...</div>
@@ -788,14 +774,13 @@
 
             <div class="admin-card">
                 <h4>Informasi Konfigurasi Video & Antrian</h4>
-                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Daftar putar video YouTube dan **Nomor Antrean Pelayanan A, B, C** sekarang diatur otomatis melalui Google Sheet Anda.</p>
-                <p style="font-size:12px; color:var(--secondary-color); margin-top:8px; font-weight:bold;">Operator cukup memperbarui nomor antrean di tab 'Data Antrian' spreadsheet, maka TV akan bersinkronisasi secara otomatis.</p>
+                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Daftar putar video YouTube dan **Nomor Antrean Pelayanan A, B, C beserta Panggilan Suara** diatur otomatis via Google Sheet.</p>
+                <p style="font-size:12px; color:var(--secondary-color); margin-top:8px; font-weight:bold;">Pastikan kolom Keterangan di tab 'Data Antrian' diisi agar asisten suara memanggil nama meja/loket tujuan secara tepat.</p>
             </div>
 
             <div class="admin-card">
                 <h4>Informasi Logo Atas</h4>
-                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Logo institusi Bapas Kelas II Purwokerto telah dikunci permanen secara cloud.</p>
-                <p style="font-size:12px; color:var(--accent-green); margin-top:8px; font-weight:bold;">Sistem memanggil logo otomatis dari Google Drive.</p>
+                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Logo institusi Bapas Kelas II Purwokerto dikunci permanen secara cloud.</p>
             </div>
 
             <div class="admin-card">
@@ -807,6 +792,7 @@
         </div>
     </div>
 
+    <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
         // --- SECURITY MANAGEMENT ---
         const USERNAME_VALID = "adminbapas";
@@ -918,7 +904,7 @@
         function nextVideoManual() { if(localVideoQueue.length <= 1) return; currentQueueIndex++; playVideoFromLocalQueue(); }
         function togglePlayPause() { if (!ytPlayerObj) return; if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; } else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; } }
         function toggleMute() { if (!ytPlayerObj) return; const btn = document.getElementById('btn-mute'); if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; } else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; } }
-        function setVolume(v) { if (ytPlayerObj) ytPlayerObj.setVolume(v); document.getElementById('volume-text').textContent = v + "%"; }
+        function setVolume(v) { if (ytPlayerObj) ytPlayerObj.setVolume(v); }
 
         // --- CHART INITIALIZATION ---
         const miniChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'70%' };
@@ -977,6 +963,63 @@
         }
 
         // ===================================================================
+        // --- 🔔 AUDIO NOTIFICATION & SYNTHESIZED VOICE ENGINE -------------
+        // ===================================================================
+        let cacheLastAntrian = { A: "", B: "", C: "" };
+
+        function triggerChimeAndVoice(nomorAntrian, namaLoket) {
+            try {
+                // 1. Jalankan Audio Synth Ding-Dong Bawaan Browser
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Nada Pertama (E5)
+                let osc1 = audioCtx.createOscillator();
+                let gain1 = audioCtx.createGain();
+                osc1.type = 'sine'; osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime);
+                gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                osc1.connect(gain1); gain1.connect(audioCtx.destination);
+                osc1.start(); osc1.stop(audioCtx.currentTime + 0.4);
+
+                // Nada Kedua (C5) dijeda 0.15 detik
+                setTimeout(() => {
+                    let osc2 = audioCtx.createOscillator();
+                    let gain2 = audioCtx.createGain();
+                    osc2.type = 'sine'; osc2.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                    osc2.connect(gain2); gain2.connect(audioCtx.destination);
+                    osc2.start(); osc2.stop(audioCtx.currentTime + 0.5);
+                }, 150);
+
+                // 2. Mainkan Panggilan Suara Setelah Bell Selesai (Jeda 0.8 Detik)
+                setTimeout(() => {
+                    // Pecah nomor antrean agar dieja per karakter (Misal: "A 0 1 2")
+                    let nomorDieja = nomorAntrian.split("").join(" ");
+                    // Ganti strip agar tidak memicu jeda aneh pada pembacaan
+                    nomorDieja = nomorDieja.replace(/-/g, ""); 
+
+                    let teksPanggilan = `Nomor antrean, ${nomorDieja}, silahkan menuju ke ${namaLoket}`;
+                    
+                    let utterance = new SpeechSynthesisUtterance(teksPanggilan);
+                    utterance.lang = 'id-ID'; // Set bahasa resmi Indonesia
+                    utterance.rate = 0.85;    // Atur kecepatan agar tidak terlalu cepat
+                    utterance.pitch = 1.0;    // Intonasi standar
+                    
+                    // Deteksi dan paksa menggunakan engine bahasa Indonesia lokal di TV jika tersedia
+                    let voices = window.speechSynthesis.getVoices();
+                    let idVoice = voices.find(v => v.lang.includes('id') || v.lang.includes('ID'));
+                    if(idVoice) utterance.voice = idVoice;
+
+                    window.speechSynthesis.speak(utterance);
+                }, 800000 / 1000); // 0.8 Detik
+
+            } catch(e) {
+                console.error("Audio Context Error: ", e);
+            }
+        }
+
+        // ===================================================================
         // --- REALTIME SINKRONISASI API SCRIPT FEEDS ------------------------
         // ===================================================================
         function saveAndConnectGSheetGateway() {
@@ -1006,11 +1049,34 @@
                         if(oldFirstVideo !== localVideoQueue[0]) playVideoFromLocalQueue();
                     }
 
-                    // B. REALTIME DATA UPDATE: TIKET NOMOR ANTREAN (A, B, C)
+                    // B. DETEKSI PERUBAHAN NOMOR ANTRIAN & STRATEGI VOICE ANNOUNCEMENT
                     if (jsonResponse.antrian) {
-                        document.getElementById('num-antrian-a').textContent = jsonResponse.antrian.A;
-                        document.getElementById('num-antrian-b').textContent = jsonResponse.antrian.B;
-                        document.getElementById('num-antrian-c').textContent = jsonResponse.antrian.C;
+                        const currentA = jsonResponse.antrian.A;
+                        const currentB = jsonResponse.antrian.B;
+                        const currentC = jsonResponse.antrian.C;
+
+                        // Periksa Perubahan Antrian A
+                        if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== currentA && currentA !== "000") {
+                            triggerChimeAndVoice(currentA, jsonResponse.antrian_loket?.A || "Ruang Pelayanan");
+                        }
+                        // Periksa Perubahan Antrian B
+                        if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== currentB && currentB !== "000") {
+                            triggerChimeAndVoice(currentB, jsonResponse.antrian_loket?.B || "Ruang Pelayanan");
+                        }
+                        // Periksa Perubahan Antrian C
+                        if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== currentC && currentC !== "000") {
+                            triggerChimeAndVoice(currentC, jsonResponse.antrian_loket?.C || "Ruang Pelayanan");
+                        }
+
+                        // Simpan nilai terbaru ke dalam Cache memori lokal browser
+                        cacheLastAntrian.A = currentA;
+                        cacheLastAntrian.B = currentB;
+                        cacheLastAntrian.C = currentC;
+
+                        // Render teks ke layar monitor
+                        document.getElementById('num-antrian-a').textContent = currentA;
+                        document.getElementById('num-antrian-b').textContent = currentB;
+                        document.getElementById('num-antrian-c').textContent = currentC;
                     }
 
                     // C. Update Data Pembimbing Kemasyarakatan (PK)
@@ -1052,7 +1118,6 @@
                 .catch(err => {
                     document.getElementById('sync-status-text').textContent = "API Error";
                     document.getElementById('sync-status-text').style.color = "#ef4444";
-                    console.error("Fetch API Error: ", err);
                 });
         }
 
@@ -1101,48 +1166,31 @@
         function downloadPureExcelTemplate() {
             try {
                 const wb = XLSX.utils.book_new();
-                const dataPK = [
-                    ["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],
-                    [1, "Eko Susilo, S.H.", 12, 3, 2, 45]
-                ];
-                const ws1 = XLSX.utils.aoa_to_sheet(dataPK);
-                XLSX.utils.book_append_sheet(wb, ws1, "Kinerja PK Individual");
+                const dataPK = [["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],[1, "Eko Susilo, S.H.", 12, 3, 2, 45]];
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataPK), "Kinerja PK Individual");
 
-                const dataGlobal = [
-                    ["KATEGORI DATA", "PARAMETER A", "PARAMETER B", "PARAMETER C", "PARAMETER D"],
-                    ["ANGGARAN (Rp)", 250000000, 131000000, 0, 0],
-                    ["", "", "", "", ""],
-                    ["JUMLAH PEGAWAI", 38, 2, 1, 4]
-                ];
-                const ws2 = XLSX.utils.aoa_to_sheet(dataGlobal);
-                XLSX.utils.book_append_sheet(wb, ws2, "Anggaran & Kehadiran");
+                const dataGlobal = [["KATEGORI DATA", "PARAMETER A", "PARAMETER B", "PARAMETER C", "PARAMETER D"],["ANGGARAN (Rp)", 250000000, 131000000, 0, 0],["", "", "", "", ""],["JUMLAH PEGAWAI", 38, 2, 1, 4]];
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataGlobal), "Anggaran & Kehadiran");
 
-                const dataVideo = [
-                    ["No", "Judul Video", "URL / Link Video YouTube Utama"],
-                    [1, "Profil Komparasi", "https://www.youtube.com/watch?v=jrXNVlQJpW0"]
-                ];
-                const ws3 = XLSX.utils.aoa_to_sheet(dataVideo);
-                XLSX.utils.book_append_sheet(wb, ws3, "Antrean Video YouTube");
+                const dataVideo = [["No", "Judul Video", "URL / Link Video YouTube Utama"],[1, "Profil Komparasi", "https://www.youtube.com/watch?v=jrXNVlQJpW0"]];
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataVideo), "Antrean Video YouTube");
 
-                const templateAntrian = [
-                    ["Jenis Antrean", "Nomor Antrean Saat Ini", "Keterangan / Loket"],
-                    ["Antrian A", "A-001", "Loket 1"],
-                    ["Antrian B", "B-001", "Loket 2"],
-                    ["Antrian C", "C-001", "Loket 3"]
-                ];
-                const ws4 = XLSX.utils.aoa_to_sheet(templateAntrian);
-                XLSX.utils.book_append_sheet(wb, ws4, "Data Antrian");
+                const templateAntrian = [["Jenis Antrean", "Nomor Antrean Saat Ini", "Keterangan / Loket"],["Antrian A", "A-001", "Meja 1"],["Antrian B", "B-001", "Meja 2"],["Antrian C", "C-001", "Ruang Registrasi"]];
+                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(templateAntrian), "Data Antrian");
 
                 XLSX.writeFile(wb, "Template_Struktur_Sheet_Bapas_Murni.xlsx");
             } catch (e) { alert(e.message); }
         }
 
-        // AUTO-POLLING REFRESH CLOUD (Setiap 25 detik sekali)
+        // AUTO-POLLING CLOUD REFRESH (Setiap 25 detik sekali)
         const savedApiUrl = localStorage.getItem("gsheet_url_bapas");
         if(savedApiUrl) {
             fetchDataFromAppsScriptAPI(savedApiUrl);
             setInterval(() => { fetchDataFromAppsScriptAPI(savedApiUrl); }, 25000); 
         }
+
+        // Pemicu aktivasi suara awal saat memuat halaman browser
+        window.addEventListener('click', () => { window.speechSynthesis.getVoices(); }, { once: true });
     </script>
 </body>
 </html>
