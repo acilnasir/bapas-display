@@ -671,9 +671,9 @@ updateDateTime();
 
           if (jsonResponse.antrian) {
             const {A, B, C} = jsonResponse.antrian;
-            if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== A && A !== "000") triggerChimeAndVoice(A, jsonResponse.antrian_loket?.A || "Ruang Pelayanan");
-            if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== B && B !== "000") triggerChimeAndVoice(B, jsonResponse.antrian_loket?.B || "Ruang Pelayanan");
-            if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== C && C !== "000") triggerChimeAndVoice(C, jsonResponse.antrian_loket?.C || "Ruang Pelayanan");
+            if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== A && A !== "000") triggerChimeAndVoice(A, jsonResponse.antrian_loket?.A || "Meja Konsultasi 1");
+            if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== B && B !== "000") triggerChimeAndVoice(B, jsonResponse.antrian_loket?.B || "Meja Konsultasi 2");
+            if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== C && C !== "000") triggerChimeAndVoice(C, jsonResponse.antrian_loket?.C || "Ruang Registrasi");
             cacheLastAntrian = { A, B, C };
             document.getElementById('num-antrian-a').textContent = A;
             document.getElementById('num-antrian-b').textContent = B;
