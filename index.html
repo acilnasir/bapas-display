@@ -90,7 +90,7 @@
             margin-top: 4px;
         }
 
-        /* PANEL KIRI (YOUTUBE INTEGRATION + CONTROLS) */
+        /* PANEL KIRI (YOUTUBE INTEGRATION) */
         .left-panel {
             grid-column: 1;
             padding: 25px;
@@ -173,7 +173,7 @@
             z-index: 5;
         }
 
-        /* PANEL KANAN (INFOGRAFIS SLIDESHOW GLOBAL & INDIVIDUAL CAROUSEL) */
+        /* PANEL KANAN (INFOGRAFIS SLIDESHOW) */
         .right-panel {
             grid-column: 2;
             display: grid;
@@ -365,7 +365,7 @@
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
         .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* FLOATING PUBLIC CONTROLS WITH HIGHEST Z-INDEX */
+        /* FLOATING PUBLIC CONTROLS */
         .bottom-trigger-control-zone {
             position: fixed;
             bottom: 15px;
@@ -483,7 +483,7 @@
         
         <div class="header-display">
             <div class="header-brand-section">
-                <img id="display-header-logo" src="" style="display: none;" class="header-logo-img" alt="Logo Kementerian">
+                <img id="display-header-logo" src="" style="display: none;" class="header-logo-img" alt="Logo">
                 <div>
                     <h1>BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
                     <p>Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Direktorat Jenderal Pemasyarakatan Jawa Tengah</p>
@@ -498,7 +498,7 @@
         <div class="left-panel">
             <div class="video-box-container">
                 <div id="yt-player"></div>
-                <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan Server YouTube...</div>
+                <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan YouTube...</div>
             </div>
             
             <div class="video-audio-controls">
@@ -511,7 +511,6 @@
                     <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
                     <span style="font-size: 12px; font-weight: bold;" id="volume-text">80%</span>
                 </div>
-                <button class="audio-btn" onclick="nextVideoManual()">⏭ Berikutnya</button>
             </div>
         </div>
 
@@ -625,7 +624,7 @@
         <div class="admin-header">
             <div>
                 <h2>PANEL UTAMA PENGENDALI MEDIA DISPLAY (MODE TERKUNCI)</h2>
-                <p style="color: #9ca3af; font-size: 14px;">Konfigurasi tautan media eksternal instansi secara realtime.</p>
+                <p style="color: #9ca3af; font-size: 14px;">Manajemen konfigurasi realtime TV display monitor.</p>
             </div>
             <div>
                 <button class="btn-logout" onclick="keluarAdmin();">🔒 Keluar & Kunci Admin</button>
@@ -634,21 +633,19 @@
 
         <div class="admin-grid">
             <div class="admin-card">
-                <h4>1. Tautan Video / Playlist YouTube</h4>
-                <label>Masukkan Link YouTube:</label>
-                <input type="text" id="txt-yt-url" placeholder="Masukkan Link Utama YouTube">
+                <h4>1. Tautan Video YouTube (1 Video Utama)</h4>
+                <label>Masukkan Link Video YouTube:</label>
+                <input type="text" id="txt-yt-url" placeholder="Contoh: https://www.youtube.com/watch?v=jrXNVlQJpW0">
                 <button type="button" class="btn-action-panel" onclick="saveAndLoadYouTube()">📺 Simpan & Putar Video</button>
             </div>
 
             <div class="admin-card">
-                <h4>2. Tautan Google Spreadsheet</h4>
+                <h4>2. Integrasi Live Google Sheets</h4>
                 <label>Tautan URL Utama Google Sheet:</label>
                 <input type="text" id="txt-gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
                 <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheet()">🔗 Hubungkan Google Sheet</button>
-                <div style="font-size:11px; color:#cbd5e1; margin-top:8px; line-height:1.4;">
-                    <b>💡 Syarat Wajib Sinkronisasi GSheet:</b><br>
-                    Buka Spreadsheet Anda, klik menu <b>File</b> ➔ <b>Bagikan</b> ➔ <b>Publikasikan ke Web</b>. Klik tombol "Publikasikan" (Biarkan opsi Seluruh Dokumen & Halaman Web standar).
-                </div>
+                
+                <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadLocalTemplateExcel()">📥 Download Template Struktur Sheet</button>
             </div>
 
             <div class="admin-card">
@@ -715,17 +712,8 @@
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
         }
 
-        // --- LOGO HANDLING ---
-        document.getElementById('admin-logo-file').addEventListener('change', function() {
-            if (this.files[0]) {
-                const img = document.getElementById('display-header-logo');
-                img.src = URL.createObjectURL(this.files[0]);
-                img.style.display = 'block';
-            }
-        });
-
         // ===================================================================
-        // --- ADAPTIVE BYPASS YOUTUBE PLAYER API ENGINE ---------------------
+        // --- 1 VIDEO CLEAN YOUTUBE PLAYER CONFIGURATION -------------------
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
@@ -740,11 +728,10 @@
             tag.src = "https://www.youtube.com/iframe_api";
             const firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            setTimeout(() => { if (!isYtApiReady && typeof YT !== 'undefined' && YT.Player) onYouTubeIframeAPIReady(); }, 2000);
         });
 
         function loadInitialYouTubeVideo() {
-            const savedYtUrl = localStorage.getItem("yt_url_bapas") || "https://www.youtube.com/watch?v=jrXNVlQJpW0&list=PL_rWyqdVEuT7Xgs6bt_dBlGu_KdNwA0C2_"; 
+            const savedYtUrl = localStorage.getItem("yt_url_bapas") || "https://www.youtube.com/watch?v=jrXNVlQJpW0"; 
             buildYouTubePlayer(savedYtUrl);
         }
 
@@ -753,112 +740,54 @@
             if(!ytUrl) { alert("Harap isi link YouTube!"); return; }
             localStorage.setItem("yt_url_bapas", ytUrl);
             buildYouTubePlayer(ytUrl);
-            alert("Tautan YouTube berhasil disinkronisasikan!");
+            alert("Video YouTube Berhasil Diperbarui!");
         }
 
         function buildYouTubePlayer(urlStr) {
-            let videoId = "";
-            let playlistId = "";
+            if (!isYtApiReady) return;
+            
+            let videoId = "jrXNVlQJpW0"; // Fallback default
+            
+            // Ekstraksi ID Video Tunggal dari berbagai macam pola link YouTube
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = urlStr.match(regExp);
+            if (match && match[2].length === 11) {
+                videoId = match[2];
+            }
 
-            try {
-                // SINKRONISASI PLAYLIST: Ambil ID unik setelah parameter list=
-                if (urlStr.includes("list=")) {
-                    const listMatch = urlStr.match(/[&?]list=([^&]+)/);
-                    if (listMatch && listMatch[1]) playlistId = listMatch[1];
-                }
+            if (ytPlayerObj) ytPlayerObj.destroy();
 
-                // Ambil ID video tunggal jika bukan kombinasi playlist
-                if (!playlistId) {
-                    const videoMatch = urlStr.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|shorts\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/);
-                    if (videoMatch && videoMatch[1]) videoId = videoMatch[1];
-                }
-
-                if (ytPlayerObj) ytPlayerObj.destroy();
-
-                let playerVarsSetting = {
+            ytPlayerObj = new YT.Player('yt-player', {
+                videoId: videoId,
+                playerVars: {
                     'autoplay': 1,
-                    'controls': 0, 
+                    'controls': 0, // Bersih tanpa tombol kontrol YouTube
                     'rel': 0,
                     'loop': 1,
-                    'modestbranding': 1,
-                    'iv_load_policy': 3
-                };
-
-                // SOLUSI BYPASS UTAMA: Jika tautan memiliki playlistId, paksa Iframe memanggil parameter list murni tanpa videoId agar terbebas dari restriksi embed
-                if (playlistId) {
-                    playerVarsSetting.listType = 'playlist';
-                    playerVarsSetting.list = playlistId;
-                } else {
-                    playerVarsSetting.playlist = videoId;
+                    'playlist': videoId, // Diperlukan agar loop video tunggal berfungsi
+                    'modestbranding': 1
+                },
+                events: {
+                    'onReady': (e) => { e.target.mute(); e.target.playVideo(); document.getElementById('video-title-indicator').textContent = "Memutar Informasi Layanan Bapas"; },
+                    'onStateChange': (e) => { if (e.data === -1 || e.data === 5) e.target.playVideo(); }
                 }
-
-                ytPlayerObj = new YT.Player('yt-player', {
-                    videoId: playlistId ? undefined : videoId,
-                    playerVars: playerVarsSetting,
-                    events: {
-                        'onReady': onPlayerReady,
-                        'onStateChange': onPlayerStateChange,
-                        'onError': onPlayerError
-                    }
-                });
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        function onPlayerReady(event) {
-            event.target.mute();
-            event.target.playVideo();
-            document.getElementById('video-title-indicator').textContent = "Memutar Informasi YouTube Playlist Terpadu";
-        }
-
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.UNSTARTED || event.data === -1) {
-                ytPlayerObj.playVideo();
-            }
-        }
-
-        function onPlayerError(event) {
-            console.log("YouTube Error Terdeteksi. Mengaktifkan Failsafe Pemutaran...");
-            // Failsafe Otomatis: Jika video pertama di playlist terblokir, paksa putar seluruh playlist murni
-            const currentSavedUrl = localStorage.getItem("yt_url_bapas");
-            if (currentSavedUrl && currentSavedUrl.includes("list=")) {
-                const pureListMatch = currentSavedUrl.match(/[&?]list=([^&]+)/);
-                if (pureListMatch && pureListMatch[1]) {
-                    if (ytPlayerObj) ytPlayerObj.destroy();
-                    ytPlayerObj = new YT.Player('yt-player', {
-                        playerVars: { 'autoplay': 1, 'controls': 0, 'listType': 'playlist', 'list': pureListMatch[1], 'loop': 1 },
-                        events: { 'onReady': (e) => { e.target.mute(); e.target.playVideo(); } }
-                    });
-                }
-            }
+            });
         }
 
         function togglePlayPause() {
             if (!ytPlayerObj) return;
-            if (ytPlayerObj.getPlayerState() === YT.PlayerState.PLAYING) {
-                ytPlayerObj.pauseVideo();
-                document.getElementById('btn-play-pause').textContent = "▶ Play";
-            } else {
-                ytPlayerObj.playVideo();
-                document.getElementById('btn-play-pause').textContent = "⏸ Pause";
-            }
+            if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; }
+            else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; }
         }
 
         function toggleMute() {
             if (!ytPlayerObj) return;
             const btn = document.getElementById('btn-mute');
-            if (ytPlayerObj.isMuted()) {
-                ytPlayerObj.unMute();
-                btn.textContent = "Aktivasi Bisu";
-            } else {
-                ytPlayerObj.mute();
-                btn.textContent = "🔊 Unmute / Suara";
-            }
+            if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; }
+            else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; }
         }
 
         function setVolume(v) { if (ytPlayerObj) ytPlayerObj.setVolume(v); document.getElementById('volume-text').textContent = v + "%"; }
-        function nextVideoManual() { if (ytPlayerObj && typeof ytPlayerObj.nextVideo === 'function') ytPlayerObj.nextVideo(); }
 
         // --- CHART INITIALIZATION ---
         const miniChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'70%' };
@@ -872,7 +801,7 @@
         const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
         const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
 
-        // --- DATABASE MANAGEMENT ---
+        // --- DATABASE VARIABLES & TIMERS ---
         let dbPK = [];
         let idxSlideG = 1;
         let idxPK = 0;
@@ -891,20 +820,20 @@
         }, 6000);
 
         // ===================================================================
-        // --- ENGINE RE-ENGINEERING: ULTRA REALTIME GOOGLE SHEETS PARSER ---
+        // --- 100% INDONESIAN REGIONAL GOOGLE SHEETS LIVE REALTIME ENGINE ---
         // ===================================================================
         function saveAndConnectGSheet() {
             const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
             if(!rawUrl) { alert("Masukkan URL!"); return; }
 
             const matches = rawUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
-            if(!matches || !matches[1]) { alert("Format URL salah."); return; }
+            if(!matches || !matches[1]) { alert("Format URL Spreadsheet tidak valid."); return; }
 
-            // Mengunci ID unik lembar sebar Google Drive Anda
             localStorage.setItem("gsheet_url_bapas", rawUrl);
             localStorage.setItem("gsheet_id_bapas", matches[1]);
             
             fetchDataFromGoogleSheets(matches[1]);
+            alert("Tautan Google Sheet Berhasil Disimpan!");
         }
 
         function fetchDataFromGoogleSheets(sheetId) {
@@ -912,15 +841,18 @@
             document.getElementById('sync-status-text').textContent = "Syncing...";
             document.getElementById('sync-status-text').style.color = "#f4d35e";
 
-            // TARGET UTAMA: Gunakan format ekspor CSV instan dan tambahkan parameter 't' (timestamp milidetik) agar bypass cache browser TV 100% realtime
-            const timestampBuster = new Date().getTime();
-            const secureLiveUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&t=${timestampBuster}`;
+            // Menggunakan Token acak waktu (Cache Buster) agar data diperbarui instan tanpa jeda
+            const cacheBuster = new Date().getTime();
+            const liveCsvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=0&x=${cacheBuster}`;
 
-            fetch(secureLiveUrl)
-                .then(res => { if(!res.ok) throw new Error("Gagal mengambil data. Pastikan dokumen telah dipublikasikan ke web."); return res.text(); })
+            fetch(liveCsvUrl)
+                .then(res => { if(!res.ok) throw new Error("Gagal mengunduh sheet."); return res.text(); })
                 .then(csvText => {
-                    // Bersihkan baris teks CSV menjadi matriks array data
-                    const rows = csvText.split("\n").map(row => row.split(","));
+                    // IMPLEMENTASI FIX: Memotong data menggunakan REGEX yang mengenali Pemisah Koma (,) sekaligus Titik Koma (;) regional Indonesia
+                    const rows = csvText.split("\n").map(row => {
+                        return row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    });
+
                     dbPK = [];
                     let parsingGlobalZone = false;
 
@@ -928,12 +860,14 @@
                         const r = rows[i];
                         if(!r || r.length < 2 || r[0] === "") continue;
 
-                        if(String(r[0]).includes("KATEGORI DATA") || String(r[0]).includes("ANGGARAN")) {
+                        const cellZero = String(r[0]).replace(/"/g, "").trim().toUpperCase();
+
+                        if(cellZero.includes("KATEGORI DATA") || cellZero.includes("ANGGARAN")) {
                             parsingGlobalZone = true;
                         }
 
                         if(!parsingGlobalZone) {
-                            // Lembar data PK Individual
+                            // Bagian 1: Data PK Individual
                             dbPK.push({
                                 nama: String(r[1]).replace(/"/g, "").trim(),
                                 litmasOk: parseInt(r[2]) || 0,
@@ -942,43 +876,47 @@
                                 klienOk: parseInt(r[5]) || 0
                             });
                         } else {
-                            // Lembar data global (Anggaran & Kehadiran)
-                            if(String(r[0]).includes("ANGGARAN")) {
+                            // Bagian 2: Data Anggaran & Kehadiran Global
+                            if(cellZero.includes("ANGGARAN")) {
                                 const pagu = parseFloat(r[1]) || 0;
                                 const real = parseFloat(r[2]) || 0;
                                 const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
+                                
                                 document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
                                 document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
                                 document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
-                                cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; cGAnggaran.update();
+                                
+                                cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; 
+                                cGAnggaran.update();
                             }
-                            if(String(r[0]).includes("JUMLAH")) {
+                            if(cellZero.includes("JUMLAH")) {
                                 const hadir = parseInt(r[1]) || 0;
                                 const cuti = parseInt(r[2]) || 0;
                                 const izin = parseInt(r[3]) || 0;
                                 const dl = parseInt(r[4]) || 0;
                                 const totalP = hadir + cuti + izin + dl;
                                 const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
+                                
                                 document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
                                 document.getElementById('lbl-g-hadir-riil').textContent = hadir;
                                 document.getElementById('lbl-g-peg-cuti').textContent = cuti;
                                 document.getElementById('lbl-g-peg-izin').textContent = izin;
                                 document.getElementById('lbl-g-peg-dl').textContent = dl;
-                                cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
+                                
+                                cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; 
+                                cGPegawai.update();
                             }
                         }
                     }
 
                     calculateAndRenderGlobalTotals();
-                    if(dbPK.length > 0) {
-                        renderIndividualPK();
-                    }
+                    if(dbPK.length > 0) renderIndividualPK();
 
                     document.getElementById('sync-status-text').textContent = "Live Realtime";
                     document.getElementById('sync-status-text').style.color = "#10b981";
                 })
                 .catch(err => {
-                    document.getElementById('sync-status-text').textContent = "Sync Offline / Error";
+                    document.getElementById('sync-status-text').textContent = "Sync Error / Offline";
                     document.getElementById('sync-status-text').style.color = "#ef4444";
                     console.error(err);
                 });
@@ -1027,11 +965,30 @@
             cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
         }
 
-        // AUTO INITIAL SINKRONISASI REALTIME (Berjalan otomatis setiap 30 detik ke Google Sheet)
+        // --- FITUR DOWNLOAD TEMPLATE STRUKTUR BARU ---
+        function downloadLocalTemplateExcel() {
+            const csvContent = "data:text/csv;charset=utf-8," 
+                + "No;Nama PK;Litmas Selesai;Litmas Belum Selesai;Klien Belum Melapor;Klien Sudah Melapor\n"
+                + "1;Eko Susilo SH;12;3;2;45\n"
+                + "2;Dwi Lestari S.Sos;8;0;0;32\n"
+                + "3;Tri Haryanto SH;15;5;4;28\n"
+                + "ANGGARAN (Rp);250000000;131000000;;\n"
+                + "JUMLAH (ORANG);38;2;1;4";
+                
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "Struktur_Panduan_GoogleSheet_Bapas.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // LOOP INTERNAL DATA REFRESH (Panggil setiap 25 detik sekali ke server Cloud Google Drive)
         const cachedId = localStorage.getItem("gsheet_id_bapas") || "1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c";
         if(cachedId) {
             fetchDataFromGoogleSheets(cachedId);
-            setInterval(() => { fetchDataFromGoogleSheets(cachedId); }, 30000); 
+            setInterval(() => { fetchDataFromGoogleSheets(cachedId); }, 25000); 
         }
     </script>
 </body>
