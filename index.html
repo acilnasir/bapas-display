@@ -306,6 +306,26 @@
       <div style="text-align: right;">
         <div id="live-date" style="font-size: 16px; font-weight: 600; margin-bottom: 5px;"></div>
         <div id="live-clock" style="font-size: 26px; font-weight: 800;">00:00:00</div>
+        <script>
+function updateDateTime() {
+    const now = new Date();
+    
+    // Konfigurasi format tanggal
+    const options = { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' };
+    const dateString = now.toLocaleDateString('id-ID', options);
+    
+    // Menampilkan jam
+    const timeString = now.toLocaleTimeString('id-ID', { hour12: false });
+    
+    // Update elemen HTML
+    document.getElementById('live-date').innerText = dateString;
+    document.getElementById('live-clock').innerText = timeString;
+}
+
+// Jalankan fungsi setiap detik
+setInterval(updateDateTime, 1000);
+updateDateTime(); // Jalankan sekali saat load
+</script>
         <div style="font-size: 13px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
       </div>
     </div>
