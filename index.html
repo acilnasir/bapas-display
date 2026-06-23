@@ -174,7 +174,7 @@
             z-index: 5;
         }
 
-        /* PANEL KANAN (SLIDESHOW) */
+        /* PANEL KANAN (INFOGRAFIS SLIDESHOW) */
         .right-panel {
             grid-column: 2;
             display: grid;
@@ -251,7 +251,7 @@
             position: relative;
         }
 
-        /* PERFORMA PK INDIVIDUAL */
+        /* PERFORMA PK CAROUSEL */
         .performance-box {
             background-color: #0d1321;
             padding: 25px 30px;
@@ -366,7 +366,7 @@
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
         .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* FLOATING PUBLIC CONTROLS */
+        /* FLOATING UTILITY CONTROLS */
         .bottom-trigger-control-zone {
             position: fixed;
             bottom: 15px;
@@ -591,7 +591,7 @@
                     <div class="pk-profile-header">
                         <div class="pk-name-tag">
                             <span id="infografis-nama">MEMUAT DATA...</span>
-                            <span class="sync-badge" id="sync-status-text">Cloud Live Sync</span>
+                            <span class="sync-badge" id="sync-status-text" style="color: var(--accent-green); background: rgba(16, 185, 129, 0.2);">Database Active</span>
                         </div>
                         <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
                     </div>
@@ -652,10 +652,10 @@
             </div>
 
             <div class="admin-card">
-                <h4>2. Integrasi Live Google Sheets</h4>
-                <label>Tautan URL Utama Google Sheet:</label>
-                <input type="text" id="txt-gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
-                <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheet()">🔗 Hubungkan Google Sheet</button>
+                <h4>2. Jalur API Realtime Google Sheets</h4>
+                <label style="margin-bottom:8px; display:block; color:#9ca3af;">Masukkan URL Apps Script (/exec):</label>
+                <input type="text" id="txt-gsheet-url" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:12px;">
+                <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheetGateway()">🔗 Hubungkan Realtime API</button>
                 <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadPureExcelTemplate()">📥 Download Template Struktur (.xlsx)</button>
             </div>
 
@@ -869,96 +869,68 @@
         }, 6000);
 
         // ===================================================================
-        // --- 100% COR-BYPASS: GOOGLE SHEETS CORE JSON FEEDS API LOGIC -----
+        // --- NEW REALTIME APPS SCRIPT JSON PARSER GATEWAY ------------------
         // ===================================================================
-        function saveAndConnectGSheet() {
+        function saveAndConnectGSheetGateway() {
             const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
-            if(!rawUrl) { alert("Masukkan URL!"); return; }
-            const matches = rawUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
-            if(!matches || !matches[1]) { alert("Format URL Spreadsheet salah."); return; }
+            if(!rawUrl) { alert("Masukkan URL Web App Apps Script!"); return; }
+            if(!rawUrl.includes("/exec")) { alert("Format URL salah. Pastikan berakhiran /exec"); return; }
+            
             localStorage.setItem("gsheet_url_bapas", rawUrl);
-            localStorage.setItem("gsheet_id_bapas", matches[1]);
-            fetchDataFromGoogleSheets(matches[1]);
-            alert("Koneksi Cloud Google Sheets Berhasil!");
+            fetchDataFromAppsScriptAPI(rawUrl);
+            alert("API Realtime Berhasil Disimpan!");
         }
 
-        function fetchDataFromGoogleSheets(sheetId) {
-            if(!sheetId) return;
+        function fetchDataFromAppsScriptAPI(apiUrl) {
+            if(!apiUrl) return;
             document.getElementById('sync-status-text').textContent = "Syncing...";
             document.getElementById('sync-status-text').style.color = "#f4d35e";
 
-            const buster = new Date().getTime();
-            
-            // SOLUSI UTAMA: Menggunakan Jalur API Ekspor Terpusat untuk memisahkan Tab 1 (gid=0) dan Tab 2 (gid=1334693153)
-            const urlTabPK = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=0&x=${buster}`;
-            const urlTabGlobal = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=1334693153&x=${buster}`;
+            fetch(apiUrl)
+                .then(res => res.json())
+                .then(jsonResponse => {
+                    if(jsonResponse.status !== "success") throw new Error(jsonResponse.message);
+                    
+                    // Ambil Data Tab 1 (PK)
+                    dbPK = jsonResponse.data_pk;
 
-            // Tarik Data Tab Kinerja PK Individual
-            fetch(urlTabPK)
-                .then(res => { if(!res.ok) throw new Error("Gagal terhubung ke Cloud Sheet."); return res.text(); })
-                .then(csvText => {
-                    // DUAL SPLITTER MATRIX: Mengatasi pemisah (;) Indonesia dan (,) Internasional secara dinamis
-                    const rows = csvText.split("\n").map(row => row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-                    dbPK = [];
-                    for(let i = 1; i < rows.length; i++) {
-                        const r = rows[i];
-                        if(!r || r.length < 5 || r[0] === "") continue;
-                        const checkLabel = String(r[0]).toUpperCase();
-                        if(checkLabel.includes("ANGGARAN") || checkLabel.includes("KATEGORI")) break; 
-                        
-                        dbPK.push({
-                            nama: String(r[1]).replace(/"/g, "").trim(),
-                            litmasOk: parseInt(r[2]) || 0,
-                            litmasNo: parseInt(r[3]) || 0,
-                            klienNo: parseInt(r[4]) || 0,
-                            klienOk: parseInt(r[5]) || 0
-                        });
+                    // Ambil Data Tab 2 (Global)
+                    const globalData = jsonResponse.global;
+                    if(globalData.anggaran) {
+                        const pagu = globalData.anggaran.pagu;
+                        const real = globalData.anggaran.realisasi;
+                        const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
+                        document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
+                        document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
+                        document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
+                        cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; cGAnggaran.update();
                     }
+
+                    if(globalData.pegawai) {
+                        const hadir = globalData.pegawai.hadir;
+                        const cuti = globalData.pegawai.cuti;
+                        const izin = globalData.pegawai.izin;
+                        const dl = globalData.pegawai.dl;
+                        const totalP = hadir + cuti + izin + dl;
+                        const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
+                        document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
+                        document.getElementById('lbl-g-hadir-riil').textContent = hadir;
+                        document.getElementById('lbl-g-peg-cuti').textContent = cuti;
+                        document.getElementById('lbl-g-peg-izin').textContent = izin;
+                        document.getElementById('lbl-g-peg-dl').textContent = dl;
+                        cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
+                    }
+
                     calculateAndRenderGlobalTotals();
                     if(dbPK.length > 0) renderIndividualPK();
-                    
-                    // Tarik paralel Data Tab Anggaran & Kehadiran Global
-                    return fetch(urlTabGlobal);
-                })
-                .then(res => res.text())
-                .then(csvText => {
-                    const rows = csvText.split("\n").map(row => row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-                    for(let i = 0; i < rows.length; i++) {
-                        const r = rows[i];
-                        if(!r || r.length < 2) continue;
-                        const label = String(r[0]).replace(/"/g, "").trim().toUpperCase();
 
-                        if(label.includes("ANGGARAN")) {
-                            const pagu = parseFloat(r[1]) || 0;
-                            const real = parseFloat(r[2]) || 0;
-                            const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
-                            document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
-                            document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
-                            document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
-                            cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; cGAnggaran.update();
-                        }
-                        if(label.includes("JUMLAH") || label.includes("PEGAWAI")) {
-                            const hadir = parseInt(r[1]) || 0;
-                            const cuti = parseInt(r[2]) || 0;
-                            const izin = parseInt(r[3]) || 0;
-                            const dl = parseInt(r[4]) || 0;
-                            const totalP = hadir + cuti + izin + dl;
-                            const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
-                            document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
-                            document.getElementById('lbl-g-hadir-riil').textContent = hadir;
-                            document.getElementById('lbl-g-peg-cuti').textContent = cuti;
-                            document.getElementById('lbl-g-peg-izin').textContent = izin;
-                            document.getElementById('lbl-g-peg-dl').textContent = dl;
-                            cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
-                        }
-                    }
                     document.getElementById('sync-status-text').textContent = "Live Realtime";
                     document.getElementById('sync-status-text').style.color = "#10b981";
                 })
                 .catch(err => {
-                    document.getElementById('sync-status-text').textContent = "Sync Offline";
+                    document.getElementById('sync-status-text').textContent = "API Error";
                     document.getElementById('sync-status-text').style.color = "#ef4444";
-                    console.error("GSheet Access Error: ", err);
+                    console.error("Fetch API Error: ", err);
                 });
         }
 
@@ -1028,11 +1000,11 @@
             } catch (e) { alert(e.message); }
         }
 
-        // LOOP SINKRONISASI REALTIME (Berjalan otomatis setiap 25 detik sekali)
-        const cachedId = localStorage.getItem("gsheet_id_bapas") || "1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c";
-        if(cachedId) {
-            fetchDataFromGoogleSheets(cachedId);
-            setInterval(() => { fetchDataFromGoogleSheets(cachedId); }, 25000); 
+        // SINKRONISASI OTOMATIS BERKALA (Berjalan setiap 25 detik sekali)
+        const savedApiUrl = localStorage.getItem("gsheet_url_bapas");
+        if(savedApiUrl) {
+            fetchDataFromAppsScriptAPI(savedApiUrl);
+            setInterval(() => { fetchDataFromAppsScriptAPI(savedApiUrl); }, 25000); 
         }
     </script>
 </body>
