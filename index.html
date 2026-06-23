@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
-    <!-- Memuat Library SheetJS (Membaca Excel) dan Chart.js (Grafik Dinamis) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -32,6 +31,7 @@
             background-color: #030712;
             color: #f3f4f6;
             overflow-x: hidden;
+            position: relative;
         }
 
         /* =================================================== */
@@ -46,6 +46,7 @@
             grid-template-columns: 55% 45%;
             background-color: var(--dark-bg);
             position: relative;
+            z-index: 10;
         }
 
         #main-display-screen:fullscreen {
@@ -93,7 +94,7 @@
             margin-top: 4px;
         }
 
-        /* PANEL KIRI (VIDEO PLAYLIST + AUDIO CONTROLS) */
+        /* PANEL KIRI (YOUTUBE INTEGRATION + CONTROLS) */
         .left-panel {
             grid-column: 1;
             padding: 25px;
@@ -114,10 +115,10 @@
             position: relative;
         }
 
-        .video-box-container video {
+        #yt-player {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            border: none;
         }
 
         .video-audio-controls {
@@ -296,6 +297,18 @@
             font-size: 22px;
             font-weight: 700;
             color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sync-badge {
+            font-size: 11px;
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: normal;
         }
 
         .pk-index-tag {
@@ -356,31 +369,33 @@
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
         .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* AREA TOMBOL KONTROL MONITOR PERMANEN */
+        /* FLOATING PUBLIC CONTROLS WITH HIGHEST Z-INDEX */
         .bottom-trigger-control-zone {
-            position: absolute;
-            bottom: 8px;
-            right: 20px;
-            z-index: 100;
+            position: fixed;
+            bottom: 15px;
+            right: 25px;
+            z-index: 99999;
             display: flex;
             gap: 15px;
             align-items: center;
         }
         .btn-trigger-public {
-            background: rgba(31, 41, 55, 0.7);
+            background: #1f2937;
             color: #d1d5db;
-            border: 1px solid #4b5563;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 6px 14px;
-            border-radius: 4px;
+            border: 2px solid #4b5563;
+            font-size: 13px;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: all 0.2s ease-in-out;
         }
         .btn-trigger-public:hover {
             color: var(--secondary-color);
-            background: rgba(31, 41, 55, 0.9);
+            background: #111827;
             border-color: var(--secondary-color);
+            transform: translateY(-2px);
         }
 
         /* =================================================== */
@@ -391,6 +406,8 @@
             padding: 40px;
             border-top: 5px solid var(--primary-color);
             display: none; 
+            position: relative;
+            z-index: 20;
         }
 
         .admin-header {
@@ -426,9 +443,6 @@
             margin-top: 15px;
             transition: background 0.2s;
         }
-        .btn-download-template:hover {
-            background-color: #1d4ed8;
-        }
 
         .admin-grid {
             display: grid;
@@ -441,6 +455,9 @@
             padding: 20px;
             border-radius: 8px;
             border: 1px solid #374151;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .admin-card h4 {
@@ -449,38 +466,39 @@
             font-size: 15px;
         }
 
-        input[type="file"], input[type="password"] {
+        input[type="file"], input[type="password"], input[type="text"] {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             background-color: #374151;
             border: 1px solid #4b5563;
             border-radius: 6px;
             color: #fff;
             box-sizing: border-box;
+            font-size: 13px;
         }
 
-        input[type="password"] {
-            margin-bottom: 10px;
+        input[type="password"], input[type="text"] {
+            margin-bottom: 12px;
         }
 
         .btn-action-panel {
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
+            padding: 10px 12px;
+            border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
             width: 100%;
             transition: background 0.2s;
         }
+        .btn-action-panel:hover {
+            background-color: #1a657f;
+        }
     </style>
 </head>
 <body>
 
-    <!-- =================================================================== -->
-    <!-- PANEL DISPLAY MONITOR UTAMA                                         -->
-    <!-- =================================================================== -->
     <div id="main-display-screen">
         
         <div class="header-display">
@@ -499,61 +517,57 @@
 
         <div class="left-panel">
             <div class="video-box-container">
-                <video id="display-video" autoplay>Browser tidak mendukung.</video>
-                <div class="playlist-indicator" id="video-title-indicator">Video: Belum Ada File Dipilih</div>
+                <div id="yt-player"></div>
+                <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan Server YouTube...</div>
             </div>
             
             <div class="video-audio-controls">
                 <div style="display: flex; gap: 8px;">
                     <button class="audio-btn" id="btn-play-pause" onclick="togglePlayPause()">⏸ Pause</button>
-                    <button class="audio-btn" id="btn-mute" onclick="toggleMute()">🔊 Mute</button>
+                    <button class="audio-btn" id="btn-mute" onclick="toggleMute()">🔊 Unmute / Suara</button>
                 </div>
                 <div class="volume-slider-container">
                     <span style="font-size: 12px; color: #9ca3af;">Volume:</span>
-                    <input type="range" class="volume-slider" id="volume-control" min="0" max="1" step="0.1" value="0.8" oninput="setVolume(this.value)">
+                    <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
                     <span style="font-size: 12px; font-weight: bold;" id="volume-text">80%</span>
                 </div>
-                <button class="audio-btn" onclick="nextVideoManual()">⏭ Lewati</button>
+                <button class="audio-btn" onclick="nextVideoManual()">⏭ Berikutnya</button>
             </div>
         </div>
 
         <div class="right-panel">
             
-            <!-- ATAS: SLIDESHOW INFOGRAFIS GLOBAL -->
             <div class="global-slideshow-box">
                 
-                <!-- Slide 1: Total Litmas Global -->
                 <div class="slide-container active" id="slide-global-1">
                     <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
-                            <div class="slide-big-number" id="lbl-g-litmas-persen">82%</div>
-                            <p style="margin-top: 5px;">Litmas Selesai: <b id="lbl-g-litmas-ok" style="color:var(--accent-green)">35</b> Dokumen</p>
-                            <p>Litmas Belum Selesai: <b id="lbl-g-litmas-no" style="color:var(--accent-red)">8</b> Dokumen</p>
+                            <div class="slide-big-number" id="lbl-g-litmas-persen">0%</div>
+                            <p style="margin-top: 5px;">Litmas Selesai: <b id="lbl-g-litmas-ok" style="color:var(--accent-green)">0</b> Dokumen</p>
+                            <p>Litmas Belum Selesai: <b id="lbl-g-litmas-no" style="color:var(--accent-red)">0</b> Dokumen</p>
                         </div>
                         <div class="slide-chart-mini"><canvas id="chartGLitmas"></canvas></div>
                     </div>
                 </div>
 
-                <!-- Slide 2: Total Kepatuhan Wajib Lapor Klien Global -->
                 <div class="slide-container" id="slide-global-2">
                     <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
-                            <div class="slide-big-number" id="lbl-g-klien-persen">94%</div>
-                            <p style="margin-top: 5px;">Klien Sudah Melapor: <b id="lbl-g-klien-ok" style="color:var(--accent-green)">105</b> Orang</p>
-                            <p>Klien Belum Melapor: <b id="lbl-g-klien-no" style="color:var(--accent-red)">6</b> Orang</p>
+                            <div class="slide-big-number" id="lbl-g-klien-persen">0%</div>
+                            <p style="margin-top: 5px;">Klien Sudah Melapor: <b id="lbl-g-klien-ok" style="color:var(--accent-green)">0</b> Orang</p>
+                            <p>Klien Belum Melapor: <b id="lbl-g-klien-no" style="color:var(--accent-red)">0</b> Orang</p>
                         </div>
                         <div class="slide-chart-mini"><canvas id="chartGKlien"></canvas></div>
                     </div>
                 </div>
 
-                <!-- Slide 3: Realisasi Anggaran Instansi -->
                 <div class="slide-container" id="slide-global-3">
                     <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
-                            <div class="slide-big-number" id="lbl-g-anggaran-persen">52.4%</div>
+                            <div class="slide-big-number" id="lbl-g-anggaran-persen">0%</div>
                             <p style="margin-top: 8px; color:#e5e7eb;" id="lbl-g-anggaran-pagu">Pagu Alokasi: Rp 0</p>
                             <p style="color:#e5e7eb;" id="lbl-g-anggaran-realisasi">Total Realisasi: Rp 0</p>
                         </div>
@@ -561,14 +575,13 @@
                     </div>
                 </div>
 
-                <!-- Slide 4: Status Kehadiran Pegawai Harian -->
                 <div class="slide-container" id="slide-global-4">
                     <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
-                            <div class="slide-big-number" id="lbl-g-hadir-persen">100%</div>
+                            <div class="slide-big-number" id="lbl-g-hadir-persen">0%</div>
                             <div style="margin-top: 5px; display: grid; grid-template-columns: 1fr 1fr; gap-x: 15px; font-size: 13px;">
-                                <p>Hadir Fisik: <b id="lbl-g-peg-hadir" style="color:var(--accent-green)">0</b></p>
+                                <p>Hadir Fisik: <b id="lbl-g-hadir-riil" style="color:var(--accent-green)">0</b></p>
                                 <p>Izin Resmi: <b id="lbl-g-peg-izin" style="color:var(--secondary-color)">0</b></p>
                                 <p>Cuti Tahunan: <b id="lbl-g-peg-cuti" style="color:var(--accent-blue)">0</b></p>
                                 <p>Dinas Luar: <b id="lbl-g-peg-dl" style="color:#a855f7;">0</b></p>
@@ -580,13 +593,15 @@
 
             </div>
 
-            <!-- BAWAH: INDIVIDUAL CAROUSEL KINERJA PER-PK -->
             <div class="performance-box">
                 <h3>STATISTIK PERFORMA PEMBIMBING KEMASYARAKATAN (PK)</h3>
                 
                 <div class="infographic-carousel-container" id="carousel-box">
                     <div class="pk-profile-header">
-                        <div class="pk-name-tag" id="infografis-nama">MEMUAT DATA...</div>
+                        <div class="pk-name-tag">
+                            <span id="infografis-nama">MEMUAT DATA...</span>
+                            <span class="sync-badge" id="sync-status-text">Cloud Live Sync</span>
+                        </div>
                         <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
                     </div>
 
@@ -619,22 +634,18 @@
             </div>
         </div>
 
-        <!-- TOMBOL KONTROL MONITOR PERMANEN (UMUM) -->
-        <div class="bottom-trigger-control-zone" id="public-control-area">
-            <button class="btn-trigger-public" onclick="openFullscreen()">📺 Aktifkan Layar Penuh (TV Monitor)</button>
-            <button class="btn-trigger-public" onclick="aksesLoginAdmin()">🔐 Panel Admin</button>
-        </div>
-
     </div>
 
-    <!-- =================================================================== -->
-    <!-- PANEL PENGATURAN ADMIN -->
-    <!-- =================================================================== -->
+    <div class="bottom-trigger-control-zone" id="public-control-area">
+        <button class="btn-trigger-public" onclick="openFullscreen()">📺 Layar Penuh (TV Monitor)</button>
+        <button class="btn-trigger-public" onclick="aksesLoginAdmin()">🔐 Panel Admin</button>
+    </div>
+
     <div class="admin-panel" id="control-panel-section">
         <div class="admin-header">
             <div>
                 <h2>PANEL UTAMA PENGENDALI MEDIA DISPLAY (MODE TERKUNCI)</h2>
-                <p style="color: #9ca3af; font-size: 14px;">Akses terverifikasi. Unggah database kompilasi instansi Anda di bawah ini.</p>
+                <p style="color: #9ca3af; font-size: 14px;">Konfigurasi tautan eksternal media informasi Anda melalui sub-kolom ini.</p>
             </div>
             <div>
                 <button class="btn-logout" onclick="keluarAdmin();">🔒 Keluar & Kunci Admin</button>
@@ -643,17 +654,19 @@
 
         <div class="admin-grid">
             <div class="admin-card">
-                <h4>1. Video Anti-Korupsi (Multi File)</h4>
-                <input type="file" id="admin-video-files" accept="video/mp4" multiple>
-                <div class="file-list-preview" id="video-queue-preview">Antrean: Playlist Kosong</div>
+                <h4>1. Tautan Video / Playlist YouTube</h4>
+                <label>Masukkan Link YouTube:</label>
+                <input type="text" id="txt-yt-url" placeholder="Contoh: https://www.youtube.com/watch?v=... atau link playlist">
+                <button type="button" class="btn-action-panel" onclick="saveAndLoadYouTube()">📺 Simpan & Putar Video</button>
+                <p style="font-size: 11px; color:#a3a3a3; margin-top:8px;">*Mendukung link video tunggal, Shorts, maupun link playlist kompilasi resmi YouTube.</p>
             </div>
 
             <div class="admin-card">
-                <h4>2. Database Terpadu Bapas (*.xlsx)</h4>
-                <input type="file" id="admin-excel-file" accept=".xlsx, .xls">
-                
-                <!-- PERBAIKAN UTAMA: TRIGGER DOWNLOAD FIX VIA LOCAL BLOB GEN -->
-                <button type="button" class="btn-download-template" onclick="generateAndDownloadTemplateFix()">📥 Download Template Kombinasi Excel</button>
+                <h4>2. Integrasi Live Google Sheets</h4>
+                <label>Tautan URL Google Spreadsheet:</label>
+                <input type="text" id="txt-gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
+                <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheet()">🔗 Hubungkan Google Sheet</button>
+                <button type="button" class="btn-download-template" onclick="generateAndDownloadTemplateFix()">📥 Download Template Panduan Excel</button>
             </div>
 
             <div class="admin-card">
@@ -670,9 +683,6 @@
         </div>
     </div>
 
-    <!-- =================================================================== -->
-    <!-- CORE JAVASCRIPT LOGIC ENGINE -->
-    <!-- =================================================================== -->
     <script>
         // --- SECURITY MANAGEMENT ---
         const USERNAME_VALID = "adminbapas";
@@ -691,6 +701,8 @@
             if (inputUser === USERNAME_VALID && inputPass === localStorage.getItem("admin_password_bapas")) {
                 panelAdmin.style.display = "block"; 
                 tombolKontrolPublik.style.display = "none";
+                document.getElementById('txt-gsheet-url').value = localStorage.getItem("gsheet_url_bapas") || "";
+                document.getElementById('txt-yt-url').value = localStorage.getItem("yt_url_bapas") || "";
                 alert("Login Berhasil!");
                 panelAdmin.scrollIntoView({ behavior: 'smooth' });
             } else {
@@ -719,6 +731,7 @@
             const el = document.getElementById("main-display-screen");
             if (el.requestFullscreen) el.requestFullscreen();
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+            else if (el.msRequestFullscreen) el.msRequestFullscreen();
         }
 
         // --- LOGO HANDLING ---
@@ -730,61 +743,185 @@
             }
         });
 
-        // --- PLAYLIST VIDEO ---
-        const videoInput = document.getElementById('admin-video-files');
-        const videoPlayer = document.getElementById('display-video');
-        let videoPlaylist = [], currentVideoIdx = 0;
-        videoPlayer.volume = 0.8;
+        // ===================================================================
+        // --- FIX RE-ENGINEERING: TIMEOUT SAFE YOUTUBE LOADER API -----------
+        // ===================================================================
+        let ytPlayerObj = null;
+        let isYtApiReady = false;
 
-        videoInput.addEventListener('change', function() {
-            if (this.files.length > 0) {
-                videoPlaylist = Array.from(this.files);
-                currentVideoIdx = 0;
-                document.getElementById('video-queue-preview').textContent = "Antrean: " + videoPlaylist.map(f => f.name).join(" ➔ ");
-                playPlaylistVideo(currentVideoIdx);
-            }
+        // Taktik Pemanggilan Callback Paksa: Browser akan memanggil fungsi ini secara native
+        function onYouTubeIframeAPIReady() {
+            isYtApiReady = true;
+            loadInitialYouTubeVideo();
+        }
+
+        // Mekanisme Pengaman Tambahan (Failsafe): Jika YouTube API tidak terpanggil otomatis dalam 3 detik, panggil manual
+        window.addEventListener('DOMContentLoaded', () => {
+            // Memuat file script API secara aman setelah DOM HTML diproduksi sempurna
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            const firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            setTimeout(() => {
+                if (!isYtApiReady && typeof YT !== 'undefined' && YT.Player) {
+                    onYouTubeIframeAPIReady();
+                }
+            }, 3000);
         });
-        function playPlaylistVideo(idx) {
-            if (videoPlaylist[idx]) {
-                videoPlayer.src = URL.createObjectURL(videoPlaylist[idx]);
-                document.getElementById('video-title-indicator').textContent = `Memutar [${idx + 1}/${videoPlaylist.length}]: ${videoPlaylist[idx].name}`;
-                videoPlayer.play().catch(() => { videoPlayer.muted = true; videoPlayer.play(); });
+
+        function loadInitialYouTubeVideo() {
+            const savedYtUrl = localStorage.getItem("yt_url_bapas") || "https://www.youtube.com/watch?v=dQw4w9WgXcQ"; 
+            buildYouTubePlayer(savedYtUrl);
+        }
+
+        function saveAndLoadYouTube() {
+            const ytUrl = document.getElementById('txt-yt-url').value.trim();
+            if(!ytUrl) { alert("Harap isi link YouTube!"); return; }
+            localStorage.setItem("yt_url_bapas", ytUrl);
+            buildYouTubePlayer(ytUrl);
+            alert("Tautan YouTube berhasil disimpan!");
+        }
+
+        function buildYouTubePlayer(urlStr) {
+            let videoId = "";
+            let playlistId = "";
+
+            try {
+                if (urlStr.includes("list=")) {
+                    const listMatch = urlStr.match(/[&?]list=([^&]+)/);
+                    if (listMatch && listMatch[1]) playlistId = listMatch[1];
+                }
+
+                const videoMatch = urlStr.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|shorts\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/);
+                if (videoMatch && videoMatch[1]) videoId = videoMatch[1];
+
+                if (!videoId && !playlistId) videoId = "dQw4w9WgXcQ";
+
+                if (ytPlayerObj) {
+                    ytPlayerObj.destroy();
+                }
+
+                let playerVarsSetting = {
+                    'autoplay': 1,
+                    'controls': 0, 
+                    'rel': 0,
+                    'loop': 1,
+                    'modestbranding': 1,
+                    'iv_load_policy': 3
+                };
+
+                if (playlistId) {
+                    playerVarsSetting.listType = 'playlist';
+                    playerVarsSetting.list = playlistId;
+                } else if (videoId) {
+                    playerVarsSetting.playlist = videoId;
+                }
+
+                ytPlayerObj = new YT.Player('yt-player', {
+                    videoId: playlistId ? undefined : videoId,
+                    playerVars: playerVarsSetting,
+                    events: {
+                        'onReady': onPlayerReady,
+                        'onStateChange': onPlayerStateChange,
+                        'onError': onPlayerError
+                    }
+                });
+
+            } catch (err) {
+                console.error("Kesalahan inisialisasi YouTube Player: ", err);
             }
         }
-        videoPlayer.addEventListener('ended', () => {
-            if (videoPlaylist.length > 0) { currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length; playPlaylistVideo(currentVideoIdx); }
-        });
-        function togglePlayPause() { videoPlayer.paused ? videoPlayer.play() : videoPlayer.pause(); }
-        function toggleMute() { videoPlayer.muted = !videoPlayer.muted; }
-        function setVolume(v) { videoPlayer.volume = v; document.getElementById('volume-text').textContent = Math.round(v*100)+"%"; }
-        function nextVideoManual() { if(videoPlaylist.length > 1) { currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length; playPlaylistVideo(currentVideoIdx); } }
+
+        function onPlayerReady(event) {
+            event.target.mute();
+            event.target.playVideo();
+            document.getElementById('video-title-indicator').textContent = "Memutar Informasi YouTube (Muted Autoplay)";
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.UNSTARTED || event.data === -1) {
+                ytPlayerObj.playVideo();
+            }
+        }
+
+        function onPlayerError(event) {
+            document.getElementById('video-title-indicator').textContent = "Gagal memutar video. Cek validitas URL / izin tonton.";
+        }
+
+        // --- AUDIO NAVIGASI KONTROL ---
+        function togglePlayPause() {
+            if (!ytPlayerObj) return;
+            const state = ytPlayerObj.getPlayerState();
+            if (state === YT.PlayerState.PLAYING) {
+                ytPlayerObj.pauseVideo();
+                document.getElementById('btn-play-pause').textContent = "▶ Play";
+            } else {
+                ytPlayerObj.playVideo();
+                document.getElementById('btn-play-pause').textContent = "⏸ Pause";
+            }
+        }
+
+        function toggleMute() {
+            if (!ytPlayerObj) return;
+            const btn = document.getElementById('btn-mute');
+            if (ytPlayerObj.isMuted()) {
+                ytPlayerObj.unMute();
+                btn.textContent = "Aktivasi Bisu";
+                document.getElementById('video-title-indicator').textContent = "Volume Suara Aktif";
+            } else {
+                ytPlayerObj.mute();
+                btn.textContent = "🔊 Unmute / Suara";
+                document.getElementById('video-title-indicator').textContent = "Video Bisu (Muted)";
+            }
+        }
+
+        function setVolume(v) {
+            if (!ytPlayerObj) return;
+            ytPlayerObj.setVolume(v);
+            document.getElementById('volume-text').textContent = v + "%";
+            if (v == 0) {
+                ytPlayerObj.mute();
+                document.getElementById('btn-mute').textContent = "🔊 Unmute / Suara";
+            } else if (ytPlayerObj.isMuted()) {
+                ytPlayerObj.unMute();
+                document.getElementById('btn-mute').textContent = "Aktivasi Bisu";
+            }
+        }
+
+        function nextVideoManual() {
+            if (ytPlayerObj && typeof ytPlayerObj.nextVideo === 'function') {
+                ytPlayerObj.nextVideo();
+            }
+        }
 
         // --- CHART INITIALIZATION ---
         const miniChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'70%' };
         const mainChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'73%' };
 
-        const cGLitmas = new Chart(document.getElementById('chartGLitmas'), { type:'doughnut', data:{datasets:[{data:[82,18],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:miniChartOpts });
-        const cGKlien = new Chart(document.getElementById('chartGKlien'), { type:'doughnut', data:{datasets:[{data:[94,6],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:miniChartOpts });
+        const cGLitmas = new Chart(document.getElementById('chartGLitmas'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
+        const cGKlien = new Chart(document.getElementById('chartGKlien'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
         const cGAnggaran = new Chart(document.getElementById('chartGAnggaran'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#3b82f6','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
-        const cGPegawai = new Chart(document.getElementById('chartGPegawai'), { type:'doughnut', data:{datasets:[{data:[100,0,0,0],backgroundColor:['#10b981','#f4d35e','#3b82f6','#a855f7'],borderWidth:0}]}, options:miniChartOpts });
+        const cGPegawai = new Chart(document.getElementById('chartGPegawai'), { type:'doughnut', data:{datasets:[{data:[0,100,0,0],backgroundColor:['#10b981','#f4d35e','#3b82f6','#a855f7'],borderWidth:0}]}, options:miniChartOpts });
 
         const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
         const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
 
-        // --- DATABASE CAROUSEL ENGINE ---
+        // --- LIVE DATABASE VARIABLES & DATA DEFAULT ---
         let dbPK = [
             { nama: "Eko Susilo, S.H.", litmasOk: 12, litmasNo: 3, klienNo: 2, klienOk: 45 },
-            { nama: "Dwi Lestari, S.Sos.", litmasOk: 8, litmasNo: 0, klienNo: 0, klienOk: 32 },
-            { nama: "Tri Haryanto, S.H.", litmasOk: 15, litmasNo: 5, klienNo: 4, klienOk: 28 }
+            { nama: "Dwi Lestari, S.Sos.", litmasOk: 8, litmasNo: 0, klienNo: 0, klienOk: 32 }
         ];
 
         let idxSlideG = 1;
         let idxPK = 0;
 
+        // ROTASI INFOGRAFIS CAROUSEL
         setInterval(() => {
             document.querySelectorAll('.slide-container').forEach(s => s.classList.remove('active'));
             idxSlideG = (idxSlideG % 4) + 1;
-            document.getElementById(`slide-global-${idxSlideG}`).classList.add('active');
+            const el = document.getElementById(`slide-global-${idxSlideG}`);
+            if(el) el.classList.add('active');
         }, 8000);
 
         setInterval(() => {
@@ -793,33 +930,58 @@
             renderIndividualPK();
         }, 6000);
 
-        // --- EXCEL FILE LOADER ---
-        document.getElementById('admin-excel-file').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
+        // --- GOOGLE SHEETS LIVE INTEGRATION ENGINE ---
+        function saveAndConnectGSheet() {
+            const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
+            if(!rawUrl) { alert("Harap masukkan tautan URL Google Sheet!"); return; }
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                
-                const wsPK = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonPK = XLSX.utils.sheet_to_json(wsPK, { header: 1, defval: 0 });
-                parseSheetPK(jsonPK);
+            const matches = rawUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if(!matches || !matches[1]) { alert("Format tautan URL salah."); return; }
 
-                if (workbook.SheetNames.length > 1) {
-                    const wsGlobal = workbook.Sheets[workbook.SheetNames[1]];
-                    const jsonGlobal = XLSX.utils.sheet_to_json(wsGlobal, { header: 1, defval: 0 });
-                    parseSheetGlobal(jsonGlobal);
-                }
-                
-                calculateAndRenderGlobalTotals();
-                idxPK = 0;
-                renderIndividualPK();
-                alert("Sukses! Seluruh Database Kompilasi Berhasil Diperbarui.");
-            };
-            reader.readAsArrayBuffer(file);
-        });
+            const sheetId = matches[1];
+            localStorage.setItem("gsheet_url_bapas", rawUrl);
+            localStorage.setItem("gsheet_id_bapas", sheetId);
+            fetchDataFromGoogleSheets(sheetId);
+        }
+
+        function fetchDataFromGoogleSheets(sheetId) {
+            document.getElementById('sync-status-text').textContent = "Syncing...";
+            document.getElementById('sync-status-text').style.color = "#f4d35e";
+
+            const accessUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=xlsx`;
+
+            fetch(accessUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error("Gagal membaca Google Sheet. Pastikan dokumen sudah dipublikasikan ke web.");
+                    return response.arrayBuffer();
+                })
+                .then(buffer => {
+                    const data = new Uint8Array(buffer);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const wsPK = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonPK = XLSX.utils.sheet_to_json(wsPK, { header: 1, defval: 0 });
+                    parseSheetPK(jsonPK);
+
+                    if (workbook.SheetNames.length > 1) {
+                        const wsGlobal = workbook.Sheets[workbook.SheetNames[1]];
+                        const jsonGlobal = XLSX.utils.sheet_to_json(wsGlobal, { header: 1, defval: 0 });
+                        parseSheetGlobal(jsonGlobal);
+                    }
+                    
+                    calculateAndRenderGlobalTotals();
+                    idxPK = 0;
+                    renderIndividualPK();
+                    
+                    document.getElementById('sync-status-text').textContent = "Live Synced";
+                    document.getElementById('sync-status-text').style.color = "#10b981";
+                })
+                .catch(error => {
+                    document.getElementById('sync-status-text').textContent = "Sync Error";
+                    document.getElementById('sync-status-text').style.color = "#ef4444";
+                    alert(error.message);
+                });
+        }
 
         function parseSheetPK(data) {
             dbPK = [];
@@ -850,9 +1012,7 @@
             const persenHadir = totalPeg > 0 ? ((hadir / totalPeg) * 100).toFixed(0) : 0;
 
             document.getElementById('lbl-g-hadir-persen').textContent = persenHadir + "%";
-            document.getElementById('lbl-g-hadir-persen').textContent = persenHadir + "%";
-            document.getElementById('lbl-g-hadir-persen').textContent = persenHadir + "%";
-            document.getElementById('lbl-g-peg-hadir').textContent = hadir;
+            document.getElementById('lbl-g-hadir-riil').textContent = hadir;
             document.getElementById('lbl-g-peg-cuti').textContent = cuti;
             document.getElementById('lbl-g-peg-izin').textContent = izin;
             document.getElementById('lbl-g-peg-dl').textContent = dl;
@@ -904,28 +1064,29 @@
             cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
         }
 
-        calculateAndRenderGlobalTotals();
-        renderIndividualPK();
+        // INITIAL CHECK FROM LOCALSTORAGE
+        const cachedSheetId = localStorage.getItem("gsheet_id_bapas");
+        if(cachedSheetId) {
+            fetchDataFromGoogleSheets(cachedSheetId);
+            setInterval(() => { fetchDataFromGoogleSheets(cachedSheetId); }, 300000); 
+        } else {
+            calculateAndRenderGlobalTotals();
+            renderIndividualPK();
+        }
 
-        // ===================================================================
-        // --- PERBAIKAN TOTAL: RE-ENGINEERING DOWNLOAD EXCEL ENGINE ----------
-        // ===================================================================
+        // --- EXCEL TEMPLATE GENERATOR ---
         function generateAndDownloadTemplateFix() {
             try {
                 const wb = XLSX.utils.book_new();
-                
-                // DATA SHEET 1
                 const dataPK = [
                     ["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],
                     [1, "Eko Susilo, S.H.", 12, 3, 2, 45],
-                    [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32],
-                    [3, "Tri Haryanto, S.H.", 15, 5, 4, 28]
+                    [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32]
                 ];
                 const ws1 = XLSX.utils.aoa_to_sheet(dataPK);
                 ws1['!cols'] = [{wch:6}, {wch:30}, {wch:18}, {wch:22}, {wch:22}, {wch:22}];
                 XLSX.utils.book_append_sheet(wb, ws1, "Kinerja PK Individual");
 
-                // DATA SHEET 2
                 const dataGlobal = [
                     ["KATEGORI DATA", "PARAMETER A (PAGU / HADIR)", "PARAMETER B (REALISASI / CUTI)", "PARAMETER C (IZIN)", "PARAMETER D (DINAS LUAR)"],
                     ["ANGGARAN (Rp)", 250000000, 131000000, 0, 0], 
@@ -937,34 +1098,23 @@
                 ws2['!cols'] = [{wch:22}, {wch:28}, {wch:28}, {wch:25}, {wch:25}];
                 XLSX.utils.book_append_sheet(wb, ws2, "Anggaran & Kehadiran");
 
-                // Konversi data workbook menjadi biner array tingkat rendah
                 const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-
-                // Fungsi helper memetakan biner menjadi struktur memori array buffer
                 function s2ab(s) {
                     const buf = new ArrayBuffer(s.length);
                     const view = new Uint8Array(buf);
                     for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
                     return buf;
                 }
-
-                // Membuat objek download link buatan di browser
                 const blob = new Blob([s2ab(wbout)], { type: "application/octet-stream" });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
-                a.download = "Template_Database_Terpadu_Bapas_Purwokerto.xlsx";
+                a.download = "Panduan_Template_Struktur_GoogleSheet_Bapas.xlsx";
                 document.body.appendChild(a);
                 a.click();
-                
-                // Bersihkan memori browser setelah mengunduh
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(url);
-                }, 100);
-
+                setTimeout(() => { document.body.removeChild(a); window.URL.revokeObjectURL(url); }, 100);
             } catch (error) {
-                alert("Kesalahan Teknis Gagal Mendownload: " + error.message);
+                alert("Gagal mendownload template: " + error.message);
             }
         }
     </script>
