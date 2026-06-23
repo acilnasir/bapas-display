@@ -91,7 +91,7 @@
             margin-top: 4px;
         }
 
-        /* PANEL KIRI (YOUTUBE INTEGRATION) */
+        /* PANEL KIRI (YOUTUBE DISPLAY) */
         .left-panel {
             grid-column: 1;
             padding: 25px;
@@ -174,7 +174,7 @@
             z-index: 5;
         }
 
-        /* PANEL KANAN (INFOGRAFIS SLIDESHOW) */
+        /* PANEL KANAN (INFOGRAFIS CAROUSEL SLIDESHOW) */
         .right-panel {
             grid-column: 2;
             display: grid;
@@ -251,7 +251,7 @@
             position: relative;
         }
 
-        /* BAWAH: INDIVIDUAL CAROUSEL PERFORMA PK */
+        /* PERFORMA PK INDIVIDUAL */
         .performance-box {
             background-color: #0d1321;
             padding: 25px 30px;
@@ -366,7 +366,7 @@
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
         .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* FLOATING PUBLIC CONTROLS */
+        /* FLOATING UTILITY CONTROLS */
         .bottom-trigger-control-zone {
             position: fixed;
             bottom: 15px;
@@ -395,7 +395,7 @@
             transform: translateY(-2px);
         }
 
-        /* STYLING PANEL KONTROL ADMIN */
+        /* PANEL ADMIN */
         .admin-panel {
             background-color: #111827;
             padding: 40px;
@@ -591,7 +591,7 @@
                     <div class="pk-profile-header">
                         <div class="pk-name-tag">
                             <span id="infografis-nama">MEMUAT DATA...</span>
-                            <span class="sync-badge" id="sync-status-text">Cloud Storage</span>
+                            <span class="sync-badge" id="sync-status-text">Cloud Live Sync</span>
                         </div>
                         <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
                     </div>
@@ -652,10 +652,11 @@
             </div>
 
             <div class="admin-card">
-                <h4>2. Database Kinerja Pegawai Bapas</h4>
-                <label style="margin-bottom:8px; display:block; color:#9ca3af;">Unggah Dokumen Kinerja (.xlsx):</label>
-                <input type="file" id="excel-file-uploader" accept=".xlsx, .xls" style="margin-bottom:12px;">
-                <button type="button" class="btn-action-panel" style="background-color: var(--btn-download);" onclick="downloadLocalTemplateExcel()">📥 Download Template Struktur (.xlsx)</button>
+                <h4>2. Integrasi Live Google Sheets</h4>
+                <label>Tautan URL Utama Google Sheet:</label>
+                <input type="text" id="txt-gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
+                <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheet()">🔗 Hubungkan Google Sheet</button>
+                <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadPureExcelTemplate()">📥 Download Template Struktur (.xlsx)</button>
             </div>
 
             <div class="admin-card">
@@ -690,6 +691,7 @@
             if (inputUser === USERNAME_VALID && inputPass === localStorage.getItem("admin_password_bapas")) {
                 panelAdmin.style.display = "block"; 
                 tombolKontrolPublik.style.display = "none";
+                document.getElementById('txt-gsheet-url').value = localStorage.getItem("gsheet_url_bapas") || "";
                 renderAdminVideoInputs();
                 alert("Login Berhasil!");
                 panelAdmin.scrollIntoView({ behavior: 'smooth' });
@@ -731,7 +733,7 @@
         });
 
         // ===================================================================
-        // --- LOCAL QUEUE MULTI-VIDEO YOUTUBE ENGINE -------------------------
+        // --- QUEUE MULTI-VIDEO YOUTUBE ENGINE -------------------------
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
@@ -741,7 +743,6 @@
         function renderAdminVideoInputs() {
             const wrapper = document.getElementById('yt-inputs-wrapper');
             wrapper.innerHTML = "";
-            
             let savedQueue = JSON.parse(localStorage.getItem("yt_local_queue_bapas"));
             if(!savedQueue || savedQueue.length === 0) {
                 savedQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0", "", ""];
@@ -752,12 +753,10 @@
         function tambahKolomVideoInput(valueString) {
             const wrapper = document.getElementById('yt-inputs-wrapper');
             const index = wrapper.children.length + 1;
-            
             const div = document.createElement('div');
             div.style.display = "flex";
             div.style.gap = "5px";
             div.style.marginBottom = "5px";
-            
             div.innerHTML = `
                 <input type="text" class="cls-yt-input" placeholder="Video ${index}" value="${valueString}">
                 <button type="button" style="background:#ef4444; color:white; border:none; padding:0 10px; border-radius:6px; cursor:pointer;" onclick="this.parentElement.remove()">X</button>
@@ -768,30 +767,22 @@
         function saveAndLoadYouTubeQueue() {
             const inputElements = document.querySelectorAll('.cls-yt-input');
             const newQueue = [];
-            
             inputElements.forEach(el => {
                 const val = el.value.trim();
                 if(val) newQueue.push(val);
             });
-
             if(newQueue.length === 0) { alert("Harap isi minimal 1 link video!"); return; }
-            
             localStorage.setItem("yt_local_queue_bapas", JSON.stringify(newQueue));
             localVideoQueue = newQueue;
             currentQueueIndex = 0;
-            
             playVideoFromLocalQueue();
-            alert("Antrean video berhasil disimpan dan dimuat ulang!");
+            alert("Antrean video berhasil disimpan!");
         }
 
         function onYouTubeIframeAPIReady() {
             isYtApiReady = true;
             const savedQueue = JSON.parse(localStorage.getItem("yt_local_queue_bapas"));
-            if(savedQueue && savedQueue.length > 0) {
-                localVideoQueue = savedQueue;
-            } else {
-                localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"];
-            }
+            localVideoQueue = (savedQueue && savedQueue.length > 0) ? savedQueue : ["https://www.youtube.com/watch?v=jrXNVlQJpW0"];
             playVideoFromLocalQueue();
         }
 
@@ -809,7 +800,6 @@
             
             const currentUrl = localVideoQueue[currentQueueIndex];
             let videoId = "jrXNVlQJpW0";
-            
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = currentUrl.match(regExp);
             if (match && match[2].length === 11) videoId = match[2];
@@ -819,33 +809,23 @@
             } else {
                 ytPlayerObj = new YT.Player('yt-player', {
                     videoId: videoId,
-                    playerVars: {
-                        'autoplay': 1,
-                        'controls': 0,
-                        'rel': 0,
-                        'modestbranding': 1,
+                    playerVars: { 
+                        'autoplay': 1, 
+                        'controls': 0, 
+                        'rel': 0, 
+                        'modestbranding': 1, 
                         'iv_load_policy': 3,
-                        'origin': window.location.origin // Legalisasi origin domain internal TV
+                        'origin': window.location.origin 
                     },
                     events: {
-                        'onReady': (e) => {
-                            e.target.mute();
-                            e.target.playVideo();
-                            updateQueueIndicator();
+                        'onReady': (e) => { e.target.mute(); e.target.playVideo(); updateQueueIndicator(); },
+                        'onStateChange': (e) => { 
+                            if (e.data === 0) { currentQueueIndex++; playVideoFromLocalQueue(); } 
+                            if (e.data === -1 || e.data === 5) e.target.playVideo(); 
                         },
-                        'onStateChange': onPlayerStateChange
+                        'onError': (e) => { currentQueueIndex++; playVideoFromLocalQueue(); }
                     }
                 });
-            }
-        }
-
-        function onPlayerStateChange(event) {
-            if (event.data === 0) {
-                currentQueueIndex++;
-                playVideoFromLocalQueue();
-            }
-            if (event.data === -1 || event.data === 5) {
-                event.target.playVideo();
             }
         }
 
@@ -853,25 +833,9 @@
             document.getElementById('video-title-indicator').textContent = `Memutar Video [${currentQueueIndex + 1}/${localVideoQueue.length}]`;
         }
 
-        function nextVideoManual() {
-            if(localVideoQueue.length <= 1) return;
-            currentQueueIndex++;
-            playVideoFromLocalQueue();
-        }
-
-        function togglePlayPause() {
-            if (!ytPlayerObj) return;
-            if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; }
-            else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; }
-        }
-
-        function toggleMute() {
-            if (!ytPlayerObj) return;
-            const btn = document.getElementById('btn-mute');
-            if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; }
-            else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; }
-        }
-
+        function nextVideoManual() { if(localVideoQueue.length <= 1) return; currentQueueIndex++; playVideoFromLocalQueue(); }
+        function togglePlayPause() { if (!ytPlayerObj) return; if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; } else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; } }
+        function toggleMute() { if (!ytPlayerObj) return; const btn = document.getElementById('btn-mute'); if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; } else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; } }
         function setVolume(v) { if (ytPlayerObj) ytPlayerObj.setVolume(v); document.getElementById('volume-text').textContent = v + "%"; }
 
         // --- CHART INITIALIZATION ---
@@ -905,93 +869,97 @@
         }, 6000);
 
         // ===================================================================
-        // --- CORE LOGIC ENGINE: PERSISTENT EXCEL DUAL-TAB FILE UPLOADER ----
+        // --- RE-ENGINEERED: DUAL STREAM TAB GOOGLE SHEETS LIVE PARSER ------
         // ===================================================================
-        document.getElementById('excel-file-uploader').addEventListener('change', handleExcelUploadProcessing);
-
-        function handleExcelUploadProcessing(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                
-                // Parser Lembar Kerja 1: Kinerja PK
-                const wsPK = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonPK = XLSX.utils.sheet_to_json(wsPK, { header: 1, defval: 0 });
-                
-                // Parser Lembar Kerja 2: Data Global (Anggaran & Kehadiran)
-                let jsonGlobal = null;
-                if (workbook.SheetNames.length > 1) {
-                    const wsGlobal = workbook.Sheets[workbook.SheetNames[1]];
-                    jsonGlobal = XLSX.utils.sheet_to_json(wsGlobal, { header: 1, defval: 0 });
-                }
-
-                // Kompresi data ke LocalStorage browser agar TV tidak kehilangan tampilan saat restart
-                localStorage.setItem("bapas_cached_json_pk", JSON.stringify(jsonPK));
-                if (jsonGlobal) localStorage.setItem("bapas_cached_json_global", JSON.stringify(jsonGlobal));
-
-                executeLocalDatabasePopulation(jsonPK, jsonGlobal);
-                alert("Database internal berhasil diperbarui langsung dari file Excel!");
-            };
-            reader.readAsArrayBuffer(file);
+        function saveAndConnectGSheet() {
+            const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
+            if(!rawUrl) { alert("Masukkan URL!"); return; }
+            const matches = rawUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            if(!matches || !matches[1]) { alert("Format URL Spreadsheet salah."); return; }
+            localStorage.setItem("gsheet_url_bapas", rawUrl);
+            localStorage.setItem("gsheet_id_bapas", matches[1]);
+            fetchDataFromGoogleSheets(matches[1]);
+            alert("Koneksi Cloud Google Sheets Berhasil!");
         }
 
-        function executeLocalDatabasePopulation(dataPK, dataGlobal) {
-            // Processing Tab 1
-            dbPK = [];
-            for (let i = 1; i < dataPK.length; i++) {
-                const r = dataPK[i];
-                if (!r || !r[1] || String(r[1]).toUpperCase().includes("NAMA PK")) continue;
-                dbPK.push({
-                    nama: String(r[1]).trim(),
-                    litmasOk: parseInt(r[2]) || 0,
-                    litmasNo: parseInt(r[3]) || 0,
-                    klienNo: parseInt(r[4]) || 0,
-                    klienOk: parseInt(r[5]) || 0
+        function fetchDataFromGoogleSheets(sheetId) {
+            if(!sheetId) return;
+            document.getElementById('sync-status-text').textContent = "Syncing...";
+            document.getElementById('sync-status-text').style.color = "#f4d35e";
+
+            const buster = new Date().getTime();
+            
+            // Mengarah ke tab Kinerja PK Individual (gid=0)
+            const urlTabPK = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=0&x=${buster}`;
+            // Mengarah ke tab Anggaran & Kehadiran (gid=1334693153)
+            const urlTabGlobal = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=1334693153&x=${buster}`;
+
+            // Tarik Data Tab Kinerja PK
+            fetch(urlTabPK)
+                .then(res => res.text())
+                .then(csvText => {
+                    const rows = csvText.split("\n").map(row => row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+                    dbPK = [];
+                    for(let i = 1; i < rows.length; i++) {
+                        const r = rows[i];
+                        if(!r || r.length < 5 || r[0] === "") continue;
+                        const checkLabel = String(r[0]).toUpperCase();
+                        if(checkLabel.includes("ANGGARAN") || checkLabel.includes("KATEGORI")) break; 
+                        
+                        dbPK.push({
+                            nama: String(r[1]).replace(/"/g, "").trim(),
+                            litmasOk: parseInt(r[2]) || 0,
+                            litmasNo: parseInt(r[3]) || 0,
+                            klienNo: parseInt(r[4]) || 0,
+                            klienOk: parseInt(r[5]) || 0
+                        });
+                    }
+                    calculateAndRenderGlobalTotals();
+                    if(dbPK.length > 0) renderIndividualPK();
+                    
+                    // Tarik Data Tab Anggaran & Kehadiran
+                    return fetch(urlTabGlobal);
+                })
+                .then(res => res.text())
+                .then(csvText => {
+                    const rows = csvText.split("\n").map(row => row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+                    for(let i = 0; i < rows.length; i++) {
+                        const r = rows[i];
+                        if(!r || r.length < 2) continue;
+                        const label = String(r[0]).replace(/"/g, "").trim().toUpperCase();
+
+                        if(label.includes("ANGGARAN")) {
+                            const pagu = parseFloat(r[1]) || 0;
+                            const real = parseFloat(r[2]) || 0;
+                            const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
+                            document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
+                            document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
+                            document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
+                            cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; cGAnggaran.update();
+                        }
+                        if(label.includes("JUMLAH") || label.includes("PEGAWAI")) {
+                            const hadir = parseInt(r[1]) || 0;
+                            const cuti = parseInt(r[2]) || 0;
+                            const izin = parseInt(r[3]) || 0;
+                            const dl = parseInt(r[4]) || 0;
+                            const totalP = hadir + cuti + izin + dl;
+                            const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
+                            document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
+                            document.getElementById('lbl-g-hadir-riil').textContent = hadir;
+                            document.getElementById('lbl-g-peg-cuti').textContent = cuti;
+                            document.getElementById('lbl-g-peg-izin').textContent = izin;
+                            document.getElementById('lbl-g-peg-dl').textContent = dl;
+                            cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
+                        }
+                    }
+                    document.getElementById('sync-status-text').textContent = "Live Realtime";
+                    document.getElementById('sync-status-text').style.color = "#10b981";
+                })
+                .catch(err => {
+                    document.getElementById('sync-status-text').textContent = "Sync Offline";
+                    document.getElementById('sync-status-text').style.color = "#ef4444";
+                    console.error(err);
                 });
-            }
-
-            // Processing Tab 2 (Global Data)
-            if (dataGlobal) {
-                for (let i = 0; i < dataGlobal.length; i++) {
-                    const r = dataGlobal[i];
-                    if (!r || r.length < 2) continue;
-                    const label = String(r[0]).trim().toUpperCase();
-
-                    if (label.includes("ANGGARAN")) {
-                        const pagu = parseFloat(r[1]) || 0;
-                        const real = parseFloat(r[2]) || 0;
-                        const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
-                        document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
-                        document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
-                        document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
-                        cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; cGAnggaran.update();
-                    }
-                    if (label.includes("JUMLAH") || label.includes("PEGAWAI")) {
-                        const hadir = parseInt(r[1]) || 0;
-                        const cuti = parseInt(r[2]) || 0;
-                        const izin = parseInt(r[3]) || 0;
-                        const dl = parseInt(r[4]) || 0;
-                        const totalP = hadir + cuti + izin + dl;
-                        const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
-                        document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
-                        document.getElementById('lbl-g-hadir-riil').textContent = hadir;
-                        document.getElementById('lbl-g-peg-cuti').textContent = cuti;
-                        document.getElementById('lbl-g-peg-izin').textContent = izin;
-                        document.getElementById('lbl-g-peg-dl').textContent = dl;
-                        cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
-                    }
-                }
-            }
-
-            calculateAndRenderGlobalTotals();
-            if (dbPK.length > 0) {
-                idxPK = 0;
-                renderIndividualPK();
-            }
         }
 
         function calculateAndRenderGlobalTotals() {
@@ -1016,7 +984,7 @@
         }
 
         function renderIndividualPK() {
-            if (dbPK.length === 0) return;
+            if(dbPK.length === 0) return;
             const current = dbPK[idxPK % dbPK.length];
             document.getElementById('infografis-nama').textContent = current.nama;
             document.getElementById('infografis-index').textContent = `PK [${(idxPK % dbPK.length) + 1}/${dbPK.length}]`;
@@ -1036,24 +1004,18 @@
             cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
         }
 
-        // ===================================================================
-        // --- 100% PURE MICROSOFT EXCEL (.XLSX) TEMPLATE GENERATOR ----------
-        // ===================================================================
-        function downloadLocalTemplateExcel() {
+        // --- EXCEL TEMPLATE DOWNLOAD GENERATOR ---
+        function downloadPureExcelTemplate() {
             try {
                 const wb = XLSX.utils.book_new();
-                
-                // Sheet 1
                 const dataPK = [
                     ["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],
                     [1, "Eko Susilo, S.H.", 12, 3, 2, 45],
-                    [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32],
-                    [3, "Tri Haryanto, S.H.", 15, 5, 4, 28]
+                    [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32]
                 ];
                 const ws1 = XLSX.utils.aoa_to_sheet(dataPK);
                 XLSX.utils.book_append_sheet(wb, ws1, "Kinerja PK Individual");
 
-                // Sheet 2
                 const dataGlobal = [
                     ["KATEGORI DATA", "PARAMETER A", "PARAMETER B", "PARAMETER C", "PARAMETER D"],
                     ["ANGGARAN (Rp)", 250000000, 131000000, 0, 0],
@@ -1062,32 +1024,16 @@
                 ];
                 const ws2 = XLSX.utils.aoa_to_sheet(dataGlobal);
                 XLSX.utils.book_append_sheet(wb, ws2, "Anggaran & Kehadiran");
-
-                XLSX.writeFile(wb, "Template_Database_Display_Bapas.xlsx");
-            } catch (error) {
-                alert("Gagal memproses pembuatan berkas excel: " + error.message);
-            }
+                XLSX.writeFile(wb, "Template_Struktur_Sheet_Bapas.xlsx");
+            } catch (e) { alert(e.message); }
         }
 
-        // AUTO LOAD INITIAL LOCAL CACHED DATABASE ON PAGE START
-        window.addEventListener('load', () => {
-            const cachedPK = localStorage.getItem("bapas_cached_json_pk");
-            const cachedGlobal = localStorage.getItem("bapas_cached_json_global");
-            
-            if (cachedPK) {
-                const jsonPK = JSON.parse(cachedPK);
-                const jsonGlobal = cachedGlobal ? JSON.parse(cachedGlobal) : null;
-                executeLocalDatabasePopulation(jsonPK, jsonGlobal);
-            } else {
-                // Fallback dummy data jika penyimpanan lokal kosong pertama kali
-                dbPK = [
-                    { nama: "Eko Susilo, S.H.", litmasOk: 12, litmasNo: 3, klienNo: 2, klienOk: 45 },
-                    { nama: "Dwi Lestari, S.Sos.", litmasOk: 8, litmasNo: 0, klienNo: 0, klienOk: 32 }
-                ];
-                calculateAndRenderGlobalTotals();
-                renderIndividualPK();
-            }
-        });
+        // AUTO INITIAL REFRESH (Panggil setiap 25 detik sekali)
+        const cachedId = localStorage.getItem("gsheet_id_bapas") || "1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c";
+        if(cachedId) {
+            fetchDataFromGoogleSheets(cachedId);
+            setInterval(() => { fetchDataFromGoogleSheets(cachedId); }, 25000); 
+        }
     </script>
 </body>
 </html>
