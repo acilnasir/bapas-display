@@ -366,7 +366,7 @@
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
         .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* FLOATING UTILITY CONTROLS */
+        /* FLOATING PUBLIC CONTROLS */
         .bottom-trigger-control-zone {
             position: fixed;
             bottom: 15px;
@@ -427,7 +427,7 @@
 
         .admin-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
             gap: 20px;
         }
 
@@ -475,16 +475,6 @@
         }
         .btn-action-panel:hover {
             background-color: #1a657f;
-        }
-
-        .yt-input-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            padding-right: 4px;
         }
     </style>
 </head>
@@ -591,7 +581,7 @@
                     <div class="pk-profile-header">
                         <div class="pk-name-tag">
                             <span id="infografis-nama">MEMUAT DATA...</span>
-                            <span class="sync-badge" id="sync-status-text" style="color: var(--accent-green); background: rgba(16, 185, 129, 0.2);">Database Active</span>
+                            <span class="sync-badge" id="sync-status-text" style="color: var(--accent-green); background: rgba(16, 185, 129, 0.2);">Cloud Active</span>
                         </div>
                         <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
                     </div>
@@ -635,8 +625,8 @@
     <div class="admin-panel" id="control-panel-section">
         <div class="admin-header">
             <div>
-                <h2>PANEL UTAMA PENGENDALI MEDIA DISPLAY (MODE TERKUNCI)</h2>
-                <p style="color: #9ca3af; font-size: 14px;">Manajemen konfigurasi realtime TV display monitor.</p>
+                <h2>PANEL UTAMA PENGENDALI MEDIA DISPLAY (MODE REALTIME)</h2>
+                <p style="color: #9ca3af; font-size: 14px;">Manajemen sinkronisasi data cloud terpusat Google Sheets API.</p>
             </div>
             <div>
                 <button class="btn-logout" onclick="keluarAdmin();">🔒 Keluar & Kunci Admin</button>
@@ -645,27 +635,26 @@
 
         <div class="admin-grid">
             <div class="admin-card">
-                <h4>1. Tautan Antrean Video YouTube</h4>
-                <div class="yt-input-container" id="yt-inputs-wrapper"></div>
-                <button type="button" class="btn-action-panel" style="background:#374151; margin-bottom:8px;" onclick="tambahKolomVideoInput('')">➕ Tambah Kolom Video</button>
-                <button type="button" class="btn-action-panel" onclick="saveAndLoadYouTubeQueue()">📺 Simpan Antrean Video</button>
-            </div>
-
-            <div class="admin-card">
-                <h4>2. Jalur API Realtime Google Sheets</h4>
-                <label style="margin-bottom:8px; display:block; color:#9ca3af;">Masukkan URL Apps Script (/exec):</label>
+                <h4>Integrasi Jalur API Google Sheets Realtime</h4>
+                <p style="font-size:12px; color:#9ca3af; margin-bottom:10px;">Masukkan URL Web App Apps Script (/exec) yang didapatkan dari Langkah 2:</p>
                 <input type="text" id="txt-gsheet-url" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:12px;">
-                <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheetGateway()">🔗 Hubungkan Realtime API</button>
+                <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheetGateway()">🔗 Hubungkan Realtime Cloud</button>
                 <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadPureExcelTemplate()">📥 Download Template Struktur (.xlsx)</button>
             </div>
 
             <div class="admin-card">
-                <h4>3. Upload Logo Instansi (Atas)</h4>
+                <h4>Informasi Konfigurasi Video TV</h4>
+                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Daftar putar video YouTube sekarang **diatur otomatis secara realtime melalui Tab ke-3 di Google Sheet Anda**.</p>
+                <p style="font-size:12px; color:var(--secondary-color); margin-top:8px; font-weight:bold;">Operator cukup menambahkan baris link video baru di tab spreadsheet, lalu TV monitor akan mengantre video secara dinamis.</p>
+            </div>
+
+            <div class="admin-card">
+                <h4>Upload Logo Instansi (Atas)</h4>
                 <input type="file" id="admin-logo-file" accept="image/*">
             </div>
 
             <div class="admin-card">
-                <h4>4. Keamanan: Ubah Password Admin</h4>
+                <h4>Keamanan: Ubah Password Admin</h4>
                 <input type="password" id="txt-pass-lama" placeholder="Password lama">
                 <input type="password" id="txt-pass-baru" placeholder="Minimal 6 karakter">
                 <button type="button" class="btn-action-panel" onclick="prosesGantiPassword()">Simpan Password Baru</button>
@@ -692,7 +681,6 @@
                 panelAdmin.style.display = "block"; 
                 tombolKontrolPublik.style.display = "none";
                 document.getElementById('txt-gsheet-url').value = localStorage.getItem("gsheet_url_bapas") || "";
-                renderAdminVideoInputs();
                 alert("Login Berhasil!");
                 panelAdmin.scrollIntoView({ behavior: 'smooth' });
             } else {
@@ -723,66 +711,16 @@
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
         }
 
-        // --- LOGO HANDLING ---
-        document.getElementById('admin-logo-file').addEventListener('change', function() {
-            if (this.files[0]) {
-                const img = document.getElementById('display-header-logo');
-                img.src = URL.createObjectURL(this.files[0]);
-                img.style.display = 'block';
-            }
-        });
-
         // ===================================================================
-        // --- QUEUE MULTI-VIDEO YOUTUBE ENGINE -----------------------------
+        // --- REALTIME AUTOMATIC YOUTUBE PLAYLIST QUEUE ---------------------
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
-        let localVideoQueue = [];
+        let localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"]; // Fallback video
         let currentQueueIndex = 0;
-
-        function renderAdminVideoInputs() {
-            const wrapper = document.getElementById('yt-inputs-wrapper');
-            wrapper.innerHTML = "";
-            let savedQueue = JSON.parse(localStorage.getItem("yt_local_queue_bapas"));
-            if(!savedQueue || savedQueue.length === 0) {
-                savedQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0", "", ""];
-            }
-            savedQueue.forEach((url) => tambahKolomVideoInput(url));
-        }
-
-        function tambahKolomVideoInput(valueString) {
-            const wrapper = document.getElementById('yt-inputs-wrapper');
-            const index = wrapper.children.length + 1;
-            const div = document.createElement('div');
-            div.style.display = "flex";
-            div.style.gap = "5px";
-            div.style.marginBottom = "5px";
-            div.innerHTML = `
-                <input type="text" class="cls-yt-input" placeholder="Video ${index}" value="${valueString}">
-                <button type="button" style="background:#ef4444; color:white; border:none; padding:0 10px; border-radius:6px; cursor:pointer;" onclick="this.parentElement.remove()">X</button>
-            `;
-            wrapper.appendChild(div);
-        }
-
-        function saveAndLoadYouTubeQueue() {
-            const inputElements = document.querySelectorAll('.cls-yt-input');
-            const newQueue = [];
-            inputElements.forEach(el => {
-                const val = el.value.trim();
-                if(val) newQueue.push(val);
-            });
-            if(newQueue.length === 0) { alert("Harap isi minimal 1 link video!"); return; }
-            localStorage.setItem("yt_local_queue_bapas", JSON.stringify(newQueue));
-            localVideoQueue = newQueue;
-            currentQueueIndex = 0;
-            playVideoFromLocalQueue();
-            alert("Antrean video berhasil disimpan!");
-        }
 
         function onYouTubeIframeAPIReady() {
             isYtApiReady = true;
-            const savedQueue = JSON.parse(localStorage.getItem("yt_local_queue_bapas"));
-            localVideoQueue = (savedQueue && savedQueue.length > 0) ? savedQueue : ["https://www.youtube.com/watch?v=jrXNVlQJpW0"];
             playVideoFromLocalQueue();
         }
 
@@ -791,7 +729,6 @@
             tag.src = "https://www.youtube.com/iframe_api";
             const firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-            renderAdminVideoInputs();
         });
 
         function playVideoFromLocalQueue() {
@@ -850,7 +787,7 @@
         const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
         const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
 
-        // --- DATABASE VARIABLES & TIMERS ---
+        // --- CAROUSEL DISPLAY TIMERS ---
         let dbPK = [];
         let idxSlideG = 1;
         let idxPK = 0;
@@ -869,12 +806,12 @@
         }, 6000);
 
         // ===================================================================
-        // --- NEW REALTIME APPS SCRIPT JSON PARSER GATEWAY ------------------
+        // --- REALTIME WEB-APP API INTERACTION GATEWAY ----------------------
         // ===================================================================
         function saveAndConnectGSheetGateway() {
             const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
             if(!rawUrl) { alert("Masukkan URL Web App Apps Script!"); return; }
-            if(!rawUrl.includes("/exec")) { alert("Format URL salah. Pastikan berakhiran /exec"); return; }
+            if(!rawUrl.includes("/exec")) { alert("Format URL salah. Harus berakhiran /exec"); return; }
             
             localStorage.setItem("gsheet_url_bapas", rawUrl);
             fetchDataFromAppsScriptAPI(rawUrl);
@@ -891,10 +828,19 @@
                 .then(jsonResponse => {
                     if(jsonResponse.status !== "success") throw new Error(jsonResponse.message);
                     
-                    // Ambil Data Tab 1 (PK)
+                    // A. Update Jalur Antrean Video YouTube jika ada perubahan di Sheet
+                    if (jsonResponse.videos && jsonResponse.videos.length > 0) {
+                        const oldFirstVideo = localVideoQueue[0];
+                        localVideoQueue = jsonResponse.videos;
+                        updateQueueIndicator();
+                        // Jika video pertama berubah, langsung muat paksa video baru
+                        if(oldFirstVideo !== localVideoQueue[0]) playVideoFromLocalQueue();
+                    }
+
+                    // B. Update Data Pembimbing Kemasyarakatan (PK)
                     dbPK = jsonResponse.data_pk;
 
-                    // Ambil Data Tab 2 (Global)
+                    // C. Update Data Global Tab 2
                     const globalData = jsonResponse.global;
                     if(globalData.anggaran) {
                         const pagu = globalData.anggaran.pagu;
@@ -996,7 +942,16 @@
                 ];
                 const ws2 = XLSX.utils.aoa_to_sheet(dataGlobal);
                 XLSX.utils.book_append_sheet(wb, ws2, "Anggaran & Kehadiran");
-                XLSX.writeFile(wb, "Template_Struktur_Sheet_Bapas.xlsx");
+
+                const dataVideo = [
+                    ["No", "Judul Video (Bebas)", "URL / Link Video YouTube Utama"],
+                    [1, "Profil Komparasi", "https://www.youtube.com/watch?v=jrXNVlQJpW0"],
+                    [2, "Video Edukasi Layanan", ""]
+                ];
+                const ws3 = XLSX.utils.aoa_to_sheet(dataVideo);
+                XLSX.utils.book_append_sheet(wb, ws3, "Antrean Video YouTube");
+
+                XLSX.writeFile(wb, "Template_Struktur_Sheet_Bapas_Murni.xlsx");
             } catch (e) { alert(e.message); }
         }
 
