@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -90,7 +91,7 @@
             margin-top: 4px;
         }
 
-        /* PANEL KIRI (YOUTUBE INTEGRATION) */
+        /* PANEL KIRI (YOUTUBE DISPLAY) */
         .left-panel {
             grid-column: 1;
             padding: 25px;
@@ -173,7 +174,7 @@
             z-index: 5;
         }
 
-        /* PANEL KANAN (INFOGRAFIS SLIDESHOW) */
+        /* PANEL KANAN (INFOGRAFIS CAROUSEL SLIDESHOW) */
         .right-panel {
             grid-column: 2;
             display: grid;
@@ -250,7 +251,7 @@
             position: relative;
         }
 
-        /* BAWAH: INDIVIDUAL CAROUSEL PERFORMA PK */
+        /* PERFORMA PK INDIVIDUAL */
         .performance-box {
             background-color: #0d1321;
             padding: 25px 30px;
@@ -365,7 +366,7 @@
         .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
         .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
 
-        /* FLOATING PUBLIC CONTROLS */
+        /* FLOATING UTILITY CONTROLS */
         .bottom-trigger-control-zone {
             position: fixed;
             bottom: 15px;
@@ -394,7 +395,7 @@
             transform: translateY(-2px);
         }
 
-        /* STYLING PANEL KONTROL ADMIN */
+        /* PANEL ADMIN */
         .admin-panel {
             background-color: #111827;
             padding: 40px;
@@ -542,7 +543,7 @@
                 </div>
 
                 <div class="slide-container" id="slide-global-2">
-                    <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
+                    <div class="slide-title">👥 TOTAL KEPATUHAAN WAJIB LAPOR KLIEN</div>
                     <div class="slide-content-grid">
                         <div class="slide-details-list">
                             <div class="slide-big-number" id="lbl-g-klien-persen">0%</div>
@@ -645,8 +646,7 @@
         <div class="admin-grid">
             <div class="admin-card">
                 <h4>1. Tautan Antrean Video YouTube</h4>
-                <div class="yt-input-container" id="yt-inputs-wrapper">
-                    </div>
+                <div class="yt-input-container" id="yt-inputs-wrapper"></div>
                 <button type="button" class="btn-action-panel" style="background:#374151; margin-bottom:8px;" onclick="tambahKolomVideoInput('')">➕ Tambah Kolom Video</button>
                 <button type="button" class="btn-action-panel" onclick="saveAndLoadYouTubeQueue()">📺 Simpan Antrean Video</button>
             </div>
@@ -656,7 +656,7 @@
                 <label>Tautan URL Utama Google Sheet:</label>
                 <input type="text" id="txt-gsheet-url" placeholder="https://docs.google.com/spreadsheets/d/.../edit">
                 <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheet()">🔗 Hubungkan Google Sheet</button>
-                <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadLocalTemplateExcel()">📥 Download Template Struktur Sheet</button>
+                <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadPureExcelTemplate()">📥 Download Template Struktur (.xlsx)</button>
             </div>
 
             <div class="admin-card">
@@ -723,35 +723,20 @@
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
         }
 
-        // --- LOGO HANDLING ---
-        document.getElementById('admin-logo-file').addEventListener('change', function() {
-            if (this.files[0]) {
-                const img = document.getElementById('display-header-logo');
-                img.src = URL.createObjectURL(this.files[0]);
-                img.style.display = 'block';
-            }
-        });
-
         // ===================================================================
-        // --- LOCAL QUEUE MULTI-VIDEO YOUTUBE ENGINE -------------------------
+        // --- FIXED YOUTUBE PLAYER (WITH DOMAIN ORIGIN VALIDATION) ---------
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
         let localVideoQueue = [];
         let currentQueueIndex = 0;
 
-        // Render form input link video dinamis di panel admin
         function renderAdminVideoInputs() {
             const wrapper = document.getElementById('yt-inputs-wrapper');
             wrapper.innerHTML = "";
-            
             let savedQueue = JSON.parse(localStorage.getItem("yt_local_queue_bapas"));
             if(!savedQueue || savedQueue.length === 0) {
-                savedQueue = [
-                    "https://www.youtube.com/watch?v=jrXNVlQJpW0",
-                    "",
-                    ""
-                ];
+                savedQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0", "", ""];
             }
             savedQueue.forEach((url) => tambahKolomVideoInput(url));
         }
@@ -759,12 +744,10 @@
         function tambahKolomVideoInput(valueString) {
             const wrapper = document.getElementById('yt-inputs-wrapper');
             const index = wrapper.children.length + 1;
-            
             const div = document.createElement('div');
             div.style.display = "flex";
             div.style.gap = "5px";
             div.style.marginBottom = "5px";
-            
             div.innerHTML = `
                 <input type="text" class="cls-yt-input" placeholder="Video ${index}" value="${valueString}">
                 <button type="button" style="background:#ef4444; color:white; border:none; padding:0 10px; border-radius:6px; cursor:pointer;" onclick="this.parentElement.remove()">X</button>
@@ -775,30 +758,22 @@
         function saveAndLoadYouTubeQueue() {
             const inputElements = document.querySelectorAll('.cls-yt-input');
             const newQueue = [];
-            
             inputElements.forEach(el => {
                 const val = el.value.trim();
                 if(val) newQueue.push(val);
             });
-
             if(newQueue.length === 0) { alert("Harap isi minimal 1 link video!"); return; }
-            
             localStorage.setItem("yt_local_queue_bapas", JSON.stringify(newQueue));
             localVideoQueue = newQueue;
             currentQueueIndex = 0;
-            
             playVideoFromLocalQueue();
-            alert("Antrean video berhasil disimpan dan dimuat ulang!");
+            alert("Antrean video berhasil disimpan!");
         }
 
         function onYouTubeIframeAPIReady() {
             isYtApiReady = true;
             const savedQueue = JSON.parse(localStorage.getItem("yt_local_queue_bapas"));
-            if(savedQueue && savedQueue.length > 0) {
-                localVideoQueue = savedQueue;
-            } else {
-                localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"];
-            }
+            localVideoQueue = (savedQueue && savedQueue.length > 0) ? savedQueue : ["https://www.youtube.com/watch?v=jrXNVlQJpW0"];
             playVideoFromLocalQueue();
         }
 
@@ -812,52 +787,38 @@
 
         function playVideoFromLocalQueue() {
             if (!isYtApiReady || localVideoQueue.length === 0) return;
-            
-            if (currentQueueIndex >= localVideoQueue.length) {
-                currentQueueIndex = 0; // Mengulang antrean kembali dari awal
-            }
+            if (currentQueueIndex >= localVideoQueue.length) currentQueueIndex = 0;
             
             const currentUrl = localVideoQueue[currentQueueIndex];
             let videoId = "jrXNVlQJpW0";
             
+            // Ekstraksi ID Video Tunggal, membuang parameter list playlist bawaan yang merusak enkripsi player
             const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             const match = currentUrl.match(regExp);
-            if (match && match[2].length === 11) {
-                videoId = match[2];
-            }
+            if (match && match[2].length === 11) videoId = match[2];
 
             if (ytPlayerObj) {
                 ytPlayerObj.loadVideoById({ videoId: videoId });
             } else {
                 ytPlayerObj = new YT.Player('yt-player', {
                     videoId: videoId,
-                    playerVars: {
-                        'autoplay': 1,
-                        'controls': 0,
-                        'rel': 0,
-                        'modestbranding': 1,
-                        'iv_load_policy': 3
+                    playerVars: { 
+                        'autoplay': 1, 
+                        'controls': 0, 
+                        'rel': 0, 
+                        'modestbranding': 1, 
+                        'iv_load_policy': 3,
+                        'origin': window.location.origin // FIX STRATEGIS: Legalisasi origin domain eksternal agar lolos dari Error 153
                     },
                     events: {
-                        'onReady': (e) => {
-                            e.target.mute();
-                            e.target.playVideo();
-                            updateQueueIndicator();
+                        'onReady': (e) => { e.target.mute(); e.target.playVideo(); updateQueueIndicator(); },
+                        'onStateChange': (e) => { 
+                            if (e.data === 0) { currentQueueIndex++; playVideoFromLocalQueue(); } 
+                            if (e.data === -1 || e.data === 5) e.target.playVideo(); 
                         },
-                        'onStateChange': onPlayerStateChange
+                        'onError': (e) => { console.log("YT Error, skipping...", e.data); currentQueueIndex++; playVideoFromLocalQueue(); }
                     }
                 });
-            }
-        }
-
-        function onPlayerStateChange(event) {
-            // Kode 0 bermakna video telah SELESAI diputar (YT.PlayerState.ENDED)
-            if (event.data === 0) {
-                currentQueueIndex++;
-                playVideoFromLocalQueue();
-            }
-            if (event.data === -1 || event.data === 5) {
-                event.target.playVideo();
             }
         }
 
@@ -865,25 +826,9 @@
             document.getElementById('video-title-indicator').textContent = `Memutar Video [${currentQueueIndex + 1}/${localVideoQueue.length}]`;
         }
 
-        function nextVideoManual() {
-            if(localVideoQueue.length <= 1) return;
-            currentQueueIndex++;
-            playVideoFromLocalQueue();
-        }
-
-        function togglePlayPause() {
-            if (!ytPlayerObj) return;
-            if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; }
-            else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; }
-        }
-
-        function toggleMute() {
-            if (!ytPlayerObj) return;
-            const btn = document.getElementById('btn-mute');
-            if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; }
-            else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; }
-        }
-
+        function nextVideoManual() { if(localVideoQueue.length <= 1) return; currentQueueIndex++; playVideoFromLocalQueue(); }
+        function togglePlayPause() { if (!ytPlayerObj) return; if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; } else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; } }
+        function toggleMute() { if (!ytPlayerObj) return; const btn = document.getElementById('btn-mute'); if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; } else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; } }
         function setVolume(v) { if (ytPlayerObj) ytPlayerObj.setVolume(v); document.getElementById('volume-text').textContent = v + "%"; }
 
         // --- CHART INITIALIZATION ---
@@ -917,19 +862,17 @@
         }, 6000);
 
         // ===================================================================
-        // --- 100% SINKRONISASI GOOGLE SHEETS LIVE REALTIME PARSER -----------
+        // --- ARSITEKTUR BARU: DUAL STREAM TAB GOOGLE SHEETS PARSER ---------
         // ===================================================================
         function saveAndConnectGSheet() {
             const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
             if(!rawUrl) { alert("Masukkan URL!"); return; }
-
             const matches = rawUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
-            if(!matches || !matches[1]) { alert("Format URL Spreadsheet tidak valid."); return; }
-
+            if(!matches || !matches[1]) { alert("Format URL Spreadsheet salah."); return; }
             localStorage.setItem("gsheet_url_bapas", rawUrl);
             localStorage.setItem("gsheet_id_bapas", matches[1]);
-            
             fetchDataFromGoogleSheets(matches[1]);
+            alert("Koneksi Cloud Google Sheets Berhasil Disinkronkan!");
         }
 
         function fetchDataFromGoogleSheets(sheetId) {
@@ -937,78 +880,76 @@
             document.getElementById('sync-status-text').textContent = "Syncing...";
             document.getElementById('sync-status-text').style.color = "#f4d35e";
 
-            const cacheBuster = new Date().getTime();
-            const liveCsvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=0&x=${cacheBuster}`;
+            const buster = new Date().getTime();
+            
+            // JALUR 1: Mengambil Data PK Individual langsung dari Tab Utama (gid=0)
+            const urlTabPK = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=0&x=${buster}`;
+            // JALUR 2: Mengambil Data Anggaran & Pegawai dari Tab Kedua (gid=1334693153)
+            const urlTabGlobal = `https://docs.google.com/spreadsheets/d/${sheetId}/pub?output=csv&gid=1334693153&x=${buster}`;
 
-            fetch(liveCsvUrl)
-                .then(res => { if(!res.ok) throw new Error("Gagal mengunduh sheet."); return res.text(); })
+            // Tarik Lembar Pertama (Data PK)
+            fetch(urlTabPK)
+                .then(res => res.text())
                 .then(csvText => {
-                    const rows = csvText.split("\n").map(row => {
-                        return row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    });
-
+                    const rows = csvText.split("\n").map(row => row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
                     dbPK = [];
-                    let parsingGlobalZone = false;
-
                     for(let i = 1; i < rows.length; i++) {
                         const r = rows[i];
-                        if(!r || r.length < 2 || r[0] === "") continue;
-
-                        const cellZero = String(r[0]).replace(/"/g, "").trim().toUpperCase();
-
-                        if(cellZero.includes("KATEGORI DATA") || cellZero.includes("ANGGARAN")) {
-                            parsingGlobalZone = true;
-                        }
-
-                        if(!parsingGlobalZone) {
-                            dbPK.push({
-                                nama: String(r[1]).replace(/"/g, "").trim(),
-                                litmasOk: parseInt(r[2]) || 0,
-                                litmasNo: parseInt(r[3]) || 0,
-                                klienNo: parseInt(r[4]) || 0,
-                                klienOk: parseInt(r[5]) || 0
-                            });
-                        } else {
-                            if(cellZero.includes("ANGGARAN")) {
-                                const pagu = parseFloat(r[1]) || 0;
-                                const real = parseFloat(r[2]) || 0;
-                                const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
-                                
-                                document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
-                                document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
-                                document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
-                                
-                                cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; 
-                                cGAnggaran.update();
-                            }
-                            if(cellZero.includes("JUMLAH")) {
-                                const hadir = parseInt(r[1]) || 0;
-                                const cuti = parseInt(r[2]) || 0;
-                                const izin = parseInt(r[3]) || 0;
-                                const dl = parseInt(r[4]) || 0;
-                                const totalP = hadir + cuti + izin + dl;
-                                const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
-                                
-                                document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
-                                document.getElementById('lbl-g-hadir-riil').textContent = hadir;
-                                document.getElementById('lbl-g-peg-cuti').textContent = cuti;
-                                document.getElementById('lbl-g-peg-izin').textContent = izin;
-                                document.getElementById('lbl-g-peg-dl').textContent = dl;
-                                
-                                cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; 
-                                cGPegawai.update();
-                            }
-                        }
+                        if(!r || r.length < 5 || r[0] === "") continue;
+                        const checkLabel = String(r[0]).toUpperCase();
+                        if(checkLabel.includes("ANGGARAN") || checkLabel.includes("KATEGORI")) break; // Hentikan jika menyentuh baris sampah
+                        
+                        dbPK.push({
+                            nama: String(r[1]).replace(/"/g, "").trim(),
+                            litmasOk: parseInt(r[2]) || 0,
+                            litmasNo: parseInt(r[3]) || 0,
+                            klienNo: parseInt(r[4]) || 0,
+                            klienOk: parseInt(r[5]) || 0
+                        });
                     }
-
                     calculateAndRenderGlobalTotals();
                     if(dbPK.length > 0) renderIndividualPK();
+                    
+                    // Lanjutkan menarik Lembar Kedua secara paralel
+                    return fetch(urlTabGlobal);
+                })
+                .then(res => res.text())
+                .then(csvText => {
+                    const rows = csvText.split("\n").map(row => row.split(/;|,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+                    for(let i = 0; i < rows.length; i++) {
+                        const r = rows[i];
+                        if(!r || r.length < 2) continue;
+                        const label = String(r[0]).replace(/"/g, "").trim().toUpperCase();
 
+                        if(label.includes("ANGGARAN")) {
+                            const pagu = parseFloat(r[1]) || 0;
+                            const real = parseFloat(r[2]) || 0;
+                            const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
+                            document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
+                            document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
+                            document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
+                            cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; cGAnggaran.update();
+                        }
+                        if(label.includes("JUMLAH") || label.includes("PEGAWAI")) {
+                            const hadir = parseInt(r[1]) || 0;
+                            const cuti = parseInt(r[2]) || 0;
+                            const izin = parseInt(r[3]) || 0;
+                            const dl = parseInt(r[4]) || 0;
+                            const totalP = hadir + cuti + izin + dl;
+                            const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
+                            document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
+                            document.getElementById('lbl-g-hadir-riil').textContent = hadir;
+                            document.getElementById('lbl-g-peg-cuti').textContent = cuti;
+                            document.getElementById('lbl-g-peg-izin').textContent = izin;
+                            document.getElementById('lbl-g-peg-dl').textContent = dl;
+                            cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
+                        }
+                    }
                     document.getElementById('sync-status-text').textContent = "Live Realtime";
                     document.getElementById('sync-status-text').style.color = "#10b981";
                 })
                 .catch(err => {
-                    document.getElementById('sync-status-text').textContent = "Sync Error / Offline";
+                    document.getElementById('sync-status-text').textContent = "Sync Offline";
                     document.getElementById('sync-status-text').style.color = "#ef4444";
                     console.error(err);
                 });
@@ -1020,7 +961,6 @@
                 totalLitmasOk += p.litmasOk; totalLitmasNo += p.litmasNo;
                 totalKlienOk += p.klienOk; totalKlienNo += p.klienNo;
             });
-
             const sumLitmas = totalLitmasOk + totalLitmasNo;
             const pLitmas = sumLitmas > 0 ? ((totalLitmasOk / sumLitmas) * 100).toFixed(0) : 0;
             document.getElementById('lbl-g-litmas-persen').textContent = pLitmas + "%";
@@ -1057,26 +997,31 @@
             cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
         }
 
-        // --- EXCEL DOWNLOAD TEMPLATE STRUKTUR ---
-        function downloadLocalTemplateExcel() {
-            const csvContent = "data:text/csv;charset=utf-8," 
-                + "No;Nama PK;Litmas Selesai;Litmas Belum Selesai;Klien Belum Melapor;Klien Sudah Melapor\n"
-                + "1;Eko Susilo SH;12;3;2;45\n"
-                + "2;Dwi Lestari S.Sos;8;0;0;32\n"
-                + "3;Tri Haryanto SH;15;5;4;28\n"
-                + "ANGGARAN (Rp);250000000;131000000;;\n"
-                + "JUMLAH (ORANG);38;2;1;4";
-                
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "Struktur_Panduan_GoogleSheet_Bapas.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+        // --- EXCEL TEMPLATE DOWNLOAD GENERATOR ---
+        function downloadPureExcelTemplate() {
+            try {
+                const wb = XLSX.utils.book_new();
+                const dataPK = [
+                    ["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],
+                    [1, "Eko Susilo, S.H.", 12, 3, 2, 45],
+                    [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32]
+                ];
+                const ws1 = XLSX.utils.aoa_to_sheet(dataPK);
+                XLSX.utils.book_append_sheet(wb, ws1, "Kinerja PK Individual");
+
+                const dataGlobal = [
+                    ["KATEGORI DATA", "PARAMETER A", "PARAMETER B", "PARAMETER C", "PARAMETER D"],
+                    ["ANGGARAN (Rp)", 250000000, 131000000, 0, 0],
+                    ["", "", "", "", ""],
+                    ["JUMLAH PEGAWAI", 38, 2, 1, 4]
+                ];
+                const ws2 = XLSX.utils.aoa_to_sheet(dataGlobal);
+                XLSX.utils.book_append_sheet(wb, ws2, "Anggaran & Kehadiran");
+                XLSX.writeFile(wb, "Template_Struktur_Sheet_Bapas.xlsx");
+            } catch (e) { alert(e.message); }
         }
 
-        // AUTO INITIAL REFRESH (Panggil setiap 25 detik sekali)
+        // INISIALISASI REFRESH OTOMATIS (Berjalan setiap 25 detik sekali)
         const cachedId = localStorage.getItem("gsheet_id_bapas") || "1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c";
         if(cachedId) {
             fetchDataFromGoogleSheets(cachedId);
