@@ -744,20 +744,17 @@
         });
 
         // ===================================================================
-        // --- FIX RE-ENGINEERING: TIMEOUT SAFE YOUTUBE LOADER API -----------
+        // --- ADAPTIVE YOUTUBE ENGINE AND PARSING ALGORITHM -----------------
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
 
-        // Taktik Pemanggilan Callback Paksa: Browser akan memanggil fungsi ini secara native
         function onYouTubeIframeAPIReady() {
             isYtApiReady = true;
             loadInitialYouTubeVideo();
         }
 
-        // Mekanisme Pengaman Tambahan (Failsafe): Jika YouTube API tidak terpanggil otomatis dalam 3 detik, panggil manual
         window.addEventListener('DOMContentLoaded', () => {
-            // Memuat file script API secara aman setelah DOM HTML diproduksi sempurna
             const tag = document.createElement('script');
             tag.src = "https://www.youtube.com/iframe_api";
             const firstScriptTag = document.getElementsByTagName('script')[0];
@@ -783,16 +780,19 @@
             alert("Tautan YouTube berhasil disimpan!");
         }
 
+        // PERBAIKAN STRATEGIS: Algoritma Pendeteksi Multi-Parameter Universal
         function buildYouTubePlayer(urlStr) {
             let videoId = "";
             let playlistId = "";
 
             try {
+                // 1. Ekstrak ID Playlist jika terdapat parameter "list="
                 if (urlStr.includes("list=")) {
                     const listMatch = urlStr.match(/[&?]list=([^&]+)/);
                     if (listMatch && listMatch[1]) playlistId = listMatch[1];
                 }
 
+                // 2. Ekstrak ID Video jika bukan halaman playlist murni
                 const videoMatch = urlStr.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|shorts\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/);
                 if (videoMatch && videoMatch[1]) videoId = videoMatch[1];
 
@@ -811,6 +811,7 @@
                     'iv_load_policy': 3
                 };
 
+                // FIX CONFLICT SINKRONISASI: Jika link memiliki Playlist ID, paksa jalankan mode Playlist
                 if (playlistId) {
                     playerVarsSetting.listType = 'playlist';
                     playerVarsSetting.list = playlistId;
