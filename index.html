@@ -91,7 +91,7 @@
             margin-top: 4px;
         }
 
-        /* PANEL KIRI (YOUTUBE DISPLAY) */
+        /* PANEL KIRI (YOUTUBE DISPLAY + NOMOR ANTRIAN) */
         .left-panel {
             grid-column: 1;
             padding: 25px;
@@ -99,11 +99,73 @@
             flex-direction: column;
             background-color: #0b0f19;
             border-right: 2px solid #1f2937;
+            gap: 15px;
         }
 
-        .video-box-container {
-            width: 100%;
+        /* SUSUNAN STRUKTUR UP-LOWER (VIDEO & ANTRIAN COMPONENT) */
+        .video-and-queue-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
             flex-grow: 1;
+            width: 100%;
+        }
+
+        /* WIDGET PANEL ANTRIAN KANAN ATAS VIDEO */
+        .queue-display-bar {
+            grid-row: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+            width: 100%;
+        }
+
+        .queue-ticket-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 2px solid #374151;
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .queue-ticket-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+        }
+        .card-type-a::before { background-color: var(--secondary-color); }
+        .card-type-b::before { background-color: var(--accent-blue); }
+        .card-type-c::before { background-color: var(--accent-green); }
+
+        .queue-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .queue-number-value {
+            font-size: 38px;
+            font-weight: 900;
+            color: #ffffff;
+            line-height: 1;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        /* BOX VIDEO YOUTUBE */
+        .video-box-container {
+            grid-row: 2;
+            width: 100%;
+            height: 100%;
             background-color: #000000;
             border-radius: 12px 12px 0 0;
             border: 2px solid #374151;
@@ -193,7 +255,6 @@
             position: relative;
         }
 
-        /* STYLING TOMBOL NAVIGASI MANUAL */
         .nav-wrapper-manual {
             display: flex;
             gap: 5px;
@@ -533,9 +594,27 @@
         </div>
 
         <div class="left-panel">
-            <div class="video-box-container">
-                <div id="yt-player"></div>
-                <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan YouTube...</div>
+            <div class="video-and-queue-container">
+                
+                <div class="queue-display-bar">
+                    <div class="queue-ticket-card card-type-a">
+                        <div class="queue-label">Antrian A</div>
+                        <div class="queue-number-value" id="num-antrian-a">A-000</div>
+                    </div>
+                    <div class="queue-ticket-card card-type-b">
+                        <div class="queue-label">Antrian B</div>
+                        <div class="queue-number-value" id="num-antrian-b">B-000</div>
+                    </div>
+                    <div class="queue-ticket-card card-type-c">
+                        <div class="queue-label">Antrian C</div>
+                        <div class="queue-number-value" id="num-antrian-c">C-000</div>
+                    </div>
+                </div>
+
+                <div class="video-box-container">
+                    <div id="yt-player"></div>
+                    <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan YouTube...</div>
+                </div>
             </div>
             
             <div class="video-audio-controls">
@@ -708,15 +787,15 @@
             </div>
 
             <div class="admin-card">
-                <h4>Informasi Konfigurasi Video TV</h4>
-                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Daftar putar video YouTube sekarang **diatur otomatis secara realtime melalui Tab ke-3 di Google Sheet Anda**.</p>
-                <p style="font-size:12px; color:var(--secondary-color); margin-top:8px; font-weight:bold;">Operator cukup menambahkan baris link video baru di tab spreadsheet, lalu TV monitor akan mengantre video secara dinamis.</p>
+                <h4>Informasi Konfigurasi Video & Antrian</h4>
+                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Daftar putar video YouTube dan **Nomor Antrean Pelayanan A, B, C** sekarang diatur otomatis melalui Google Sheet Anda.</p>
+                <p style="font-size:12px; color:var(--secondary-color); margin-top:8px; font-weight:bold;">Operator cukup memperbarui nomor antrean di tab 'Data Antrian' spreadsheet, maka TV akan bersinkronisasi secara otomatis.</p>
             </div>
 
             <div class="admin-card">
                 <h4>Informasi Logo Atas</h4>
-                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Logo institusi Bapas Kelas II Purwokerto telah **dikunci permanen secara cloud** menggunakan berkas yang Anda sematkan di Google Drive.</p>
-                <p style="font-size:12px; color:var(--accent-green); margin-top:8px; font-weight:bold;">Sistem akan memanggil logo secara langsung tanpa perlu pengunggahan ulang.</p>
+                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Logo institusi Bapas Kelas II Purwokerto telah dikunci permanen secara cloud.</p>
+                <p style="font-size:12px; color:var(--accent-green); margin-top:8px; font-weight:bold;">Sistem memanggil logo otomatis dari Google Drive.</p>
             </div>
 
             <div class="admin-card">
@@ -778,7 +857,7 @@
         }
 
         // ===================================================================
-        // --- REALTIME AUTOMATIC YOUTUBE PLAYLIST QUEUE ---------------------
+        // --- YOUTUBE PLAYLIST QUEUE ENGINE ---------------------------------
         // ===================================================================
         let ytPlayerObj = null;
         let isYtApiReady = false;
@@ -853,34 +932,24 @@
         const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
         const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
 
-        // --- CAROUSEL DISPLAY LOGIC & TIMERS ---
+        // --- CAROUSEL ROTATION LOGIC ---
         let dbPK = [];
         let idxSlideG = 1;
         let idxPK = 0;
-        
         let pauseGlobalTimer = 0;
         let pausePKTimer = 0;
 
-        // Auto-rotation Slide Global (Setiap 8 detik)
         setInterval(() => {
-            if (pauseGlobalTimer > 0) {
-                pauseGlobalTimer--;
-                return;
-            }
+            if (pauseGlobalTimer > 0) { pauseGlobalTimer--; return; }
             changeGlobalSlideNext();
         }, 8000);
 
-        // Auto-rotation Slide Performa PK (Setiap 6 detik)
         setInterval(() => {
-            if (dbPK.length === 0 || pausePKTimer > 0) {
-                pausePKTimer--;
-                return;
-            }
+            if (dbPK.length === 0 || pausePKTimer > 0) { pausePKTimer--; return; }
             idxPK = (idxPK + 1) % dbPK.length;
             renderIndividualPK();
         }, 6000);
 
-        // Fungsi Perubahan Slide Global
         function changeGlobalSlideNext() {
             document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
             idxSlideG = (idxSlideG % 4) + 1;
@@ -888,16 +957,11 @@
             if(el) el.classList.add('active');
         }
 
-        // ===================================================================
-        // --- LOGIK MANAJEMEN NAVIGASI MANUAL (STRATEGIS) -------------------
-        // ===================================================================
         function navigateGlobalSlide(direction) {
-            pauseGlobalTimer = 15; // Menghentikan perputaran otomatis selama 15 detik
-            
+            pauseGlobalTimer = 15; 
             idxSlideG = idxSlideG + direction;
             if (idxSlideG > 4) idxSlideG = 1;
             if (idxSlideG < 1) idxSlideG = 4;
-
             document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
             const el = document.getElementById(`slide-global-${idxSlideG}`);
             if(el) el.classList.add('active');
@@ -905,23 +969,20 @@
 
         function navigatePKManual(direction) {
             if (dbPK.length === 0) return;
-            pausePKTimer = 15; // Menghentikan rotasi otomatis profil PK selama 15 detik
-
+            pausePKTimer = 15; 
             idxPK = idxPK + direction;
             if (idxPK >= dbPK.length) idxPK = 0;
             if (idxPK < 0) idxPK = dbPK.length - 1;
-
             renderIndividualPK();
         }
 
         // ===================================================================
-        // --- REALTIME WEB-APP API INTERACTION GATEWAY ----------------------
+        // --- REALTIME SINKRONISASI API SCRIPT FEEDS ------------------------
         // ===================================================================
         function saveAndConnectGSheetGateway() {
             const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
             if(!rawUrl) { alert("Masukkan URL Web App Apps Script!"); return; }
             if(!rawUrl.includes("/exec")) { alert("Format URL salah. Harus berakhiran /exec"); return; }
-            
             localStorage.setItem("gsheet_url_bapas", rawUrl);
             fetchDataFromAppsScriptAPI(rawUrl);
             alert("API Realtime Berhasil Disimpan!");
@@ -937,7 +998,7 @@
                 .then(jsonResponse => {
                     if(jsonResponse.status !== "success") throw new Error(jsonResponse.message);
                     
-                    // A. Update Jalur Antrean Video YouTube jika ada perubahan di Sheet
+                    // A. Update Jalur Antrean Video YouTube
                     if (jsonResponse.videos && jsonResponse.videos.length > 0) {
                         const oldFirstVideo = localVideoQueue[0];
                         localVideoQueue = jsonResponse.videos;
@@ -945,10 +1006,17 @@
                         if(oldFirstVideo !== localVideoQueue[0]) playVideoFromLocalQueue();
                     }
 
-                    // B. Update Data Pembimbing Kemasyarakatan (PK)
+                    // B. REALTIME DATA UPDATE: TIKET NOMOR ANTREAN (A, B, C)
+                    if (jsonResponse.antrian) {
+                        document.getElementById('num-antrian-a').textContent = jsonResponse.antrian.A;
+                        document.getElementById('num-antrian-b').textContent = jsonResponse.antrian.B;
+                        document.getElementById('num-antrian-c').textContent = jsonResponse.antrian.C;
+                    }
+
+                    // C. Update Data Pembimbing Kemasyarakatan (PK)
                     dbPK = jsonResponse.data_pk;
 
-                    // C. Update Data Global Tab 2
+                    // D. Update Data Global Tab 2
                     const globalData = jsonResponse.global;
                     if(globalData.anggaran) {
                         const pagu = globalData.anggaran.pagu;
@@ -1030,14 +1098,12 @@
             cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
         }
 
-        // --- EXCEL TEMPLATE DOWNLOAD GENERATOR ---
         function downloadPureExcelTemplate() {
             try {
                 const wb = XLSX.utils.book_new();
                 const dataPK = [
                     ["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],
-                    [1, "Eko Susilo, S.H.", 12, 3, 2, 45],
-                    [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32]
+                    [1, "Eko Susilo, S.H.", 12, 3, 2, 45]
                 ];
                 const ws1 = XLSX.utils.aoa_to_sheet(dataPK);
                 XLSX.utils.book_append_sheet(wb, ws1, "Kinerja PK Individual");
@@ -1052,18 +1118,26 @@
                 XLSX.utils.book_append_sheet(wb, ws2, "Anggaran & Kehadiran");
 
                 const dataVideo = [
-                    ["No", "Judul Video (Bebas)", "URL / Link Video YouTube Utama"],
-                    [1, "Profil Komparasi", "https://www.youtube.com/watch?v=jrXNVlQJpW0"],
-                    [2, "Video Edukasi Layanan", ""]
+                    ["No", "Judul Video", "URL / Link Video YouTube Utama"],
+                    [1, "Profil Komparasi", "https://www.youtube.com/watch?v=jrXNVlQJpW0"]
                 ];
                 const ws3 = XLSX.utils.aoa_to_sheet(dataVideo);
                 XLSX.utils.book_append_sheet(wb, ws3, "Antrean Video YouTube");
+
+                const templateAntrian = [
+                    ["Jenis Antrean", "Nomor Antrean Saat Ini", "Keterangan / Loket"],
+                    ["Antrian A", "A-001", "Loket 1"],
+                    ["Antrian B", "B-001", "Loket 2"],
+                    ["Antrian C", "C-001", "Loket 3"]
+                ];
+                const ws4 = XLSX.utils.aoa_to_sheet(templateAntrian);
+                XLSX.utils.book_append_sheet(wb, ws4, "Data Antrian");
 
                 XLSX.writeFile(wb, "Template_Struktur_Sheet_Bapas_Murni.xlsx");
             } catch (e) { alert(e.message); }
         }
 
-        // SINKRONISASI OTOMATIS BERKALA (Berjalan setiap 25 detik sekali)
+        // AUTO-POLLING REFRESH CLOUD (Setiap 25 detik sekali)
         const savedApiUrl = localStorage.getItem("gsheet_url_bapas");
         if(savedApiUrl) {
             fetchDataFromAppsScriptAPI(savedApiUrl);
