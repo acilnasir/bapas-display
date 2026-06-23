@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #114b5f;
+            --secondary-color: #f4d35e;
+            --dark-bg: #0a0f1d;
+            --panel-bg: #111827;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --btn-download: #2563eb;
+            --card-bg: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        /* =================================================== */
+        /* STYLING DISPLAY UTAMA (OPTIMAL FULL HD 1080P)       */
+        /* =================================================== */
+        #main-display-screen {
+            width: 100%;
+            height: 100vh;
+            max-height: 1080px;
+            display: grid;
+            grid-template-rows: 110px 1fr;
+            grid-template-columns: 55% 45%;
+            background-color: var(--dark-bg);
+            position: relative;
+        }
+
+        #main-display-screen:fullscreen {
+            width: 1920px;
+            height: 1080px;
+            background-color: var(--dark-bg);
+        }
+
+        /* HEADER DISPLAY */
+        .header-display {
+            grid-column: 1 / span 2;
+            background: linear-gradient(90deg, var(--primary-color), #1e293b);
+            border-bottom: 4px solid var(--secondary-color);
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .header-brand-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Logo Kementerian Atas */
+        .header-logo-img {
+            height: 75px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .header-display h1 {
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+        }
+
+        .header-display p {
+            font-size: 16px;
+            color: var(--secondary-color);
+            margin-top: 4px;
+        }
+
+        /* PANEL KIRI (VIDEO PLAYLIST) */
+        .left-panel {
+            grid-column: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            background-color: #0b0f19;
+            border-right: 2px solid #1f2937;
+        }
+
+        .video-box-container {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            border-radius: 12px;
+            border: 2px solid #374151;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .video-box-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .playlist-indicator {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            border: 1px solid var(--secondary-color);
+        }
+
+        /* PANEL KANAN (SLIDE & INFOGRAFIS PK BERGANTIAN) */
+        .right-panel {
+            grid-column: 2;
+            display: grid;
+            grid-template-rows: 35% 65%;
+            height: 100%;
+        }
+
+        .slide-box {
+            background-color: #0f172a;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 2px solid #1f2937;
+            overflow: hidden;
+        }
+
+        .slide-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        /* INFOGRAFIS CAROUSEL PERFORMA PK */
+        .performance-box {
+            background-color: #0d1321;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .performance-box h3 {
+            font-size: 18px;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            border-left: 5px solid var(--primary-color);
+            padding-left: 10px;
+        }
+
+        /* TAMPILAN CARD CAROUSEL INFOGRAFIS */
+        .infographic-carousel-container {
+            flex-grow: 1;
+            background-color: var(--card-bg);
+            border: 2px solid #1f2937;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.5s ease-in-out;
+        }
+
+        .pk-profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .pk-name-tag {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .pk-index-tag {
+            background-color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+
+        /* Grid penempatan Dua Grafik Pie bersebelahan */
+        .charts-flex-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: center;
+            justify-items: center;
+            flex-grow: 1;
+        }
+
+        .chart-card-wrapper {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .chart-container-canvas {
+            width: 170px;
+            height: 170px;
+            position: relative;
+        }
+
+        .chart-center-text {
+            position: absolute;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 22px;
+            font-weight: 800;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .chart-legend-info {
+            margin-top: 15px;
+            font-size: 14px;
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .dot-green { width: 10px; height: 10px; background-color: var(--accent-green); border-radius: 50%; }
+        .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
+
+        /* =================================================== */
+        /* STYLING PANEL KONTROL ADMIN                         */
+        /* =================================================== */
+        .admin-panel {
+            background-color: #111827;
+            padding: 40px;
+            border-top: 5px solid var(--primary-color);
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #374151;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn-fullscreen {
+            background-color: #e11d48;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-download-template {
+            background-color: var(--btn-download);
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 10px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .admin-card {
+            background-color: #1f2937;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+        }
+
+        .admin-card h4 {
+            margin-bottom: 12px;
+            color: #ffffff;
+            font-size: 15px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="main-display-screen">
+        
+        <div class="header-display">
+            <div class="header-brand-section">
+                <img id="display-header-logo" src="" style="display: none;" class="header-logo-img" alt="Logo Kementerian">
+                <div>
+                    <h1>BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
+                    <p>Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Direktorat Jenderal Pemasyarakatan Jawa Tengah</p>
+                </div>
+            </div>
+            
+            <div style="text-align: right;">
+                <div id="live-clock" style="font-size: 26px; font-weight: 800;">00:00:00</div>
+                <div style="font-size: 13px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
+            </div>
+        </div>
+
+        <div class="left-panel">
+            <div class="video-box-container">
+                <video id="display-video" autoplay muted>Browser tidak mendukung.</video>
+                <div class="playlist-indicator" id="video-title-indicator">Video: Belum Ada File Dipilih</div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="slide-box">
+                <div id="slide-placeholder-text" style="color: #4b5563;">
+                    <p style="font-size: 18px; font-weight: bold; color: var(--secondary-color);">PROFIL STRUKTUR & LAYANAN BAPAS</p>
+                </div>
+                <img id="display-slide-img" src="" style="display: none;" alt="Slide Profil">
+            </div>
+
+            <div class="performance-box">
+                <h3>STATISTIK PERFORMA PEMBIMBING KEMASYARAKATAN (PK)</h3>
+                
+                <div class="infographic-carousel-container" id="carousel-box">
+                    <div class="pk-profile-header">
+                        <div class="pk-name-tag" id="infografis-nama">MEMUAT DATA...</div>
+                        <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
+                    </div>
+
+                    <div class="charts-flex-grid">
+                        <div class="chart-card-wrapper">
+                            <span style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color:#9ca3af;">Penyelesaian Litmas</span>
+                            <div class="chart-container-canvas">
+                                <canvas id="chartLitmas"></canvas>
+                                <div class="chart-center-text" id="text-persen-litmas">0%</div>
+                            </div>
+                            <div class="chart-legend-info">
+                                <div class="legend-item"><span class="dot-green"></span>
