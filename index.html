@@ -1194,3 +1194,103 @@
     </script>
 </body>
 </html>
+<script>
+        // URL API PERMANEN (Sesuai permintaan Anda)
+        const PERMANENT_API_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
+
+        // --- SECURITY & SYSTEM ---
+        const USERNAME_VALID = "adminbapas";
+        if (!localStorage.getItem("admin_password_bapas")) {
+            localStorage.setItem("admin_password_bapas", "purwokerto123");
+        }
+
+        // --- SINKRONISASI OTOMATIS SAAT HALAMAN DIBUKA ---
+        window.addEventListener('DOMContentLoaded', () => {
+            // Memanggil API secara otomatis setiap 25 detik
+            fetchDataFromAppsScriptAPI(PERMANENT_API_URL);
+            setInterval(() => { fetchDataFromAppsScriptAPI(PERMANENT_API_URL); }, 25000);
+            
+            // Inisialisasi YouTube
+            const tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+        });
+
+        // --- FUNGSI UTAMA FETCH DATA (Modifikasi untuk URL Permanen) ---
+        function fetchDataFromAppsScriptAPI(apiUrl) {
+            document.getElementById('sync-status-text').textContent = "Syncing...";
+            document.getElementById('sync-status-text').style.color = "#f4d35e";
+
+            fetch(apiUrl)
+                .then(res => res.json())
+                .then(jsonResponse => {
+                    if(jsonResponse.status !== "success") throw new Error(jsonResponse.message);
+                    
+                    // A. Update Antrean Video
+                    if (jsonResponse.videos && jsonResponse.videos.length > 0) {
+                        const oldFirstVideo = localVideoQueue[0];
+                        localVideoQueue = jsonResponse.videos;
+                        updateQueueIndicator();
+                        if(oldFirstVideo !== localVideoQueue[0]) playVideoFromLocalQueue();
+                    }
+
+                    // B. Update Antrean Pelayanan & Panggilan Suara
+                    if (jsonResponse.antrian) {
+                        const currentA = jsonResponse.antrian.A;
+                        const currentB = jsonResponse.antrian.B;
+                        const currentC = jsonResponse.antrian.C;
+
+                        if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== currentA && currentA !== "000") {
+                            triggerChimeAndVoice(currentA, jsonResponse.antrian_loket?.A || "Ruang Pelayanan");
+                        }
+                        if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== currentB && currentB !== "000") {
+                            triggerChimeAndVoice(currentB, jsonResponse.antrian_loket?.B || "Ruang Pelayanan");
+                        }
+                        if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== currentC && currentC !== "000") {
+                            triggerChimeAndVoice(currentC, jsonResponse.antrian_loket?.C || "Ruang Pelayanan");
+                        }
+
+                        cacheLastAntrian = { A: currentA, B: currentB, C: currentC };
+                        document.getElementById('num-antrian-a').textContent = currentA;
+                        document.getElementById('num-antrian-b').textContent = currentB;
+                        document.getElementById('num-antrian-c').textContent = currentC;
+                    }
+
+                    // C. Update Data Kinerja
+                    dbPK = jsonResponse.data_pk;
+                    const globalData = jsonResponse.global;
+                    if(globalData.anggaran) {
+                        const pagu = globalData.anggaran.pagu;
+                        const real = globalData.anggaran.realisasi;
+                        const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
+                        document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
+                        document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
+                        document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
+                        cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; cGAnggaran.update();
+                    }
+
+                    if(globalData.pegawai) {
+                        const hadir = globalData.pegawai.hadir;
+                        const totalP = hadir + globalData.pegawai.cuti + globalData.pegawai.izin + globalData.pegawai.dl;
+                        const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
+                        document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
+                        document.getElementById('lbl-g-hadir-riil').textContent = hadir;
+                        cGPegawai.data.datasets[0].data = [hadir, globalData.pegawai.cuti, globalData.pegawai.izin, globalData.pegawai.dl]; cGPegawai.update();
+                    }
+
+                    calculateAndRenderGlobalTotals();
+                    if(dbPK.length > 0) renderIndividualPK();
+
+                    document.getElementById('sync-status-text').textContent = "Live Realtime";
+                    document.getElementById('sync-status-text').style.color = "#10b981";
+                })
+                .catch(err => {
+                    document.getElementById('sync-status-text').textContent = "API Error";
+                    document.getElementById('sync-status-text').style.color = "#ef4444";
+                });
+        }
+        
+        // ... (Fungsi lainnya seperti triggerChimeAndVoice, navigate, dll tetap sama) ...
+    </script>
+</body>
+</html>
