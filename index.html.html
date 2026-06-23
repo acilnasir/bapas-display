@@ -70,7 +70,6 @@
             gap: 20px;
         }
 
-        /* Logo Kementerian Atas */
         .header-logo-img {
             height: 75px;
             width: auto;
@@ -92,7 +91,7 @@
             margin-top: 4px;
         }
 
-        /* PANEL KIRI (VIDEO PLAYLIST) */
+        /* PANEL KIRI (VIDEO PLAYLIST + AUDIO CONTROLS) */
         .left-panel {
             grid-column: 1;
             padding: 25px;
@@ -104,10 +103,11 @@
 
         .video-box-container {
             width: 100%;
-            height: 100%;
+            flex-grow: 1;
             background-color: #000000;
-            border-radius: 12px;
+            border-radius: 12px 12px 0 0;
             border: 2px solid #374151;
+            border-bottom: none;
             overflow: hidden;
             position: relative;
         }
@@ -116,6 +116,51 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
+        }
+
+        /* BARU: Panel Audio Kontrol Khusus di Layar TV */
+        .video-audio-controls {
+            width: 100%;
+            background-color: #111827;
+            border: 2px solid #374151;
+            border-top: 1px solid #4b5563;
+            border-radius: 0 0 12px 12px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .audio-btn {
+            background-color: #374151;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .audio-btn:hover {
+            background-color: #4b5563;
+        }
+
+        .volume-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-grow: 1;
+            max-width: 300px;
+        }
+
+        .volume-slider {
+            width: 100%;
+            cursor: pointer;
+            accent-color: var(--secondary-color);
         }
 
         .playlist-indicator {
@@ -127,6 +172,7 @@
             border-radius: 20px;
             font-size: 13px;
             border: 1px solid var(--secondary-color);
+            z-index: 5;
         }
 
         /* PANEL KANAN (SLIDE & INFOGRAFIS PK BERGANTIAN) */
@@ -173,7 +219,6 @@
             padding-left: 10px;
         }
 
-        /* TAMPILAN CARD CAROUSEL INFOGRAFIS */
         .infographic-carousel-container {
             flex-grow: 1;
             background-color: var(--card-bg);
@@ -210,7 +255,6 @@
             color: var(--secondary-color);
         }
 
-        /* Grid penempatan Dua Grafik Pie bersebelahan */
         .charts-flex-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -343,7 +387,6 @@
                     <p>Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Direktorat Jenderal Pemasyarakatan Jawa Tengah</p>
                 </div>
             </div>
-            
             <div style="text-align: right;">
                 <div id="live-clock" style="font-size: 26px; font-weight: 800;">00:00:00</div>
                 <div style="font-size: 13px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
@@ -352,8 +395,21 @@
 
         <div class="left-panel">
             <div class="video-box-container">
-                <video id="display-video" autoplay muted>Browser tidak mendukung.</video>
+                <video id="display-video" autoplay>Browser tidak mendukung.</video>
                 <div class="playlist-indicator" id="video-title-indicator">Video: Belum Ada File Dipilih</div>
+            </div>
+            
+            <div class="video-audio-controls">
+                <div style="display: flex; gap: 8px;">
+                    <button class="audio-btn" id="btn-play-pause" onclick="togglePlayPause()">⏸ Pause</button>
+                    <button class="audio-btn" id="btn-mute" onclick="toggleMute()">🔊 Mute</button>
+                </div>
+                <div class="volume-slider-container">
+                    <span style="font-size: 12px; color: #9ca3af;">Volume:</span>
+                    <input type="range" class="volume-slider" id="volume-control" min="0" max="1" step="0.1" value="0.8" oninput="setVolume(this.value)">
+                    <span style="font-size: 12px; font-weight: bold;" id="volume-text">80%</span>
+                </div>
+                <button class="audio-btn" onclick="nextVideoManual()">⏭ Lewati</button>
             </div>
         </div>
 
@@ -382,4 +438,323 @@
                                 <div class="chart-center-text" id="text-persen-litmas">0%</div>
                             </div>
                             <div class="chart-legend-info">
-                                <div class="legend-item"><span class="dot-green"></span>
+                                <div class="legend-item"><span class="dot-green"></span> Selesai: <b id="lbl-litmas-ok" style="color:var(--accent-green)">0</b></div>
+                                <div class="legend-item"><span class="dot-red"></span> Belum: <b id="lbl-litmas-no" style="color:var(--accent-red)">0</b></div>
+                            </div>
+                        </div>
+
+                        <div class="chart-card-wrapper">
+                            <span style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color:#9ca3af;">Kepatuhan Wajib Lapor Klien</span>
+                            <div class="chart-container-canvas">
+                                <canvas id="chartKlien"></canvas>
+                                <div class="chart-center-text" id="text-persen-klien">0%</div>
+                            </div>
+                            <div class="chart-legend-info">
+                                <div class="legend-item"><span class="dot-green"></span> Sudah: <b id="lbl-klien-ok" style="color:var(--accent-green)">0</b></div>
+                                <div class="legend-item"><span class="dot-red"></span> Belum: <b id="lbl-klien-no" style="color:var(--accent-red)">0</b></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="admin-panel" id="control-panel-section">
+        <div class="admin-header">
+            <div>
+                <h2>PANEL UTAMA PENGENDALI MEDIA DISPLAY</h2>
+                <p style="color: #9ca3af; font-size: 14px;">Atur playlist video, gambar, dan database Excel lewat panel ini.</p>
+            </div>
+            <button class="btn-fullscreen" onclick="openFullscreen();">📺 AKTIFKAN MODE MONITOR (FULL SCREEN)</button>
+        </div>
+
+        <div class="admin-grid">
+            <div class="admin-card">
+                <h4>1. Video Anti-Korupsi (Multi File)</h4>
+                <input type="file" id="admin-video-files" accept="video/mp4" multiple>
+                <div class="file-list-preview" id="video-queue-preview">Antrean: Playlist Kosong</div>
+            </div>
+
+            <div class="admin-card">
+                <h4>2. Gambar Slide Profil Instansi</h4>
+                <input type="file" id="admin-slide-files" accept="image/*" multiple>
+                <div class="file-list-preview" id="slide-queue-preview">Slide: Teks bawaan</div>
+            </div>
+
+            <div class="admin-card">
+                <h4>3. Database Kinerja PK (*.xlsx)</h4>
+                <input type="file" id="admin-excel-file" accept=".xlsx, .xls">
+                <button type="button" class="btn-download-template" onclick="generateAndDownloadTemplate()">📥 Download Template Excel</button>
+            </div>
+
+            <div class="admin-card">
+                <h4>4. Upload Logo Instansi (Atas)</h4>
+                <input type="file" id="admin-logo-file" accept="image/*">
+                <p style="font-size: 11px; color: #9ca3af; margin-top: 5px;">Format file disarankan: .png (transparan) atau .jpg</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. JAM DIGITAL ---
+        setInterval(() => { document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('id-ID'); }, 1000);
+
+        // --- 2. FULLSCREEN MODE ---
+        function openFullscreen() {
+            const el = document.getElementById("main-display-screen");
+            if (el.requestFullscreen) el.requestFullscreen();
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        }
+
+        // --- FEATURE: UPLOAD LOGO HANDLING ---
+        const logoInput = document.getElementById('admin-logo-file');
+        const headerLogoImg = document.getElementById('display-header-logo');
+
+        logoInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                headerLogoImg.src = URL.createObjectURL(file);
+                headerLogoImg.style.display = 'block';
+            }
+        });
+
+        // --- 3. MULTI-VIDEO PLAYLIST & AUDIO CONTROL INTERACTION ---
+        const videoInput = document.getElementById('admin-video-files');
+        const videoPlayer = document.getElementById('display-video');
+        const videoTitle = document.getElementById('video-title-indicator');
+        const btnMute = document.getElementById('btn-mute');
+        const btnPlayPause = document.getElementById('btn-play-pause');
+        const volText = document.getElementById('volume-text');
+        
+        let videoPlaylist = [];
+        let currentVideoIdx = 0;
+
+        // Set volume awal player ke 80%
+        videoPlayer.volume = 0.8;
+
+        videoInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                videoPlaylist = Array.from(this.files);
+                currentVideoIdx = 0;
+                document.getElementById('video-queue-preview').textContent = "Antrean: " + videoPlaylist.map(f => f.name).join(" ➔ ");
+                playPlaylistVideo(currentVideoIdx);
+            }
+        });
+
+        function playPlaylistVideo(index) {
+            if (videoPlaylist.length > 0 && index < videoPlaylist.length) {
+                videoPlayer.src = URL.createObjectURL(videoPlaylist[index]);
+                videoTitle.textContent = `Memutar [${index + 1}/${videoPlaylist.length}]: ${videoPlaylist[index].name}`;
+                btnPlayPause.textContent = "⏸ Pause";
+                
+                // Info penting: Jika browser menolak play bersuara secara instan, ia akan otomatis me-mute video
+                videoPlayer.play().catch(e => {
+                    console.log("Browser memblokir pemutaran audio otomatis. Memutar dalam kondisi Muted.");
+                    videoPlayer.muted = true;
+                    btnMute.textContent = "🔇 Unmute";
+                    videoPlayer.play();
+                });
+            }
+        }
+
+        videoPlayer.addEventListener('ended', () => {
+            if (videoPlaylist.length > 0) {
+                currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length;
+                playPlaylistVideo(currentVideoIdx);
+            }
+        });
+
+        // FUNGSI BARU: Kontrol Suara & Navigasi Tombol Fisik Monitor
+        function togglePlayPause() {
+            if (videoPlayer.paused) {
+                videoPlayer.play();
+                btnPlayPause.textContent = "⏸ Pause";
+            } else {
+                videoPlayer.pause();
+                btnPlayPause.textContent = "▶ Play";
+            }
+        }
+
+        function toggleMute() {
+            if (videoPlayer.muted) {
+                videoPlayer.muted = false;
+                btnMute.textContent = "🔊 Mute";
+            } else {
+                videoPlayer.muted = true;
+                btnMute.textContent = "🔇 Unmute";
+            }
+        }
+
+        function setVolume(value) {
+            videoPlayer.volume = value;
+            volText.textContent = Math.round(value * 100) + "%";
+            if (value == 0) {
+                btnMute.textContent = "🔇 Unmute";
+                videoPlayer.muted = true;
+            } else {
+                btnMute.textContent = "🔊 Mute";
+                videoPlayer.muted = false;
+            }
+        }
+
+        function nextVideoManual() {
+            if (videoPlaylist.length > 1) {
+                currentVideoIdx = (currentVideoIdx + 1) % videoPlaylist.length;
+                playPlaylistVideo(currentVideoIdx);
+            }
+        }
+
+        // --- 4. SLIDESHOW PROFIL ---
+        const slideInput = document.getElementById('admin-slide-files');
+        const slideImg = document.getElementById('display-slide-img');
+        let slideUrls = [], currentSlideIdx = 0, slideTimer = null;
+
+        slideInput.addEventListener('change', function() {
+            if (this.files.length > 0) {
+                clearInterval(slideTimer);
+                slideUrls = Array.from(this.files).map(file => URL.createObjectURL(file));
+                document.getElementById('slide-placeholder-text').style.display = 'none';
+                slideImg.style.display = 'block';
+                currentSlideIdx = 0;
+                runSlideShow();
+                slideTimer = setInterval(runSlideShow, 6000);
+            }
+        });
+        function runSlideShow() {
+            if(slideUrls.length > 0) {
+                slideImg.src = slideUrls[currentSlideIdx];
+                currentSlideIdx = (currentSlideIdx + 1) % slideUrls.length;
+            }
+        }
+
+        // --- 5. INITIALIZE CHART.JS ---
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            cutout: '73%',
+        };
+
+        const ctxLitmas = document.getElementById('chartLitmas').getContext('2d');
+        const chartLitmasObj = new Chart(ctxLitmas, {
+            type: 'doughnut',
+            data: {
+                labels: ['Selesai', 'Belum'],
+                datasets: [{ data: [0, 0], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }]
+            },
+            options: chartOptions
+        });
+
+        const ctxKlien = document.getElementById('chartKlien').getContext('2d');
+        const chartKlienObj = new Chart(ctxKlien, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sudah', 'Belum'],
+                datasets: [{ data: [0, 0], backgroundColor: ['#10b981', '#ef4444'], borderWidth: 0 }]
+            },
+            options: chartOptions
+        });
+
+        // --- 6. EXCEL PARSING & INFOGRAPHICS CAROUSEL SYSTEM ---
+        let parsedDatabasePK = [];
+        let currentPKCarouselIdx = 0;
+        let carouselTimer = null;
+
+        parsedDatabasePK = [
+            { nama: "Eko Susilo, S.H.", litmasOk: 12, litmasNo: 3, klienNo: 2, klienOk: 45 },
+            { nama: "Dwi Lestari, S.Sos.", litmasOk: 8, litmasNo: 0, klienNo: 0, klienOk: 32 },
+            { nama: "Tri Haryanto, S.H.", litmasOk: 15, litmasNo: 5, klienNo: 4, klienOk: 28 }
+        ];
+        
+        startCarouselInterval();
+
+        document.getElementById('admin-excel-file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: 0 });
+                processExcelDatabase(jsonData);
+            };
+            reader.readAsArrayBuffer(file);
+        });
+
+        function processExcelDatabase(data) {
+            parsedDatabasePK = [];
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
+                if (!row[0] || row[1] === "Nama PK" || String(row[0]).includes("No")) continue;
+
+                parsedDatabasePK.push({
+                    nama: row[1],
+                    litmasOk: parseInt(row[2]) || 0,
+                    litmasNo: parseInt(row[3]) || 0,
+                    klienNo: parseInt(row[4]) || 0,
+                    klienOk: parseInt(row[5]) || 0
+                });
+            }
+
+            if (parsedDatabasePK.length > 0) {
+                currentPKCarouselIdx = 0;
+                startCarouselInterval();
+                alert(`Sukses memuat ${parsedDatabasePK.length} Personel PK!`);
+            }
+        }
+
+        function startCarouselInterval() {
+            clearInterval(carouselTimer);
+            updateInfographicView();
+            carouselTimer = setInterval(() => {
+                currentPKCarouselIdx = (currentPKCarouselIdx + 1) % parsedDatabasePK.length;
+                updateInfographicView();
+            }, 7000);
+        }
+
+        function updateInfographicView() {
+            if (parsedDatabasePK.length === 0) return;
+
+            const currentData = parsedDatabasePK[currentPKCarouselIdx];
+            document.getElementById('infografis-nama').textContent = currentData.nama;
+            document.getElementById('infografis-index').textContent = `PK [${currentPKCarouselIdx + 1}/${parsedDatabasePK.length}]`;
+
+            const totalLitmas = currentData.litmasOk + currentData.litmasNo;
+            const persenLitmas = totalLitmas > 0 ? ((currentData.litmasOk / totalLitmas) * 100).toFixed(0) : 0;
+            document.getElementById('text-persen-litmas').textContent = persenLitmas + "%";
+            document.getElementById('lbl-litmas-ok').textContent = currentData.litmasOk;
+            document.getElementById('lbl-litmas-no').textContent = currentData.litmasNo;
+
+            chartLitmasObj.data.datasets[0].data = [currentData.litmasOk, currentData.litmasNo];
+            chartLitmasObj.update();
+
+            const totalKlien = currentData.klienOk + currentData.klienNo;
+            const persenKlien = totalKlien > 0 ? ((currentData.klienOk / totalKlien) * 100).toFixed(0) : 0;
+            document.getElementById('text-persen-klien').textContent = persenKlien + "%";
+            document.getElementById('lbl-klien-ok').textContent = currentData.klienOk;
+            document.getElementById('lbl-klien-no').textContent = currentData.klienNo;
+
+            chartKlienObj.data.datasets[0].data = [currentData.klienOk, currentData.klienNo];
+            chartKlienObj.update();
+        }
+
+        // --- 7. GEN TEMPLATE EXCEL ---
+        function generateAndDownloadTemplate() {
+            const templateData = [
+                ["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],
+                [1, "Eko Susilo, S.H.", 12, 3, 2, 45],
+                [2, "Dwi Lestari, S.Sos.", 8, 0, 0, 32]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(templateData);
+            ws['!cols'] = [{ wch: 6 }, { wch: 30 }, { wch: 18 }, { wch: 22 }, { wch: 22 }, { wch: 22 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Kinerja PK");
+            XLSX.writeFile(wb, "Template_Database_Performa_PK_Purwokerto.xlsx");
+        }
+    </script>
+</body>
+</html>
