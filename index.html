@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
-    <!-- Memuat Library SheetJS untuk Pembuatan Berkas Excel (.xlsx) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    <!-- Memuat Library Chart.js (Grafik Dinamis) -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -479,69 +477,6 @@
             border-color: var(--secondary-color);
             transform: translateY(-2px);
         }
-
-        /* PANEL ADMIN */
-        .admin-panel {
-            background-color: #111827;
-            padding: 40px;
-            border-top: 5px solid var(--primary-color);
-            display: none; 
-            position: relative;
-            z-index: 20;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #374151;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
-
-        .btn-logout {
-            background-color: #e11d48;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 20px;
-        }
-
-        .admin-card {
-            background-color: #1f2937;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #374151;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .admin-card h4 {
-            margin-bottom: 12px;
-            color: #ffffff;
-            font-size: 15px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            background-color: #374151;
-            border: 1px solid #4b5563;
-            border-radius: 6px;
-            color: #fff;
-            box-sizing: border-box;
-            font-size: 13px;
-        }
     </style>
 </head>
 <body>
@@ -565,7 +500,6 @@
         <div class="left-panel">
             <div class="video-and-queue-container">
                 
-                <!-- DISPLAY ANTRIAN PELAYANAN -->
                 <div class="queue-display-bar">
                     <div class="queue-ticket-card card-type-a">
                         <div class="queue-label">Antrian A</div>
@@ -581,7 +515,6 @@
                     </div>
                 </div>
 
-                <!-- BOX YOUTUBE PLAYER -->
                 <div class="video-box-container">
                     <div id="yt-player"></div>
                     <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan YouTube...</div>
@@ -729,94 +662,15 @@
                 </div>
             </div>
         </div>
-
     </div>
 
     <div class="bottom-trigger-control-zone" id="public-control-area">
         <button class="btn-trigger-public" onclick="openFullscreen()">📺 Layar Penuh (TV Monitor)</button>
-        <button class="btn-trigger-public" onclick="aksesLoginAdmin()">🔐 Panel Admin</button>
     </div>
 
-    <div class="admin-panel" id="control-panel-section">
-        <div class="admin-header">
-            <div>
-                <h2>PANEL UTAMA PENGENDALI MEDIA DISPLAY (MODE REALTIME)</h2>
-                <p style="color: #9ca3af; font-size: 14px;">Manajemen sinkronisasi data cloud terpusat Google Sheets API.</p>
-            </div>
-            <div>
-                <button class="btn-logout" onclick="keluarAdmin();">🔒 Keluar & Kunci Admin</button>
-            </div>
-        </div>
-
-        <div class="admin-grid">
-            <div class="admin-card">
-                <h4>Integrasi Jalur API Google Sheets Realtime</h4>
-                <p style="font-size:12px; color:#9ca3af; margin-bottom:10px;">Masukkan URL Web App Apps Script (/exec):</p>
-                <input type="text" id="txt-gsheet-url" placeholder="https://script.google.com/macros/s/.../exec" style="margin-bottom:12px;">
-                <button type="button" class="btn-action-panel" onclick="saveAndConnectGSheetGateway()">🔗 Hubungkan Realtime Cloud</button>
-                <button type="button" class="btn-action-panel" style="background-color: var(--btn-download); margin-top: 10px;" onclick="downloadPureExcelTemplate()">📥 Download Template Struktur (.xlsx)</button>
-            </div>
-
-            <div class="admin-card">
-                <h4>Informasi Konfigurasi Video & Antrian</h4>
-                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Daftar putar video YouTube dan **Nomor Antrean Pelayanan A, B, C beserta Panggilan Suara** diatur otomatis via Google Sheet.</p>
-            </div>
-
-            <div class="admin-card">
-                <h4>Informasi Logo Atas</h4>
-                <p style="font-size:13px; color:#9ca3af; line-height:1.5;">Logo institusi Bapas Kelas II Purwokerto dikunci permanen secara cloud.</p>
-            </div>
-
-            <div class="admin-card">
-                <h4>Keamanan: Ubah Password Admin</h4>
-                <input type="text" id="txt-pass-lama" placeholder="Password lama">
-                <input type="text" id="txt-pass-baru" placeholder="Minimal 6 karakter">
-                <button type="button" class="btn-action-panel" onclick="prosesGantiPassword()">Simpan Password Baru</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
-        // --- SECURITY MANAGEMENT ---
-        const USERNAME_VALID = "adminbapas";
-        if (!localStorage.getItem("admin_password_bapas")) {
-            localStorage.setItem("admin_password_bapas", "purwokerto123");
-        }
-        const panelAdmin = document.getElementById('control-panel-section');
-        const tombolKontrolPublik = document.getElementById('public-control-area');
-
-        function aksesLoginAdmin() {
-            const inputUser = prompt("Masukkan Username Petugas Bapas:");
-            if (!inputUser) return;
-            const inputPass = prompt("Masukkan Password Pengaman:");
-            if (!inputPass) return;
-
-            if (inputUser === USERNAME_VALID && inputPass === localStorage.getItem("admin_password_bapas")) {
-                panelAdmin.style.display = "block"; 
-                tombolKontrolPublik.style.display = "none";
-                document.getElementById('txt-gsheet-url').value = localStorage.getItem("gsheet_url_bapas") || "";
-                alert("Login Berhasil!");
-                panelAdmin.scrollIntoView({ behavior: 'smooth' });
-            } else {
-                alert("Salah! Akses ditolak.");
-            }
-        }
-
-        function prosesGantiPassword() {
-            const passLama = document.getElementById('txt-pass-lama').value;
-            const passBaru = document.getElementById('txt-pass-baru').value;
-            if (passLama !== localStorage.getItem("admin_password_bapas")) { alert("Password lama salah!"); return; }
-            if (passBaru.length < 6) { alert("Minimal 6 karakter!"); return; }
-            localStorage.setItem("admin_password_bapas", passBaru);
-            alert("Password berhasil diperbarui!");
-        }
-
-        function keluarAdmin() {
-            panelAdmin.style.display = "none"; 
-            tombolKontrolPublik.style.display = "flex";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+        // --- KONFIGURASI LINK PERMANEN ---
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
 
         // --- CLOCK & FULLSCREEN ---
         setInterval(() => { document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('id-ID'); }, 1000);
@@ -826,9 +680,7 @@
             else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
         }
 
-        // ===================================================================
-        // --- YOUTUBE PLAYLIST QUEUE ENGINE ---------------------------------
-        // ===================================================================
+        // --- YOUTUBE PLAYLIST QUEUE ENGINE ---
         let ytPlayerObj = null;
         let isYtApiReady = false;
         let localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"]; 
@@ -844,6 +696,10 @@
             tag.src = "https://www.youtube.com/iframe_api";
             const firstScriptTag = document.getElementsByTagName('script')[0];
             firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+            
+            // Inisialisasi Data Otomatis
+            fetchDataFromAppsScriptAPI(SCRIPT_URL);
+            setInterval(() => { fetchDataFromAppsScriptAPI(SCRIPT_URL); }, 25000);
         });
 
         function playVideoFromLocalQueue() {
@@ -862,12 +718,7 @@
                 ytPlayerObj = new YT.Player('yt-player', {
                     videoId: videoId,
                     playerVars: { 
-                        'autoplay': 1, 
-                        'controls': 0, 
-                        'rel': 0, 
-                        'modestbranding': 1, 
-                        'iv_load_policy': 3,
-                        'origin': window.location.origin 
+                        'autoplay': 1, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'iv_load_policy': 3, 'origin': window.location.origin 
                     },
                     events: {
                         'onReady': (e) => { e.target.mute(); e.target.playVideo(); updateQueueIndicator(); },
@@ -946,16 +797,11 @@
             renderIndividualPK();
         }
 
-        // ===================================================================
-        // --- 🔔 AUDIO NOTIFICATION & SYNTHESIZED VOICE ENGINE -------------
-        // ===================================================================
+        // --- AUDIO NOTIFICATION ---
         let cacheLastAntrian = { A: "", B: "", C: "" };
-
         function triggerChimeAndVoice(nomorAntrian, namaLoket) {
             try {
-                // 1. Jalankan Audio Synth Ding-Dong Pengarah Perhatian
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
                 let osc1 = audioCtx.createOscillator();
                 let gain1 = audioCtx.createGain();
                 osc1.type = 'sine'; osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime);
@@ -963,7 +809,6 @@
                 gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
                 osc1.connect(gain1); gain1.connect(audioCtx.destination);
                 osc1.start(); osc1.stop(audioCtx.currentTime + 0.4);
-
                 setTimeout(() => {
                     let osc2 = audioCtx.createOscillator();
                     let gain2 = audioCtx.createGain();
@@ -973,111 +818,54 @@
                     osc2.connect(gain2); gain2.connect(audioCtx.destination);
                     osc2.start(); osc2.stop(audioCtx.currentTime + 0.5);
                 }, 150);
-
-                // 2. Modul Panggilan Suara Dinamis Mengikuti Kolom Keterangan / Loket
                 setTimeout(() => {
-                    // Mengubah "A-012" menjadi ejaan terpisah "A 0 1 2" agar robot mengeja angka dengan fasih
-                    let nomorDieja = nomorAntrian.split("").join(" ");
-                    nomorDieja = nomorDieja.replace(/-/g, ""); 
-
-                    // STRATEGI OPTIMASI: Memastikan nama loket dipanggil secara mutlak sesuai input operator
-                    let teksPanggilan = `Nomor antrean, ${nomorDieja}, silahkan menuju ke ${namaLoket}`;
-                    
-                    let utterance = new SpeechSynthesisUtterance(teksPanggilan);
+                    let nomorDieja = nomorAntrian.split("").join(" ").replace(/-/g, ""); 
+                    let utterance = new SpeechSynthesisUtterance(`Nomor antrean, ${nomorDieja}, silahkan menuju ke ${namaLoket}`);
                     utterance.lang = 'id-ID'; 
-                    utterance.rate = 0.82; // Kecepatan pelafalan lambat-formal agar jelas terdengar harian
-                    utterance.pitch = 1.0; 
-                    
-                    let voices = window.speechSynthesis.getVoices();
-                    let idVoice = voices.find(v => v.lang.includes('id') || v.lang.includes('ID'));
-                    if(idVoice) utterance.voice = idVoice;
-
+                    utterance.rate = 0.82; 
                     window.speechSynthesis.speak(utterance);
                 }, 750); 
-
-            } catch(e) {
-                console.error("Audio Context Error: ", e);
-            }
+            } catch(e) { console.error("Audio Context Error: ", e); }
         }
 
-        // ===================================================================
-        // --- REALTIME SINKRONISASI API SCRIPT FEEDS ------------------------
-        // ===================================================================
-        function saveAndConnectGSheetGateway() {
-            const rawUrl = document.getElementById('txt-gsheet-url').value.trim();
-            if(!rawUrl) { alert("Masukkan URL Web App Apps Script!"); return; }
-            if(!rawUrl.includes("/exec")) { alert("Format URL salah. Harus berakhiran /exec"); return; }
-            localStorage.setItem("gsheet_url_bapas", rawUrl);
-            fetchDataFromAppsScriptAPI(rawUrl);
-            alert("API Realtime Berhasil Disimpan!");
-        }
-
+        // --- SYNC API ---
         function fetchDataFromAppsScriptAPI(apiUrl) {
-            if(!apiUrl) return;
             document.getElementById('sync-status-text').textContent = "Syncing...";
-            document.getElementById('sync-status-text').style.color = "#f4d35e";
-
             fetch(apiUrl)
                 .then(res => res.json())
                 .then(jsonResponse => {
-                    if(jsonResponse.status !== "success") throw new Error(jsonResponse.message);
+                    if(jsonResponse.status !== "success") return;
                     
                     if (jsonResponse.videos && jsonResponse.videos.length > 0) {
-                        const oldFirstVideo = localVideoQueue[0];
                         localVideoQueue = jsonResponse.videos;
                         updateQueueIndicator();
-                        if(oldFirstVideo !== localVideoQueue[0]) playVideoFromLocalQueue();
                     }
 
-                    // DETEKSI PERUBAHAN NOMOR ANTRIAN & STRATEGI VOICE ANNOUNCEMENT
                     if (jsonResponse.antrian) {
-                        const currentA = jsonResponse.antrian.A;
-                        const currentB = jsonResponse.antrian.B;
-                        const currentC = jsonResponse.antrian.C;
-
-                        // Periksa Perubahan Antrian A -> Kirim parameter loket dinamis dari Sheet
-                        if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== currentA && currentA !== "000") {
-                            triggerChimeAndVoice(currentA, jsonResponse.antrian_loket?.A || "Ruang Pelayanan");
-                        }
-                        // Periksa Perubahan Antrian B -> Kirim parameter loket dinamis dari Sheet
-                        if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== currentB && currentB !== "000") {
-                            triggerChimeAndVoice(currentB, jsonResponse.antrian_loket?.B || "Ruang Pelayanan");
-                        }
-                        // Periksa Perubahan Antrian C -> Kirim parameter loket dinamis dari Sheet
-                        if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== currentC && currentC !== "000") {
-                            triggerChimeAndVoice(currentC, jsonResponse.antrian_loket?.C || "Ruang Pelayanan");
-                        }
-
-                        cacheLastAntrian.A = currentA;
-                        cacheLastAntrian.B = currentB;
-                        cacheLastAntrian.C = currentC;
-
-                        document.getElementById('num-antrian-a').textContent = currentA;
-                        document.getElementById('num-antrian-b').textContent = currentB;
-                        document.getElementById('num-antrian-c').textContent = currentC;
+                        const {A, B, C} = jsonResponse.antrian;
+                        if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== A && A !== "000") triggerChimeAndVoice(A, jsonResponse.antrian_loket?.A || "Ruang Pelayanan");
+                        if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== B && B !== "000") triggerChimeAndVoice(B, jsonResponse.antrian_loket?.B || "Ruang Pelayanan");
+                        if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== C && C !== "000") triggerChimeAndVoice(C, jsonResponse.antrian_loket?.C || "Ruang Pelayanan");
+                        cacheLastAntrian = { A, B, C };
+                        document.getElementById('num-antrian-a').textContent = A;
+                        document.getElementById('num-antrian-b').textContent = B;
+                        document.getElementById('num-antrian-c').textContent = C;
                     }
 
                     dbPK = jsonResponse.data_pk;
-
                     const globalData = jsonResponse.global;
                     if(globalData.anggaran) {
-                        const pagu = globalData.anggaran.pagu;
-                        const real = globalData.anggaran.realisasi;
-                        const persenA = pagu > 0 ? ((real / pagu) * 100).toFixed(1) : 0;
-                        document.getElementById('lbl-g-anggaran-persen').textContent = persenA + "%";
+                        const {pagu, realisasi} = globalData.anggaran;
+                        document.getElementById('lbl-g-anggaran-persen').textContent = (pagu > 0 ? ((realisasi / pagu) * 100).toFixed(1) : 0) + "%";
                         document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
-                        document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + real.toLocaleString('id-ID');
-                        cGAnggaran.data.datasets[0].data = [real, pagu - real > 0 ? pagu - real : 0]; cGAnggaran.update();
+                        document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + realisasi.toLocaleString('id-ID');
+                        cGAnggaran.data.datasets[0].data = [realisasi, pagu - realisasi > 0 ? pagu - realisasi : 0]; cGAnggaran.update();
                     }
 
                     if(globalData.pegawai) {
-                        const hadir = globalData.pegawai.hadir;
-                        const cuti = globalData.pegawai.cuti;
-                        const izin = globalData.pegawai.izin;
-                        const dl = globalData.pegawai.dl;
+                        const {hadir, cuti, izin, dl} = globalData.pegawai;
                         const totalP = hadir + cuti + izin + dl;
-                        const persenH = totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0;
-                        document.getElementById('lbl-g-hadir-persen').textContent = persenH + "%";
+                        document.getElementById('lbl-g-hadir-persen').textContent = (totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0) + "%";
                         document.getElementById('lbl-g-hadir-riil').textContent = hadir;
                         document.getElementById('lbl-g-peg-cuti').textContent = cuti;
                         document.getElementById('lbl-g-peg-izin').textContent = izin;
@@ -1087,32 +875,21 @@
 
                     calculateAndRenderGlobalTotals();
                     if(dbPK.length > 0) renderIndividualPK();
-
                     document.getElementById('sync-status-text').textContent = "Live Realtime";
-                    document.getElementById('sync-status-text').style.color = "#10b981";
                 })
-                .catch(err => {
-                    document.getElementById('sync-status-text').textContent = "API Error";
-                    document.getElementById('sync-status-text').style.color = "#ef4444";
-                });
+                .catch(err => { document.getElementById('sync-status-text').textContent = "API Error"; });
         }
 
         function calculateAndRenderGlobalTotals() {
             let totalLitmasOk = 0, totalLitmasNo = 0, totalKlienOk = 0, totalKlienNo = 0;
-            dbPK.forEach(p => {
-                totalLitmasOk += p.litmasOk; totalLitmasNo += p.litmasNo;
-                totalKlienOk += p.klienOk; totalKlienNo += p.klienNo;
-            });
+            dbPK.forEach(p => { totalLitmasOk += p.litmasOk; totalLitmasNo += p.litmasNo; totalKlienOk += p.klienOk; totalKlienNo += p.klienNo; });
             const sumLitmas = totalLitmasOk + totalLitmasNo;
-            const pLitmas = sumLitmas > 0 ? ((totalLitmasOk / sumLitmas) * 100).toFixed(0) : 0;
-            document.getElementById('lbl-g-litmas-persen').textContent = pLitmas + "%";
+            document.getElementById('lbl-g-litmas-persen').textContent = (sumLitmas > 0 ? ((totalLitmasOk / sumLitmas) * 100).toFixed(0) : 0) + "%";
             document.getElementById('lbl-g-litmas-ok').textContent = totalLitmasOk;
             document.getElementById('lbl-g-litmas-no').textContent = totalLitmasNo;
             cGLitmas.data.datasets[0].data = [totalLitmasOk, totalLitmasNo]; cGLitmas.update();
-
             const sumKlien = totalKlienOk + totalKlienNo;
-            const pKlien = sumKlien > 0 ? ((totalKlienOk / sumKlien) * 100).toFixed(0) : 0;
-            document.getElementById('lbl-g-klien-persen').textContent = pKlien + "%";
+            document.getElementById('lbl-g-klien-persen').textContent = (sumKlien > 0 ? ((totalKlienOk / sumKlien) * 100).toFixed(0) : 0) + "%";
             document.getElementById('lbl-g-klien-ok').textContent = totalKlienOk;
             document.getElementById('lbl-g-klien-no').textContent = totalKlienNo;
             cGKlien.data.datasets[0].data = [totalKlienOk, totalKlienNo]; cGKlien.update();
@@ -1123,45 +900,16 @@
             const current = dbPK[idxPK % dbPK.length];
             document.getElementById('infografis-nama').textContent = current.nama;
             document.getElementById('infografis-index').textContent = `PK [${(idxPK % dbPK.length) + 1}/${dbPK.length}]`;
-
             const totL = current.litmasOk + current.litmasNo;
-            const pL = totL > 0 ? ((current.litmasOk / totL) * 100).toFixed(0) : 0;
-            document.getElementById('text-persen-litmas').textContent = pL + "%";
+            document.getElementById('text-persen-litmas').textContent = (totL > 0 ? ((current.litmasOk / totL) * 100).toFixed(0) : 0) + "%";
             document.getElementById('lbl-litmas-ok').textContent = current.litmasOk;
             document.getElementById('lbl-litmas-no').textContent = current.litmasNo;
             cLitmas.data.datasets[0].data = [current.litmasOk, current.litmasNo]; cLitmas.update();
-
             const totK = current.klienOk + current.klienNo;
-            const pK = totK > 0 ? ((current.klienOk / totK) * 100).toFixed(0) : 0;
-            document.getElementById('text-persen-klien').textContent = pK + "%";
+            document.getElementById('text-persen-klien').textContent = (totK > 0 ? ((current.klienOk / totK) * 100).toFixed(0) : 0) + "%";
             document.getElementById('lbl-klien-ok').textContent = current.klienOk;
             document.getElementById('lbl-klien-no').textContent = current.klienNo;
             cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
-        }
-
-        function downloadPureExcelTemplate() {
-            try {
-                const wb = XLSX.utils.book_new();
-                const dataPK = [["No", "Nama PK", "Litmas Selesai", "Litmas Belum Selesai", "Klien Belum Melapor", "Klien Sudah Melapor"],[1, "Eko Susilo, S.H.", 12, 3, 2, 45]];
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataPK), "Kinerja PK Individual");
-
-                const dataGlobal = [["KATEGORI DATA", "PARAMETER A", "PARAMETER B", "PARAMETER C", "PARAMETER D"],["ANGGARAN (Rp)", 250000000, 131000000, 0, 0],["", "", "", "", ""],["JUMLAH PEGAWAI", 38, 2, 1, 4]];
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataGlobal), "Anggaran & Kehadiran");
-
-                const dataVideo = [["No", "Judul Video", "URL / Link Video YouTube Utama"],[1, "Profil Komparasi", "https://www.youtube.com/watch?v=jrXNVlQJpW0"]];
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(dataVideo), "Antrean Video YouTube");
-
-                const templateAntrian = [["Jenis Antrean", "Nomor Antrean Saat Ini", "Keterangan / Loket"],["Antrian A", "A-012", "Meja 1"],["Antrian B", "B-005", "Meja 2"],["Antrian C", "C-021", "Ruang Registrasi"]];
-                XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(templateAntrian), "Data Antrian");
-
-                XLSX.writeFile(wb, "Template_Struktur_Sheet_Bapas_Murni.xlsx");
-            } catch (e) { alert(e.message); }
-        }
-
-        const savedApiUrl = localStorage.getItem("gsheet_url_bapas");
-        if(savedApiUrl) {
-            fetchDataFromAppsScriptAPI(savedApiUrl);
-            setInterval(() => { fetchDataFromAppsScriptAPI(savedApiUrl); }, 25000); 
         }
 
         window.addEventListener('click', () => { window.speechSynthesis.getVoices(); }, { once: true });
