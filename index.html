@@ -3,11 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Display Infografis Kinerja - Bapas Kelas II Purwokerto</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <title>Display Infografis Kinerja & Antrean - Bapas Kelas II Purwokerto</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   
-  <style>
+  <style id="custom-theme-styles">
     :root {
       --primary-color: #114b5f;
       --secondary-color: #f4d35e;
@@ -16,731 +15,713 @@
       --accent-green: #10b981;
       --accent-red: #ef4444;
       --accent-blue: #3b82f6;
-      --btn-download: #2563eb;
       --card-bg: #111827;
+      --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      
+      --font-size-title: 30px;
+      --font-size-subtitle: 16px;
+      --font-size-queue-label: 26px;
+      --font-size-queue-num: 54px;
+      --font-size-card-title: 15px;
+      --font-size-body: 14px;
     }
+  </style>
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background-color: #030712; color: #f3f4f6; overflow-x: hidden; }
+    .view-screen { display: none; width: 100%; }
+    .view-screen.active-view { display: block; }
 
-    body {
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #030712;
-      color: #f3f4f6;
-      overflow-x: hidden;
-      position: relative;
-    }
-
+    /* LAYOUT MONITOR DISPLAY UTAMA */
     #main-display-screen {
-      width: 100%;
-      height: 100vh;
-      max-height: 1080px;
-      display: grid;
-      grid-template-rows: 110px 1fr;
-      grid-template-columns: 55% 45%;
-      background-color: var(--dark-bg);
-      position: relative;
-      z-index: 10;
+      width: 100%; height: 100vh; max-height: 1080px;
+      display: grid; grid-template-rows: 110px 1fr; grid-template-columns: 55% 45%;
+      background-color: var(--dark-bg); position: relative;
     }
-
-    #main-display-screen:fullscreen {
-      width: 1920px;
-      height: 1080px;
-      background-color: var(--dark-bg);
-    }
-
-    /* HEADER DISPLAY */
     .header-display {
-      grid-column: 1 / span 2;
-      background: linear-gradient(90deg, var(--primary-color), #1e293b);
-      border-bottom: 4px solid var(--secondary-color);
-      padding: 0 40px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+      grid-column: 1 / span 2; background: linear-gradient(90deg, var(--primary-color), #1e293b);
+      border-bottom: 4px solid var(--secondary-color); padding: 0 40px;
+      display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
+    .header-brand-section { display: flex; align-items: center; gap: 20px; }
+    .header-logo-img { height: 75px; width: auto; object-fit: contain; }
+    .header-display h1 { font-size: var(--font-size-title); font-weight: 800; color: #ffffff; text-transform: uppercase; }
+    .header-display p { font-size: var(--font-size-subtitle); color: var(--secondary-color); margin-top: 4px; }
 
-    .header-brand-section {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .header-logo-img {
-      height: 75px;
-      width: auto;
-      object-fit: contain;
-    }
-
-    .header-display h1 {
-      font-size: 30px;
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #ffffff;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
-    }
-
-    .header-display p {
-      font-size: 16px;
-      color: var(--secondary-color);
-      margin-top: 4px;
-    }
-
-    /* PANEL KIRI */
-    .left-panel {
-      grid-column: 1;
-      padding: 25px;
-      display: flex;
-      flex-direction: column;
-      background-color: #0b0f19;
-      border-right: 2px solid #1f2937;
-      gap: 15px;
-    }
-
-    .video-and-queue-container {
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
-      flex-grow: 1;
-      width: 100%;
-    }
-
-    .queue-display-bar {
-      grid-row: 1;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 12px;
-      width: 100%;
-    }
-
+    .left-panel { grid-column: 1; padding: 25px; display: flex; flex-direction: column; background-color: #0b0f19; border-right: 2px solid #1f2937; gap: 15px; }
+    .video-and-queue-container { display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr; flex-grow: 1; }
+    .queue-display-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
     .queue-ticket-card {
-      background: linear-gradient(135deg, #1e293b, #0f172a);
-      border: 2px solid #374151;
-      border-radius: 8px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-      position: relative;
-      overflow: hidden;
+      background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #374151; border-radius: 8px;
+      padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
     }
-
-    .queue-ticket-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; width: 4px; height: 100%;
-    }
+    .queue-ticket-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
     .card-type-a::before { background-color: var(--secondary-color); }
     .card-type-b::before { background-color: var(--accent-blue); }
     .card-type-c::before { background-color: var(--accent-green); }
+    .queue-label { font-size: var(--font-size-queue-label); font-weight: 700; color: #9ca3af; text-transform: uppercase; }
+    .queue-number-value { font-size: var(--font-size-queue-num); font-weight: 900; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
 
-    .queue-label {
-      font-size: 26px;
-      font-weight: 700;
-      color: #9ca3af;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 2px;
-    }
+    .video-box-container { width: 100%; height: 100%; background-color: #000000; border-radius: 12px 12px 0 0; border: 2px solid #374151; overflow: hidden; position: relative; }
+    #yt-player { width: 100%; height: 100%; border: none; }
+    .playlist-indicator { position: absolute; bottom: 10px; left: 10px; background: rgba(0, 0, 0, 0.7); padding: 4px 10px; border-radius: 4px; font-size: 12px; z-index: 50; }
 
-    .queue-number-value {
-      font-size: 50px;
-      font-weight: 900;
-      color: #ffffff;
-      line-height: 1;
-      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-    }
-
-    /* BOX VIDEO YOUTUBE */
-    .video-box-container {
-      grid-row: 2;
-      width: 100%;
-      height: 100%;
-      background-color: #000000;
-      border-radius: 12px 12px 0 0;
-      border: 2px solid #374151;
-      border-bottom: none;
-      overflow: hidden;
-      position: relative;
-    }
-
-    #yt-player {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    .video-audio-controls {
-      width: 100%;
-      background-color: #111827;
-      border: 2px solid #374151;
-      border-top: 1px solid #4b5563;
-      border-radius: 0 0 12px 12px;
-      padding: 12px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    }
-
-    .audio-btn {
-      background-color: #374151;
-      color: #fff;
-      border: none;
-      padding: 6px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
-
+    .video-audio-controls { background-color: #111827; border: 2px solid #374151; border-radius: 0 0 12px 12px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+    .audio-btn { background-color: #374151; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: var(--font-size-body); transition: background 0.2s; }
     .audio-btn:hover { background-color: #4b5563; }
-
-    .volume-slider-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-grow: 1;
-      max-width: 300px;
-    }
-
+    .volume-slider-container { display: flex; align-items: center; gap: 10px; flex-grow: 1; max-width: 250px; }
     .volume-slider { width: 100%; cursor: pointer; accent-color: var(--secondary-color); }
 
-    /* PANEL KANAN */
-    .right-panel {
-      grid-column: 2;
-      display: grid;
-      grid-template-rows: 42% 58%;
-      height: 100%;
-    }
-
-    .global-slideshow-box {
-      background-color: #0f172a;
-      padding: 20px;
-      border-bottom: 2px solid #1f2937;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
-    }
-
-    .nav-wrapper-manual { display: flex; gap: 5px; align-items: center; }
-
-    .btn-nav-arrow {
-      background-color: rgba(55, 65, 81, 0.8);
-      color: #ffffff;
-      border: 1px solid #4b5563;
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .btn-nav-arrow:hover { background-color: var(--secondary-color); color: #000000; border-color: var(--secondary-color); }
-
+    .right-panel { grid-column: 2; display: grid; grid-template-rows: 45% 55%; height: 100%; }
+    .global-slideshow-box { background-color: #0f172a; padding: 20px; border-bottom: 2px solid #1f2937; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
     .slide-header-flex { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #374151; padding-bottom: 5px; margin-bottom: 10px; }
-
     .slide-container { display: none; width: 100%; height: 100%; background-color: var(--card-bg); border: 1px solid #374151; border-radius: 8px; padding: 15px 25px; }
-    .slide-container.active { display: flex; flex-direction: column; justify-content: space-between; animation: fadeIn 0.5s ease-in-out; }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .slide-title { font-size: 15px; text-transform: uppercase; color: var(--secondary-color); font-weight: bold; letter-spacing: 0.5px; }
+    .slide-container.active { display: flex; flex-direction: column; justify-content: space-between; }
+    .slide-title { font-size: var(--font-size-card-title); text-transform: uppercase; color: var(--secondary-color); font-weight: bold; }
     .slide-content-grid { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-grow: 1; }
-    .slide-big-number { font-size: 50px; font-weight: 800; color: #ffffff; line-height: 1; }
-    .slide-details-list { font-size: 14px; color: #9ca3af; line-height: 1.6; }
+    .slide-big-number { font-size: 50px; font-weight: 800; color: #ffffff; }
+    .slide-details-list { font-size: var(--font-size-body); color: #9ca3af; line-height: 1.6; }
     .slide-chart-mini { width: 100px; height: 100px; position: relative; }
 
-    /* PERFORMA PK */
-    .performance-box { background-color: #0d1321; padding: 25px 30px; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-    .performance-box h3 { font-size: 16px; color: var(--secondary-color); margin-bottom: 15px; text-transform: uppercase; border-left: 5px solid var(--primary-color); padding-left: 10px; }
+    .slide-nav-buttons { display: flex; gap: 6px; }
+    .btn-slide-nav { background-color: #1e293b; color: #fff; border: 1px solid #334155; padding: 4px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-slide-nav:hover { background-color: var(--secondary-color); color: #000; }
 
+    .performance-box { background-color: #0d1321; padding: 25px 30px; display: flex; flex-direction: column; overflow: hidden; }
+    .performance-box h3 { font-size: var(--font-size-card-title); color: var(--secondary-color); margin-bottom: 15px; text-transform: uppercase; border-left: 5px solid var(--primary-color); padding-left: 10px; }
     .infographic-carousel-container { flex-grow: 1; background-color: var(--card-bg); border: 2px solid #1f2937; border-radius: 12px; padding: 15px 20px; display: flex; flex-direction: column; justify-content: space-between; }
     .pk-profile-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #374151; padding-bottom: 10px; margin-bottom: 10px; }
-    .pk-name-tag { font-size: 22px; font-weight: 700; color: #ffffff; display: flex; align-items: center; gap: 10px; }
-    .sync-badge { font-size: 11px; background-color: rgba(16, 185, 129, 0.2); color: var(--accent-green); padding: 2px 8px; border-radius: 4px; font-weight: normal; }
-    .pk-index-tag { background-color: var(--primary-color); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; color: var(--secondary-color); }
-    .charts-flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; justify-items: center; flex-grow: 1; }
+    .pk-name-tag { font-size: 22px; font-weight: 700; color: #ffffff; }
+    .pk-index-tag { background-color: var(--primary-color); padding: 4px 12px; border-radius: 20px; font-size: 12px; color: var(--secondary-color); font-weight: bold; }
+    .charts-flex-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: center; }
     .chart-card-wrapper { width: 100%; display: flex; flex-direction: column; align-items: center; position: relative; }
-    .chart-container-canvas { width: 145px; height: 145px; position: relative; }
-    .chart-center-text { position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 800; color: #ffffff; }
-    .chart-legend-info { margin-top: 10px; font-size: 13px; width: 100%; display: flex; justify-content: space-around; background-color: rgba(0, 0, 0, 0.2); padding: 6px; border-radius: 6px; }
-    .legend-item { display: flex; align-items: center; gap: 6px; }
-    .dot-green { width: 10px; height: 10px; background-color: var(--accent-green); border-radius: 50%; }
-    .dot-red { width: 10px; height: 10px; background-color: var(--accent-red); border-radius: 50%; }
-    .dot-blue { width: 10px; height: 10px; background-color: var(--accent-blue); border-radius: 50%; }
+    .chart-container-canvas { width: 135px; height: 135px; position: relative; }
+    .chart-center-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 20px; font-weight: 800; color: #ffffff; }
+    .chart-legend-info { margin-top: 8px; font-size: 12px; width: 100%; display: flex; justify-content: space-around; background-color: rgba(0, 0, 0, 0.2); padding: 4px; border-radius: 6px; }
 
-    /* FLOATING CONTROLS */
-    .bottom-trigger-control-zone { position: fixed; bottom: 15px; right: 25px; z-index: 99999; display: flex; gap: 15px; align-items: center; }
-    .btn-trigger-public { background: #1f2937; color: #d1d5db; border: 2px solid #4b5563; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: all 0.2s ease-in-out; }
-    .btn-trigger-public:hover { color: var(--secondary-color); background: #111827; border-color: var(--secondary-color); transform: translateY(-2px); }
+    .bottom-trigger-control-zone { position: fixed; bottom: 15px; right: 25px; z-index: 99999; display: flex; gap: 15px; }
+    .btn-trigger-public { background: #1f2937; color: #d1d5db; border: 2px solid #4b5563; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+
+    /* ====== LOGIN & PANELS ====== */
+    .auth-view-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); padding: 20px; }
+    .auth-card { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); border: 2px solid #1e293b; border-radius: 16px; width: 100%; max-width: 450px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
+    .auth-card h2 { font-size: 26px; font-weight: 800; text-align: center; color: #fff; margin-bottom: 30px; }
+    .form-group { margin-bottom: 22px; }
+    .form-group label { display: block; margin-bottom: 9px; color: #9ca3af; font-size: 14px; font-weight: 600; }
+    .form-control { width: 100%; background-color: #1e293b; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; color: #fff; font-size: 15px; }
+    .btn-block { width: 100%; padding: 14px; font-weight: 700; font-size: 15px; border-radius: 8px; border: none; background-color: var(--primary-color); color: white; cursor: pointer; }
+
+    .admin-dashboard-view { background-color: #020617; min-height: 100vh; color: #f8fafc; font-size: 15px; }
+    .admin-navbar { background-color: #0f172a; padding: 20px 50px; border-bottom: 4px solid var(--primary-color); display: flex; justify-content: space-between; align-items: center; }
+    .admin-navbar h2 { font-size: 24px; font-weight: 800; }
+    .admin-container { max-width: 1500px; margin: 40px auto; padding: 0 30px; display: grid; grid-template-columns: 60% 40%; gap: 35px; }
+    .admin-card-panel { background-color: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 30px; }
+    .admin-card-panel h3 { font-size: 20px; color: var(--secondary-color); margin-bottom: 22px; padding-bottom: 10px; border-bottom: 2px solid #1e293b; font-weight: 700; }
+    
+    .grid-control-antrean { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .loket-control-box { background-color: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; text-align: center; }
+    .loket-number { font-size: 48px; font-weight: 900; color: #ffffff; margin: 15px 0; }
+    .btn-group-antrean { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-antrean-action { padding: 12px; font-weight: 800; border-radius: 6px; cursor: pointer; border: none; }
+    .btn-up { background-color: var(--accent-green); color: #fff; }
+    .btn-down { background-color: #4b5563; color: #fff; }
+    .btn-call { background-color: var(--accent-blue); color: #fff; grid-column: span 2; margin-top: 5px; font-size: 15px; padding: 14px; }
+
+    .video-manager-list { max-height: 250px; overflow-y: auto; background-color: #1e293b; border-radius: 8px; padding: 15px; margin-bottom: 15px; border: 1px solid #334155; display: flex; flex-direction: column; gap: 10px; }
+    .video-item-card { display: flex; align-items: center; gap: 15px; background-color: #0f172a; padding: 10px; border-radius: 6px; border: 1px solid #2d3748; }
+    .video-thumbnail-img { width: 90px; height: 50px; object-fit: cover; border-radius: 4px; background-color: #000; border: 1px solid #4a5568; }
+    .video-info-text { flex-grow: 1; font-size: 13px; color: #e2e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .btn-shortcut { background-color: #10b981; color: #000; font-weight: 800; padding: 14px 24px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; font-size: 15px; width: 100%; justify-content: center; }
+
+    .customizer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 14px; }
+    .customizer-field { display: flex; flex-direction: column; gap: 8px; }
+    .input-color-picker { width: 100%; height: 42px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; background: transparent; }
+    .btn-reset-theme { background-color: var(--accent-red); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 20px; width: 100%; }
   </style>
 </head>
 <body>
-  <div id="main-display-screen">
-    <div class="header-display">
-      <div class="header-brand-section">
-        <img id="display-header-logo" src="https://lh3.googleusercontent.com/d/1xHFp8MzEzoQ-Ron8SgP38U9D5-1e2M83" class="header-logo-img" alt="Logo Instansi">
-        <div>
-          <h1>BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
-          <p>Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Direktorat Jenderal Pemasyarakatan Jawa Tengah</p>
+
+  <div class="app-viewport">
+    
+    <div id="view-main-display" class="view-screen active-view">
+      <div id="main-display-screen">
+        <div class="header-display">
+          <div class="header-brand-section">
+            <img id="display-header-logo" src="https://lh3.googleusercontent.com/d/1xHFp8MzEzoQ-Ron8SgP38U9D5-1e2M83" class="header-logo-img" alt="Logo">
+            <div>
+              <h1>BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
+              <p>Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Jawa Tengah</p>
+            </div>
+          </div>
+          <div style="text-align: right;">
+            <div style="display: flex; gap: 15px; font-size: 30px; font-weight: 600; align-items: center;">
+              <div id="live-date">Kamis, 25 Jun 2026</div>
+              <div id="live-clock">00:00:00</div>
+            </div>
+            <div style="font-size: 18px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
+          </div>
+        </div>
+
+        <div class="left-panel">
+          <div class="video-and-queue-container">
+            <div class="queue-display-bar">
+              <div class="queue-ticket-card card-type-a"><div class="queue-label">Meja Konsultasi 1</div><div class="queue-number-value" id="num-antrian-a">A-000</div></div>
+              <div class="queue-ticket-card card-type-b"><div class="queue-label">Meja Konsultasi 2</div><div class="queue-number-value" id="num-antrian-b">B-000</div></div>
+              <div class="queue-ticket-card card-type-c"><div class="queue-label">Ruang Registrasi</div><div class="queue-number-value" id="num-antrian-c">C-000</div></div>
+            </div>
+            <div class="video-box-container">
+              <div id="yt-player"></div>
+              <div class="playlist-indicator" id="video-title-indicator">Menghubungkan YouTube...</div>
+            </div>
+          </div>
+          <div class="video-audio-controls">
+            <div style="display: flex; gap: 8px;">
+              <button class="audio-btn" onclick="togglePlayPause()">⏸ Pause/Play</button>
+              <button class="audio-btn" onclick="toggleMute()">🔊 Unmute / Suara</button>
+            </div>
+            <div class="volume-slider-container">
+              <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="audio-btn" onclick="nextVideoManual()">>>>> Lewati</button>
+              <button class="audio-btn" style="background-color: var(--primary-color);" onclick="openFullscreenDisplay()">📺 Layar Penuh</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-panel">
+          <div class="global-slideshow-box">
+            <div class="slide-container active" id="slide-global-1">
+              <div class="slide-header-flex">
+                <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
+                <div class="slide-nav-buttons">
+                  <button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button>
+                  <button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button>
+                </div>
+              </div>
+              <div class="slide-content-grid">
+                <div class="slide-details-list">
+                  <div class="slide-big-number" id="lbl-g-litmas-persen">0%</div>
+                  <p style="margin-top: 5px;">Selesai: <b id="lbl-g-litmas-ok" style="color:var(--accent-green)">0</b> Dokumen</p>
+                  <p>Belum Selesai: <b id="lbl-g-litmas-no" style="color:var(--accent-red)">0</b> Dokumen</p>
+                </div>
+                <div class="slide-chart-mini"><canvas id="chartGLitmas"></canvas></div>
+              </div>
+            </div>
+            <div class="slide-container" id="slide-global-2">
+              <div class="slide-header-flex">
+                <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
+                <div class="slide-nav-buttons">
+                  <button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button>
+                  <button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button>
+                </div>
+              </div>
+              <div class="slide-content-grid">
+                <div class="slide-details-list">
+                  <div class="slide-big-number" id="lbl-g-klien-persen">0%</div>
+                  <p style="margin-top: 5px;">Sudah Lapor: <b id="lbl-g-klien-ok" style="color:var(--accent-green)">0</b> Orang</p>
+                  <p>Belum Lapor: <b id="lbl-g-klien-no" style="color:var(--accent-red)">0</b> Orang</p>
+                </div>
+                <div class="slide-chart-mini"><canvas id="chartGKlien"></canvas></div>
+              </div>
+            </div>
+            <div class="slide-container" id="slide-global-3">
+              <div class="slide-header-flex">
+                <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
+                <div class="slide-nav-buttons">
+                  <button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button>
+                  <button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button>
+                </div>
+              </div>
+              <div class="slide-content-grid">
+                <div class="slide-details-list">
+                  <div class="slide-big-number" id="lbl-g-anggaran-persen">0%</div>
+                  <p style="margin-top: 5px;" id="lbl-g-anggaran-pagu">Pagu: Rp 0</p>
+                  <p id="lbl-g-anggaran-realisasi">Realisasi: Rp 0</p>
+                </div>
+                <div class="slide-chart-mini"><canvas id="chartGAnggaran"></canvas></div>
+              </div>
+            </div>
+            <div class="slide-container" id="slide-global-4">
+              <div class="slide-header-flex">
+                <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
+                <div class="slide-nav-buttons">
+                  <button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button>
+                  <button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button>
+                </div>
+              </div>
+              <div class="slide-content-grid">
+                <div class="slide-details-list">
+                  <div class="slide-big-number" id="lbl-g-hadir-persen">0%</div>
+                  <p style="margin-top: 4px;">Hadir Fisik: <b id="lbl-g-hadir-riil" style="color:var(--accent-green)">0</b></p>
+                  <p>Absen/Izin/Cuti: <b id="lbl-g-hadir-absen" style="color:var(--secondary-color)">0</b></p>
+                </div>
+                <div class="slide-chart-mini"><canvas id="chartGPegawai"></canvas></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="performance-box">
+            <h3>STATISTIK PERFORMA PEMBIMBING KEMASYARAKATAN (PK)</h3>
+            <div class="infographic-carousel-container">
+              <div class="pk-profile-header">
+                <div class="pk-name-tag"><span id="infografis-nama">MEMUAT DATA...</span></div>
+                <div class="slide-nav-buttons">
+                  <button class="btn-slide-nav" onclick="gantiPKManual(-1)">◀ Prev</button>
+                  <div class="pk-index-tag" id="infografis-index" style="display:inline-block; margin:0 5px;">PK [0/0]</div>
+                  <button class="btn-slide-nav" onclick="gantiPKManual(1)">Next ▶</button>
+                </div>
+              </div>
+              <div class="charts-flex-grid">
+                <div class="chart-card-wrapper">
+                  <span style="font-size:12px; color:#9ca3af; margin-bottom:5px;">Litmas</span>
+                  <div class="chart-container-canvas"><canvas id="chartLitmas"></canvas><div class="chart-center-text" id="text-persen-litmas">0%</div></div>
+                  <div class="chart-legend-info">Selesai: <b id="ind-litmas-ok" style="color:var(--accent-green)">0</b> | Belum: <b id="ind-litmas-no" style="color:var(--accent-red)">0</b></div>
+                </div>
+                <div class="chart-card-wrapper">
+                  <span style="font-size:12px; color:#9ca3af; margin-bottom:5px;">Wajib Lapor</span>
+                  <div class="chart-container-canvas"><canvas id="chartKlien"></canvas><div class="chart-center-text" id="text-persen-klien">0%</div></div>
+                  <div class="chart-legend-info">Sudah: <b id="ind-klien-ok" style="color:var(--accent-blue)">0</b> | Belum: <b id="ind-klien-no" style="color:var(--accent-red)">0</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div style="text-align: right;">
-        <div id="date-time-container" style="display: flex; gap: 15px; font-size: 30px; font-weight: 600; align-items: center;">
-          <div id="live-date"></div>
-          <div id="live-clock">00:00:00</div>
-        </div>
-       <script>
-        function updateDateTime() {
-        const now = new Date();
-    
-    // Format: "Hari, dd mmm yyyy"
-    const dateOptions = { weekday: 'long', day: '2-digit', month: 'short', year: 'numeric' };
-    const dateString = now.toLocaleDateString('id-ID', dateOptions);
-    
-    // Format: Jam
-    const timeString = now.toLocaleTimeString('id-ID', { hour12: false });
-    
-    // Update ke elemen HTML
-    document.getElementById('live-date').innerText = dateString;
-    document.getElementById('live-clock').innerText = timeString;
-}
 
-// Jalankan setiap detik
-setInterval(updateDateTime, 1000);
-updateDateTime(); 
-</script>
-        <div style="font-size: 20px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
+      <div class="bottom-trigger-control-zone">
+        <button class="btn-trigger-public" onclick="switchView('view-login-admin')">⚙️ Log Masuk Admin</button>
       </div>
     </div>
 
-    <div class="left-panel">
-      <div class="video-and-queue-container">
-        <div class="queue-display-bar">
-          <div class="queue-ticket-card card-type-a">
-            <div class="queue-label">Meja Konsultasi 1</div>
-            <div class="queue-number-value" id="num-antrian-a">A-000</div>
-          </div>
-          <div class="queue-ticket-card card-type-b">
-            <div class="queue-label">Meja Konsultasi 2</div>
-            <div class="queue-number-value" id="num-antrian-b">B-000</div>
-          </div>
-          <div class="queue-ticket-card card-type-c">
-            <div class="queue-label">Ruang Registrasi</div>
-            <div class="queue-number-value" id="num-antrian-c">C-000</div>
-          </div>
+    <div id="view-login-admin" class="view-screen">
+      <div class="auth-view-wrapper">
+        <div class="auth-card">
+          <h2>LOGIN PANEL OPERATOR</h2>
+          <div class="form-group"><label>User ID</label><input type="text" id="txt-username" class="form-control" placeholder="Masukkan User ID"></div>
+          <div class="form-group"><label>Password</label><input type="password" id="txt-password" class="form-control" placeholder="Masukkan Password"></div>
+          <button class="btn-block" onclick="processLogin()">Masuk Pengaturan</button>
+          <button class="btn-block" style="background-color: #334155; margin-top: 12px;" onclick="switchView('view-main-display')">Kembali ke Monitor</button>
+          <div id="login-error-msg" style="color: var(--accent-red); margin-top:15px; display:none; text-align:center; font-weight:bold;">Kredensial Salah / Data Belum Sinkron!</div>
         </div>
-        <div class="video-box-container">
-          <div id="yt-player"></div>
-          <div class="playlist-indicator" id="video-title-indicator">Video: Menghubungkan YouTube...</div>
-        </div>
-      </div>
-      <div class="video-audio-controls">
-        <div style="display: flex; gap: 8px;">
-          <button class="audio-btn" id="btn-play-pause" onclick="togglePlayPause()">⏸ Pause</button>
-          <button class="audio-btn" id="btn-mute" onclick="toggleMute()">🔊 Unmute / Suara</button>
-        </div>
-        <div class="volume-slider-container">
-          <span style="font-size: 12px; color: #9ca3af;">Volume:</span>
-          <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
-          <span style="font-size: 12px; font-weight: bold;" id="volume-text">80%</span>
-        </div>
-        <button class="audio-btn" onclick="nextVideoManual()">⏭ Lewati</button>
       </div>
     </div>
 
-    <div class="right-panel">
-      <div class="global-slideshow-box">
-        <div class="slide-container active" id="slide-global-1">
-          <div class="slide-header-flex">
-            <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
-            <div class="nav-wrapper-manual">
-              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
-              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
-            </div>
-          </div>
-          <div class="slide-content-grid">
-            <div class="slide-details-list">
-              <div class="slide-big-number" id="lbl-g-litmas-persen">0%</div>
-              <p style="margin-top: 5px;">Litmas Selesai: <b id="lbl-g-litmas-ok" style="color:var(--accent-green)">0</b> Dokumen</p>
-              <p>Litmas Belum Selesai: <b id="lbl-g-litmas-no" style="color:var(--accent-red)">0</b> Dokumen</p>
-            </div>
-            <div class="slide-chart-mini"><canvas id="chartGLitmas"></canvas></div>
-          </div>
+    <div id="view-admin-dashboard" class="view-screen">
+      <div class="admin-dashboard-view">
+        <div class="admin-navbar">
+          <h2>⚙️ PANEL MANAJEMEN INDUK DISPLAY & PLAYLIST</h2>
+          <button class="audio-btn" style="background-color:var(--accent-red); padding:12px 24px;" onclick="switchView('view-main-display')">Keluar Panel</button>
         </div>
 
-        <div class="slide-container" id="slide-global-2">
-          <div class="slide-header-flex">
-            <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
-            <div class="nav-wrapper-manual">
-              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
-              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+        <div class="admin-container">
+          <div>
+            <div class="admin-card-panel">
+              <h3>📌 MANIPULASI NOMOR ANTREAN AKTIF (DUAL-WINDOW SYNC)</h3>
+              <div class="grid-control-antrean" style="margin-bottom:20px;">
+                <div class="loket-control-box">
+                  <div>Meja Konsultasi 1</div><div class="loket-number" id="admin-num-a">A-000</div>
+                  <div class="btn-group-antrean">
+                    <button class="btn-antrean-action btn-up" onclick="changeAntreanLokal('A', 1)">+ Naik</button>
+                    <button class="btn-antrean-action btn-down" onclick="changeAntreanLokal('A', -1)">- Turun</button>
+                    <button class="btn-antrean-action btn-call" onclick="pemicuSuaraPanggil('A')">🔊 Panggil</button>
+                  </div>
+                </div>
+                <div class="loket-control-box">
+                  <div>Meja Konsultasi 2</div><div class="loket-number" id="admin-num-b">B-000</div>
+                  <div class="btn-group-antrean">
+                    <button class="btn-antrean-action btn-up" onclick="changeAntreanLokal('B', 1)">+ Naik</button>
+                    <button class="btn-antrean-action btn-down" onclick="changeAntreanLokal('B', -1)">- Turun</button>
+                    <button class="btn-antrean-action btn-call" onclick="pemicuSuaraPanggil('B')">🔊 Panggil</button>
+                  </div>
+                </div>
+                <div class="loket-control-box">
+                  <div>Ruang Registrasi</div><div class="loket-number" id="admin-num-c">C-000</div>
+                  <div class="btn-group-antrean">
+                    <button class="btn-antrean-action btn-up" onclick="changeAntreanLokal('C', 1)">+ Naik</button>
+                    <button class="btn-antrean-action btn-down" onclick="changeAntreanLokal('C', -1)">- Turun</button>
+                    <button class="btn-antrean-action btn-call" onclick="pemicuSuaraPanggil('C')">🔊 Panggil</button>
+                  </div>
+                </div>
+              </div>
+              <button class="btn-block" style="background-color: var(--accent-red); padding:15px; font-size:16px; font-weight:800;" onclick="resetSeluruhAntreanAksi()">
+                🔄 RESET SEMUA NOMOR ANTREAN MENJADI 000
+              </button>
             </div>
-          </div>
-          <div class="slide-content-grid">
-            <div class="slide-details-list">
-              <div class="slide-big-number" id="lbl-g-klien-persen">0%</div>
-              <p style="margin-top: 5px;">Klien Sudah Melapor: <b id="lbl-g-klien-ok" style="color:var(--accent-green)">0</b> Orang</p>
-              <p>Klien Belum Melapor: <b id="lbl-g-klien-no" style="color:var(--accent-red)">0</b> Orang</p>
-            </div>
-            <div class="slide-chart-mini"><canvas id="chartGKlien"></canvas></div>
-          </div>
-        </div>
 
-        <div class="slide-container" id="slide-global-3">
-          <div class="slide-header-flex">
-            <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
-            <div class="nav-wrapper-manual">
-              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
-              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+            <div class="admin-card-panel">
+              <h3>🎬 PLAYLIST VIDEO YOUTUBE & THUMBNAIL (SHEET SYNC)</h3>
+              <div class="video-manager-list" id="admin-playlist-dom"></div>
+              <div style="display: flex; gap: 12px;">
+                <input type="text" id="txt-new-video-url" class="form-control" placeholder="Masukkan URL YouTube Baru...">
+                <button class="audio-btn" style="background-color:var(--accent-green); white-space:nowrap; padding:0 25px;" onclick="tambahVideoKePlaylist()">➕ Tambah</button>
+              </div>
             </div>
           </div>
-          <div class="slide-content-grid">
-            <div class="slide-details-list">
-              <div class="slide-big-number" id="lbl-g-anggaran-persen">0%</div>
-              <p style="margin-top: 8px; color:#e5e7eb;" id="lbl-g-anggaran-pagu">Pagu Alokasi: Rp 0</p>
-              <p style="color:#e5e7eb;" id="lbl-g-anggaran-realisasi">Total Realisasi: Rp 0</p>
-            </div>
-            <div class="slide-chart-mini"><canvas id="chartGAnggaran"></canvas></div>
-          </div>
-        </div>
 
-        <div class="slide-container" id="slide-global-4">
-          <div class="slide-header-flex">
-            <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
-            <div class="nav-wrapper-manual">
-              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(-1)">◀</button>
-              <button class="btn-nav-arrow" onclick="navigateGlobalSlide(1)">▶</button>
+          <div>
+            <div class="admin-card-panel">
+              <h3>📺 MULTI-WINDOW TELEVISI MONITOR</h3>
+              <button class="btn-block" style="padding:15px; margin-bottom:20px; font-size:16px; background-color:var(--accent-blue);" onclick="bukaJendelaDisplayPengunjung()">🖥️ Lontarkan Pop-up Layar Pengunjung</button>
+              <a href="https://docs.google.com/spreadsheets/d/1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c/edit" target="_blank" class="btn-shortcut">
+                📊 Buka Lembar Kerja Google Sheets
+              </a>
             </div>
-          </div>
-          <div class="slide-content-grid">
-            <div class="slide-details-list">
-              <div class="slide-big-number" id="lbl-g-hadir-persen">0%</div>
-              <div style="margin-top: 5px; display: grid; grid-template-columns: 1fr 1fr; gap-x: 15px; font-size: 13px;">
-                <p>Hadir Fisik: <b id="lbl-g-hadir-riil" style="color:var(--accent-green)">0</b></p>
-                <p>Izin Resmi: <b id="lbl-g-peg-izin" style="color:var(--secondary-color)">0</b></p>
-                <p>Cuti Tahunan: <b id="lbl-g-peg-cuti" style="color:var(--accent-blue)">0</b></p>
-                <p>Dinas Luar: <b id="lbl-g-peg-dl" style="color:#a855f7;">0</b></p>
-              </div>
-            </div>
-            <div class="slide-chart-mini"><canvas id="chartGPegawai"></canvas></div>
-          </div>
-        </div>
-      </div>
 
-      <div class="performance-box">
-        <h3>STATISTIK PERFORMA PEMBIMBING KEMASYARAKATAN (PK)</h3>
-        <div class="infographic-carousel-container" id="carousel-box">
-          <div class="pk-profile-header">
-            <div class="pk-name-tag">
-              <span id="infografis-nama">MEMUAT DATA...</span>
-              <span class="sync-badge" id="sync-status-text" style="color: var(--accent-green); background: rgba(16, 185, 129, 0.2);">Cloud Active</span>
+            <div class="admin-card-panel">
+              <h3>🎨 KUSTOMISASI VISUAL ATRIBUT MONITOR</h3>
+              <div class="customizer-grid">
+                <div class="customizer-field"><label>Warna Utama</label><input type="color" id="cp-primary" class="input-color-picker" onchange="aplikasikanAtributTema()"></div>
+                <div class="customizer-field"><label>Warna Sekunder</label><input type="color" id="cp-secondary" class="input-color-picker" onchange="aplikasikanAtributTema()"></div>
+                <div class="customizer-field"><label>Warna Latar</label><input type="color" id="cp-bg" class="input-color-picker" onchange="aplikasikanAtributTema()"></div>
+                <div class="customizer-field">
+                  <label>Jenis Huruf (Font)</label>
+                  <select id="cp-font" class="form-control" style="padding:10px;" onchange="aplikasikanAtributTema()">
+                    <option value="'Segoe UI', sans-serif">Segoe UI Default</option>
+                    <option value="'Arial', sans-serif">Arial Clean</option>
+                    <option value="'Georgia', serif">Georgia Serif</option>
+                  </select>
+                </div>
+                <div class="customizer-field"><label>Ukuran Judul Header</label><input type="range" id="size-title" min="20" max="45" value="30" oninput="aplikasikanAtributTema()"></div>
+                <div class="customizer-field"><label>Ukuran Angka Antrean</label><input type="range" id="size-queue" min="35" max="70" value="54" oninput="aplikasikanAtributTema()"></div>
+              </div>
+              <button class="btn-reset-theme" onclick="resetAtributTemaKeAwal()">🔄 Kembalikan ke Pengaturan Awal (Reset)</button>
             </div>
-            <div class="nav-wrapper-manual">
-              <button class="btn-nav-arrow" onclick="navigatePKManual(-1)">◀</button>
-              <div class="pk-index-tag" id="infografis-index">PK [0/0]</div>
-              <button class="btn-nav-arrow" onclick="navigatePKManual(1)">▶</button>
-            </div>
-          </div>
-          <div class="charts-flex-grid">
-            <div class="chart-card-wrapper">
-              <span style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#9ca3af;">Penyelesaian Litmas</span>
-              <div class="chart-container-canvas">
-                <canvas id="chartLitmas"></canvas>
-                <div class="chart-center-text" id="text-persen-litmas">0%</div>
-              </div>
-              <div class="chart-legend-info">
-                <div class="legend-item"><span class="dot-green"></span> Selesai: <b id="lbl-litmas-ok" style="color:var(--accent-green)">0</b></div>
-                <div class="legend-item"><span class="dot-red"></span> Belum: <b id="lbl-litmas-no" style="color:var(--accent-red)">0</b></div>
-              </div>
-            </div>
-            <div class="chart-card-wrapper">
-              <span style="font-size: 13px; font-weight: 600; margin-bottom: 8px; color:#9ca3af;">Kepatuhan Wajib Lapor Klien</span>
-              <div class="chart-container-canvas">
-                <canvas id="chartKlien"></canvas>
-                <div class="chart-center-text" id="text-persen-klien">0%</div>
-              </div>
-              <div class="chart-legend-info">
-                <div class="legend-item"><span class="dot-green"></span> Sudah: <b id="lbl-klien-ok" style="color:var(--accent-green)">0</b></div>
-                <div class="legend-item"><span class="dot-red"></span> Belum: <b id="lbl-klien-no" style="color:var(--accent-red)">0</b></div>
-              </div>
+
+            <div class="admin-card-panel" style="font-size:13px; color:#94a3b8;">
+              Status Hubungan Cloud: <span id="sync-status-text" style="color:var(--accent-blue); font-weight:bold;">Menghubungkan...</span>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="bottom-trigger-control-zone" id="public-control-area">
-    <button class="btn-trigger-public" onclick="openFullscreen()">📺 Layar Penuh (TV Monitor)</button>
   </div>
 
   <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
-
-    setInterval(() => { document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('id-ID'); }, 1000);
     
-    function openFullscreen() {
+    let dataAntreanLokal = { A: 0, B: 0, C: 0 };
+    let localVideoQueue = [];
+    let currentQueueIndex = 0;
+    let dbUserAkun = [];
+    let dbPK = [];
+    let currentSlide = 1;
+    let idxPK = 0;
+    let autoSlideTimer = null;
+
+    const broadcastEngine = new BroadcastChannel('bapas_purwokerto_broadcast_system');
+
+    broadcastEngine.onmessage = (event) => {
+      if (event.data.type === 'SYNC_ALL_STATE') {
+        dataAntreanLokal = event.data.antrean;
+        localVideoQueue = event.data.playlist;
+        renderSeluruhDataKeLayar();
+      }
+      if (event.data.type === 'TRIGGER_VOICE_CALL') {
+        eksekusiSuaraLokal(event.data.loket);
+      }
+      if (event.data.type === 'THEME_CHANGED') {
+        document.getElementById('custom-theme-styles').innerHTML = event.data.styles;
+      }
+    };
+
+    function pancarkanStateKeJendelaLain(triggerVoice = false, loketVoice = '') {
+      broadcastEngine.postMessage({ type: 'SYNC_ALL_STATE', antrean: dataAntreanLokal, playlist: localVideoQueue });
+      if(triggerVoice) broadcastEngine.postMessage({ type: 'TRIGGER_VOICE_CALL', loket: loketVoice });
+    }
+
+    function bukaJendelaDisplayPengunjung() {
+      window.open(window.location.href, '_blank', 'width=1920,height=1080,menubar=no,status=no');
+      setTimeout(() => { pancarkanStateKeJendelaLain(); aplikasikanAtributTema(); }, 1000);
+    }
+
+    function openFullscreenDisplay() {
       const el = document.getElementById("main-display-screen");
       if (el.requestFullscreen) el.requestFullscreen();
       else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
 
-    let ytPlayerObj = null;
-    let isYtApiReady = false;
-    let localVideoQueue = ["https://www.youtube.com/watch?v=jrXNVlQJpW0"]; 
-    let currentQueueIndex = 0;
+    setInterval(() => {
+      if(document.getElementById('live-clock')) document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('id-ID');
+    }, 1000);
 
-    function onYouTubeIframeAPIReady() {
-      isYtApiReady = true;
-      playVideoFromLocalQueue();
+    function switchView(viewId) {
+      document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active-view'));
+      document.getElementById(viewId).classList.add('active-view');
+      if(viewId === 'view-main-display') renderSeluruhDataKeLayar();
     }
 
+    function changeAntreanLokal(loket, step) {
+      dataAntreanLokal[loket] += step;
+      if (dataAntreanLokal[loket] < 0) dataAntreanLokal[loket] = 0;
+      renderSeluruhDataKeLayar();
+      pancarkanStateKeJendelaLain();
+      if(step > 0) pemicuSuaraPanggil(loket);
+      komitDataKeCloud({ aksi: 'update_antrean', data: dataAntreanLokal });
+    }
+
+    function resetSeluruhAntreanAksi() {
+      if(!confirm("Apakah Anda yakin ingin mereset seluruh nomor antrean menjadi 000?")) return;
+      dataAntreanLokal = { A: 0, B: 0, C: 0 };
+      renderSeluruhDataKeLayar();
+      pancarkanStateKeJendelaLain();
+      komitDataKeCloud({ aksi: 'reset_antrean', data: dataAntreanLokal });
+    }
+
+    function pemicuSuaraPanggil(loket) {
+      eksekusiSuaraLokal(loket);
+      pancarkanStateKeJendelaLain(true, loket);
+    }
+
+    function ekstrakIDYoutube(url) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    function tambahVideoKePlaylist() {
+      const input = document.getElementById('txt-new-video-url');
+      const url = input.value.trim();
+      if(!url) return;
+      localVideoQueue.push(url);
+      input.value = '';
+      renderSeluruhDataKeLayar();
+      pancarkanStateKeJendelaLain();
+      komitDataKeCloud({ aksi: 'tambah_video', url: url });
+      if(localVideoQueue.length === 1) memuatInstalasiVideoYouTube();
+    }
+
+    function renderSeluruhDataKeLayar() {
+      const pad = (n) => n.toString().padStart(3, '0');
+      ['A', 'B', 'C'].forEach(k => {
+        const teks = `${k}-${pad(dataAntreanLokal[k])}`;
+        if(document.getElementById(`num-antrian-${k.toLowerCase()}`)) document.getElementById(`num-antrian-${k.toLowerCase()}`).textContent = teks;
+        if(document.getElementById(`admin-num-${k.toLowerCase()}`)) document.getElementById(`admin-num-${k.toLowerCase()}`).textContent = teks;
+      });
+
+      const box = document.getElementById('admin-playlist-dom');
+      if(box) {
+        box.innerHTML = '';
+        localVideoQueue.forEach((url, i) => {
+          const videoId = ekstrakIDYoutube(url);
+          const thumbUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+          box.innerHTML += `
+            <div class="video-item-card">
+              <img class="video-thumbnail-img" src="${thumbUrl}" alt="Miniatur">
+              <div class="video-info-text"><b>[Video ${i+1}]</b><br>${url}</div>
+            </div>
+          `;
+        });
+      }
+    }
+
+    function gantiSlideManual(arah) {
+      resetSlideTimer();
+      document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
+      currentSlide = currentSlide + arah;
+      if (currentSlide > 4) currentSlide = 1;
+      if (currentSlide < 1) currentSlide = 4;
+      if(document.getElementById(`slide-global-${currentSlide}`)) document.getElementById(`slide-global-${currentSlide}`).classList.add('active');
+    }
+
+    function gantiPKManual(arah) {
+      if(dbPK.length === 0) return;
+      idxPK = idxPK + arah;
+      if (idxPK >= dbPK.length) idxPK = 0;
+      if (idxPK < 0) idxPK = dbPK.length - 1;
+      renderProfilPKSpesifik();
+    }
+
+    function renderProfilPKSpesifik() {
+      if(dbPK.length === 0 || !dbPK[idxPK]) return;
+      const pk = dbPK[idxPK];
+      document.getElementById('infografis-nama').textContent = pk.nama;
+      document.getElementById('infografis-index').textContent = `PK [${idxPK + 1}/${dbPK.length}]`;
+      
+      const totL = pk.litmasOk + pk.litmasNo;
+      document.getElementById('text-persen-litmas').textContent = (totL > 0 ? ((pk.litmasOk / totL) * 100).toFixed(0) : 0) + "%";
+      document.getElementById('ind-litmas-ok').textContent = pk.litmasOk;
+      document.getElementById('ind-litmas-no').textContent = pk.litmasNo;
+      cLitmas.data.datasets[0].data = [pk.litmasOk, pk.litmasNo]; cLitmas.update();
+
+      const totK = pk.klienOk + pk.klienNo;
+      document.getElementById('text-persen-klien').textContent = (totK > 0 ? ((pk.klienOk / totK) * 100).toFixed(0) : 0) + "%";
+      document.getElementById('ind-klien-ok').textContent = pk.klienOk;
+      document.getElementById('ind-klien-no').textContent = pk.klienNo;
+      cKlien.data.datasets[0].data = [pk.klienOk, pk.klienNo]; cKlien.update();
+    }
+
+    function komitDataKeCloud(payload) {
+      if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Mengirim...";
+      fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' }, 
+        body: JSON.stringify(payload)
+      }).then(() => {
+        if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Tersinkronisasi";
+      });
+    }
+
+    function unduhDataTerbaruDariCloud() {
+      fetch(SCRIPT_URL)
+        .then(res => res.json())
+        .then(res => {
+          if (res.status !== "success") return;
+          
+          if (res.antrean) dataAntreanLokal = res.antrean;
+          if (res.videos && res.videos.length > 0) {
+            // Cek jika jumlah playlist berubah dari cloud untuk re-init player youtube
+            const isChanged = localVideoQueue.length !== res.videos.length;
+            localVideoQueue = res.videos;
+            if(isChanged && isYtApiReady) memuatInstalasiVideoYouTube();
+          }
+          if (res.userid) dbUserAkun = res.userid;
+          
+          dbPK = res.data_pk || [];
+          aplikasikanDataKeGrafikChart(res.global);
+          renderSeluruhDataKeLayar();
+          
+          if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Cloud Online";
+        }).catch(() => {
+          if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Offline Mode";
+        });
+    }
+
+    // ENGINE YOUTUBE
+    let ytPlayerObj = null; let isYtApiReady = false;
     window.addEventListener('DOMContentLoaded', () => {
-      const tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      fetchDataFromAppsScriptAPI(SCRIPT_URL);
-      setInterval(() => { fetchDataFromAppsScriptAPI(SCRIPT_URL); }, 25000);
+      const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(tag);
+      inisialisasiNilaiDefaultCustomizer(); inisialisasiGrafikMulaMula(); unduhDataTerbaruDariCloud();
+      setInterval(unduhDataTerbaruDariCloud, 10000); 
     });
 
-    function playVideoFromLocalQueue() {
+    function onYouTubeIframeAPIReady() { isYtApiReady = true; memuatInstalasiVideoYouTube(); }
+
+    function memuatInstalasiVideoYouTube() {
       if (!isYtApiReady || localVideoQueue.length === 0) return;
       if (currentQueueIndex >= localVideoQueue.length) currentQueueIndex = 0;
-      
-      const currentUrl = localVideoQueue[currentQueueIndex];
-      let videoId = "jrXNVlQJpW0";
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = currentUrl.match(regExp);
-      if (match && match[2].length === 11) videoId = match[2];
+      const urlAktif = localVideoQueue[currentQueueIndex];
+      const videoId = ekstrakIDYoutube(urlAktif) || "jrXNVlQJpW0";
 
-      if (ytPlayerObj) {
-        ytPlayerObj.loadVideoById({ videoId: videoId });
+      if (ytPlayerObj && typeof ytPlayerObj.loadVideoById === 'function') {
+        ytPlayerObj.loadVideoById({ videoId: videoId }); updateQueueIndicator();
       } else {
         ytPlayerObj = new YT.Player('yt-player', {
-          videoId: videoId,
-          playerVars: { 
-            'autoplay': 1, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'iv_load_policy': 3, 'origin': window.location.origin 
-          },
+          videoId: videoId, playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'origin': window.location.origin },
           events: {
             'onReady': (e) => { e.target.mute(); e.target.playVideo(); updateQueueIndicator(); },
-            'onStateChange': (e) => { 
-              if (e.data === 0) { currentQueueIndex++; playVideoFromLocalQueue(); } 
-              if (e.data === -1 || e.data === 5) e.target.playVideo(); 
-            },
-            'onError': (e) => { currentQueueIndex++; playVideoFromLocalQueue(); }
+            'onStateChange': (e) => { if (e.data === 0) { currentQueueIndex++; memuatInstalasiVideoYouTube(); } if (e.data === -1) e.target.playVideo(); },
+            'onError': () => { currentQueueIndex++; memuatInstalasiVideoYouTube(); }
           }
         });
       }
     }
 
     function updateQueueIndicator() {
-      document.getElementById('video-title-indicator').textContent = `Memutar Video [${currentQueueIndex + 1}/${localVideoQueue.length}]`;
+      const label = document.getElementById('video-title-indicator');
+      if(label && localVideoQueue.length > 0) label.textContent = `Memutar Video [${(currentQueueIndex % localVideoQueue.length) + 1}/${localVideoQueue.length}]`;
     }
 
-    function nextVideoManual() { if(localVideoQueue.length <= 1) return; currentQueueIndex++; playVideoFromLocalQueue(); }
-    
-    function togglePlayPause() { 
-      if (!ytPlayerObj) return; 
-      if (ytPlayerObj.getPlayerState() === 1) { ytPlayerObj.pauseVideo(); document.getElementById('btn-play-pause').textContent = "▶ Play"; } 
-      else { ytPlayerObj.playVideo(); document.getElementById('btn-play-pause').textContent = "⏸ Pause"; } 
-    }
-    
-    function toggleMute() { 
-      if (!ytPlayerObj) return; 
-      const btn = document.getElementById('btn-mute'); 
-      if (ytPlayerObj.isMuted()) { ytPlayerObj.unMute(); btn.textContent = "Aktivasi Bisu"; } 
-      else { ytPlayerObj.mute(); btn.textContent = "🔊 Unmute / Suara"; } 
-    }
-    
-    function setVolume(v) { if (ytPlayerObj) ytPlayerObj.setVolume(v); }
+    function nextVideoManual() { if(localVideoQueue.length > 0) { currentQueueIndex++; memuatInstalasiVideoYouTube(); } }
+    function togglePlayPause() { if(ytPlayerObj) ytPlayerObj.getPlayerState() === 1 ? ytPlayerObj.pauseVideo() : ytPlayerObj.playVideo(); }
+    function toggleMute() { if(ytPlayerObj) ytPlayerObj.isMuted() ? ytPlayerObj.unMute() : ytPlayerObj.mute(); }
+    function setVolume(v) { if(ytPlayerObj) ytPlayerObj.setVolume(v); }
 
-    const miniChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'70%' };
-    const mainChartOpts = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'73%' };
-
-    const cGLitmas = new Chart(document.getElementById('chartGLitmas'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
-    const cGKlien = new Chart(document.getElementById('chartGKlien'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
-    const cGAnggaran = new Chart(document.getElementById('chartGAnggaran'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#3b82f6','#1f2937'],borderWidth:0}]}, options:miniChartOpts });
-    const cGPegawai = new Chart(document.getElementById('chartGPegawai'), { type:'doughnut', data:{datasets:[{data:[0,100,0,0],backgroundColor:['#10b981','#f4d35e','#3b82f6','#a855f7'],borderWidth:0}]}, options:miniChartOpts });
-    const cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
-    const cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,0],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:mainChartOpts });
-
-    let dbPK = [];
-    let idxSlideG = 1;
-    let idxPK = 0;
-    let pauseGlobalTimer = 0;
-    let pausePKTimer = 0;
-
-    setInterval(() => {
-      if (pauseGlobalTimer > 0) { pauseGlobalTimer--; return; }
-      changeGlobalSlideNext();
-    }, 8000);
-
-    setInterval(() => {
-      if (dbPK.length === 0 || pausePKTimer > 0) { pausePKTimer--; return; }
-      idxPK = (idxPK + 1) % dbPK.length;
-      renderIndividualPK();
-    }, 6000);
-
-    function changeGlobalSlideNext() {
-      document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
-      idxSlideG = (idxSlideG % 4) + 1;
-      const el = document.getElementById(`slide-global-${idxSlideG}`);
-      if(el) el.classList.add('active');
+    function processLogin() {
+      const u = document.getElementById('txt-username').value.trim(); const p = document.getElementById('txt-password').value.trim();
+      let valid = dbUserAkun.some(acc => acc.username == u && acc.password == p);
+      if(!valid && u === "admin" && p === "bapas123") valid = true; 
+      if(valid) { document.getElementById('login-error-msg').style.display = 'none'; switchView('view-admin-dashboard'); } 
+      else { document.getElementById('login-error-msg').style.display = 'block'; }
     }
 
-    function navigateGlobalSlide(direction) {
-      pauseGlobalTimer = 15; 
-      idxSlideG = idxSlideG + direction;
-      if (idxSlideG > 4) idxSlideG = 1;
-      if (idxSlideG < 1) idxSlideG = 4;
-      document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
-      const el = document.getElementById(`slide-global-${idxSlideG}`);
-      if(el) el.classList.add('active');
-    }
-
-    function navigatePKManual(direction) {
-      if (dbPK.length === 0) return;
-      pausePKTimer = 15; 
-      idxPK = idxPK + direction;
-      if (idxPK >= dbPK.length) idxPK = 0;
-      if (idxPK < 0) idxPK = dbPK.length - 1;
-      renderIndividualPK();
-    }
-
-    let cacheLastAntrian = { A: "", B: "", C: "" };
-    function triggerChimeAndVoice(nomorAntrian, namaLoket) {
+    function eksekusiSuaraLokal(loket) {
+      const nomorInt = dataAntreanLokal[loket]; let namaLoket = loket === 'A' ? "Meja Konsultasi 1" : loket === 'B' ? "Meja Konsultasi 2" : "Ruang Registrasi";
       try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let osc1 = audioCtx.createOscillator();
-        let gain1 = audioCtx.createGain();
-        osc1.type = 'sine'; osc1.frequency.setValueAtTime(659.25, audioCtx.currentTime);
-        gain1.gain.setValueAtTime(0.3, audioCtx.currentTime);
-        gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
-        osc1.connect(gain1); gain1.connect(audioCtx.destination);
-        osc1.start(); osc1.stop(audioCtx.currentTime + 0.4);
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
+        osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.2);
         setTimeout(() => {
-          let osc2 = audioCtx.createOscillator();
-          let gain2 = audioCtx.createGain();
-          osc2.type = 'sine'; osc2.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-          gain2.gain.setValueAtTime(0.3, audioCtx.currentTime);
-          gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-          osc2.connect(gain2); gain2.connect(audioCtx.destination);
-          osc2.start(); osc2.stop(audioCtx.currentTime + 0.5);
-        }, 150);
-        setTimeout(() => {
-          let nomorDieja = nomorAntrian.split("").join(" ").replace(/-/g, ""); 
-          let utterance = new SpeechSynthesisUtterance(`Nomor antrean, ${nomorDieja}, silahkan menuju ke ${namaLoket}`);
-          utterance.lang = 'id-ID'; 
-          utterance.rate = 0.82; 
-          window.speechSynthesis.speak(utterance);
-        }, 750); 
-      } catch(e) { console.error("Audio Context Error: ", e); }
+          let kalimat = `Nomor antrean ${loket} ${nomorInt.toString().split("").join(" ")}, silahkan menuju ke ${namaLoket}`;
+          let utterance = new SpeechSynthesisUtterance(kalimat); utterance.lang = 'id-ID'; utterance.rate = 0.85; window.speechSynthesis.speak(utterance);
+        }, 300);
+      } catch(e){}
     }
 
-    function fetchDataFromAppsScriptAPI(apiUrl) {
-      document.getElementById('sync-status-text').textContent = "Syncing...";
-      fetch(apiUrl)
-        .then(res => res.json())
-        .then(jsonResponse => {
-          if(jsonResponse.status !== "success") return;
-          
-          if (jsonResponse.videos && jsonResponse.videos.length > 0) {
-            localVideoQueue = jsonResponse.videos;
-            updateQueueIndicator();
-          }
-
-          if (jsonResponse.antrian) {
-            const {A, B, C} = jsonResponse.antrian;
-            if(cacheLastAntrian.A !== "" && cacheLastAntrian.A !== A && A !== "000") triggerChimeAndVoice(A, jsonResponse.antrian_loket?.A || "Meja Konsultasi 1");
-            if(cacheLastAntrian.B !== "" && cacheLastAntrian.B !== B && B !== "000") triggerChimeAndVoice(B, jsonResponse.antrian_loket?.B || "Meja Konsultasi 2");
-            if(cacheLastAntrian.C !== "" && cacheLastAntrian.C !== C && C !== "000") triggerChimeAndVoice(C, jsonResponse.antrian_loket?.C || "Ruang Registrasi");
-            cacheLastAntrian = { A, B, C };
-            document.getElementById('num-antrian-a').textContent = A;
-            document.getElementById('num-antrian-b').textContent = B;
-            document.getElementById('num-antrian-c').textContent = C;
-          }
-
-          dbPK = jsonResponse.data_pk;
-          const globalData = jsonResponse.global;
-          if(globalData.anggaran) {
-            const {pagu, realisasi} = globalData.anggaran;
-            document.getElementById('lbl-g-anggaran-persen').textContent = (pagu > 0 ? ((realisasi / pagu) * 100).toFixed(1) : 0) + "%";
-            document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu Alokasi: Rp " + pagu.toLocaleString('id-ID');
-            document.getElementById('lbl-g-anggaran-realisasi').textContent = "Total Realisasi: Rp " + realisasi.toLocaleString('id-ID');
-            cGAnggaran.data.datasets[0].data = [realisasi, pagu - realisasi > 0 ? pagu - realisasi : 0]; cGAnggaran.update();
-          }
-
-          if(globalData.pegawai) {
-            const {hadir, cuti, izin, dl} = globalData.pegawai;
-            const totalP = hadir + cuti + izin + dl;
-            document.getElementById('lbl-g-hadir-persen').textContent = (totalP > 0 ? ((hadir / totalP) * 100).toFixed(0) : 0) + "%";
-            document.getElementById('lbl-g-hadir-riil').textContent = hadir;
-            document.getElementById('lbl-g-peg-cuti').textContent = cuti;
-            document.getElementById('lbl-g-peg-izin').textContent = izin;
-            document.getElementById('lbl-g-peg-dl').textContent = dl;
-            cGPegawai.data.datasets[0].data = [hadir, cuti, izin, dl]; cGPegawai.update();
-          }
-
-          calculateAndRenderGlobalTotals();
-          if(dbPK.length > 0) renderIndividualPK();
-          document.getElementById('sync-status-text').textContent = "Live Realtime";
-        })
-        .catch(err => { document.getElementById('sync-status-text').textContent = "API Error"; });
+    function inisialisasiNilaiDefaultCustomizer() {
+      document.getElementById('cp-primary').value = "#114b5f"; document.getElementById('cp-secondary').value = "#f4d35e"; document.getElementById('cp-bg').value = "#0a0f1d";
     }
 
-    function calculateAndRenderGlobalTotals() {
-      let totalLitmasOk = 0, totalLitmasNo = 0, totalKlienOk = 0, totalKlienNo = 0;
-      dbPK.forEach(p => { totalLitmasOk += p.litmasOk; totalLitmasNo += p.litmasNo; totalKlienOk += p.klienOk; totalKlienNo += p.klienNo; });
-      const sumLitmas = totalLitmasOk + totalLitmasNo;
-      document.getElementById('lbl-g-litmas-persen').textContent = (sumLitmas > 0 ? ((totalLitmasOk / sumLitmas) * 100).toFixed(0) : 0) + "%";
-      document.getElementById('lbl-g-litmas-ok').textContent = totalLitmasOk;
-      document.getElementById('lbl-g-litmas-no').textContent = totalLitmasNo;
-      cGLitmas.data.datasets[0].data = [totalLitmasOk, totalLitmasNo]; cGLitmas.update();
-      const sumKlien = totalKlienOk + totalKlienNo;
-      document.getElementById('lbl-g-klien-persen').textContent = (sumKlien > 0 ? ((totalKlienOk / sumKlien) * 100).toFixed(0) : 0) + "%";
-      document.getElementById('lbl-g-klien-ok').textContent = totalKlienOk;
-      document.getElementById('lbl-g-klien-no').textContent = totalKlienNo;
-      cGKlien.data.datasets[0].data = [totalKlienOk, totalKlienNo]; cGKlien.update();
+    function aplikasikanAtributTema() {
+      const prim = document.getElementById('cp-primary').value; const sec = document.getElementById('cp-secondary').value; const bg = document.getElementById('cp-bg').value;
+      const font = document.getElementById('cp-font').value; const sizeTitle = document.getElementById('size-title').value + "px"; const sizeQueue = document.getElementById('size-queue').value + "px";
+      const compiledStyles = `:root { --primary-color: ${prim}; --secondary-color: ${sec}; --dark-bg: ${bg}; --panel-bg: #111827; --accent-green: #10b981; --accent-red: #ef4444; --accent-blue: #3b82f6; --card-bg: #111827; --font-family: ${font}; --font-size-title: ${sizeTitle}; --font-size-queue-num: ${sizeQueue}; }`;
+      document.getElementById('custom-theme-styles').innerHTML = compiledStyles; broadcastEngine.postMessage({ type: 'THEME_CHANGED', styles: compiledStyles });
     }
 
-    function renderIndividualPK() {
-      if(dbPK.length === 0) return;
-      const current = dbPK[idxPK % dbPK.length];
-      document.getElementById('infografis-nama').textContent = current.nama;
-      document.getElementById('infografis-index').textContent = `PK [${(idxPK % dbPK.length) + 1}/${dbPK.length}]`;
-      const totL = current.litmasOk + current.litmasNo;
-      document.getElementById('text-persen-litmas').textContent = (totL > 0 ? ((current.litmasOk / totL) * 100).toFixed(0) : 0) + "%";
-      document.getElementById('lbl-litmas-ok').textContent = current.litmasOk;
-      document.getElementById('lbl-litmas-no').textContent = current.litmasNo;
-      cLitmas.data.datasets[0].data = [current.litmasOk, current.litmasNo]; cLitmas.update();
-      const totK = current.klienOk + current.klienNo;
-      document.getElementById('text-persen-klien').textContent = (totK > 0 ? ((current.klienOk / totK) * 100).toFixed(0) : 0) + "%";
-      document.getElementById('lbl-klien-ok').textContent = current.klienOk;
-      document.getElementById('lbl-klien-no').textContent = current.klienNo;
-      cKlien.data.datasets[0].data = [current.klienOk, current.klienNo]; cKlien.update();
+    function resetAtributTemaKeAwal() {
+      inisialisasiNilaiDefaultCustomizer(); document.getElementById('cp-font').value = "'Segoe UI', sans-serif"; document.getElementById('size-title').value = 30; document.getElementById('size-queue').value = 54; aplikasikanAtributTema();
     }
 
-    window.addEventListener('click', () => { window.speechSynthesis.getVoices(); }, { once: true });
+    let cGLitmas, cGKlien, cGAnggaran, cGPegawai, cLitmas, cKlien;
+    function resetSlideTimer() {
+      clearInterval(autoSlideTimer);
+      autoSlideTimer = setInterval(() => {
+        document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
+        currentSlide = (currentSlide % 4) + 1;
+        if(document.getElementById(`slide-global-${currentSlide}`)) document.getElementById(`slide-global-${currentSlide}`).classList.add('active');
+      }, 7000);
+    }
+
+    function inisialisasiGrafikMulaMula() {
+      const opt = { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, cutout:'70%' };
+      cGLitmas = new Chart(document.getElementById('chartGLitmas'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:opt });
+      cGKlien = new Chart(document.getElementById('chartGKlien'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#3b82f6','#1f2937'],borderWidth:0}]}, options:opt });
+      cGAnggaran = new Chart(document.getElementById('chartGAnggaran'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#f4d35e','#1f2937'],borderWidth:0}]}, options:opt });
+      cGPegawai = new Chart(document.getElementById('chartGPegawai'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#1f2937'],borderWidth:0}]}, options:opt });
+      cLitmas = new Chart(document.getElementById('chartLitmas'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#10b981','#ef4444'],borderWidth:0}]}, options:opt });
+      cKlien = new Chart(document.getElementById('chartKlien'), { type:'doughnut', data:{datasets:[{data:[0,100],backgroundColor:['#3b82f6','#ef4444'],borderWidth:0}]}, options:opt });
+      resetSlideTimer(); setInterval(() => { if(dbPK.length > 0) gantiPKManual(1); }, 6000);
+    }
+
+    function aplikasikanDataKeGrafikChart(global) {
+      if(!global) return;
+      let lOk = 0, lNo = 0, kOk = 0, kNo = 0; 
+      dbPK.forEach(p => { lOk += p.litmasOk; lNo += p.litmasNo; kOk += p.klienOk; kNo += p.klienNo; });
+      
+      const totalL = lOk + lNo;
+      document.getElementById('lbl-g-litmas-persen').textContent = (totalL > 0 ? ((lOk / totalL) * 100).toFixed(0) : 0) + "%";
+      document.getElementById('lbl-g-litmas-ok').textContent = lOk; document.getElementById('lbl-g-litmas-no').textContent = lNo;
+      cGLitmas.data.datasets[0].data = [lOk, lNo]; cGLitmas.update();
+
+      const totalK = kOk + kNo;
+      document.getElementById('lbl-g-klien-persen').textContent = (totalK > 0 ? ((kOk / totalK) * 100).toFixed(0) : 0) + "%";
+      document.getElementById('lbl-g-klien-ok').textContent = kOk; document.getElementById('lbl-g-klien-no').textContent = kNo;
+      cGKlien.data.datasets[0].data = [kOk, kNo]; cGKlien.update();
+
+      if(global.anggaran) {
+        const { pagu, realisasi } = global.anggaran;
+        document.getElementById('lbl-g-anggaran-persen').textContent = (pagu > 0 ? ((realisasi / pagu) * 100).toFixed(1) : 0) + "%";
+        document.getElementById('lbl-g-anggaran-pagu').textContent = "Pagu: Rp " + pagu.toLocaleString('id-ID');
+        document.getElementById('lbl-g-anggaran-realisasi').textContent = "Realisasi: Rp " + realisasi.toLocaleString('id-ID');
+        cGAnggaran.data.datasets[0].data = [realisasi, pagu - realisasi > 0 ? pagu - realisasi : 0]; cGAnggaran.update();
+      }
+
+      if(global.pegawai) {
+        const { hadir, cuti, izin, dl } = global.pegawai; const absen = cuti + izin + dl; const totalPeg = hadir + absen;
+        document.getElementById('lbl-g-hadir-persen').textContent = (totalPeg > 0 ? ((hadir / totalPeg) * 100).toFixed(0) : 0) + "%";
+        document.getElementById('lbl-g-hadir-riil').textContent = hadir + " Pegawai (Hadir)";
+        document.getElementById('lbl-g-hadir-absen').textContent = `Absen: ${absen} (Cuti: ${cuti}, Izin: ${izin}, DL: ${dl})`;
+        cGPegawai.data.datasets[0].data = [hadir, absen]; cGPegawai.update();
+      }
+      
+      // Amankan eksekusi render PK jika array belum siap
+      if(dbPK.length > 0) {
+        if(!dbPK[idxPK]) idxPK = 0; 
+        renderProfilPKSpesifik();
+      }
+    }
   </script>
 </body>
 </html>
