@@ -8,22 +8,11 @@
   
   <style id="custom-theme-styles">
     :root {
-      --primary-color: #114b5f;
-      --secondary-color: #f4d35e;
-      --dark-bg: #0a0f1d;
-      --panel-bg: #111827;
-      --accent-green: #10b981;
-      --accent-red: #ef4444;
-      --accent-blue: #3b82f6;
-      --card-bg: #111827;
+      --primary-color: #114b5f; --secondary-color: #f4d35e; --dark-bg: #0a0f1d; --panel-bg: #111827;
+      --accent-green: #10b981; --accent-red: #ef4444; --accent-blue: #3b82f6; --card-bg: #111827;
       --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      
-      --font-size-title: 30px;
-      --font-size-subtitle: 16px;
-      --font-size-queue-label: 26px;
-      --font-size-queue-num: 54px;
-      --font-size-card-title: 15px;
-      --font-size-body: 14px;
+      --font-size-title: 30px; --font-size-subtitle: 16px; --font-size-queue-label: 26px; --font-size-queue-num: 54px;
+      --font-size-card-title: 15px; --font-size-body: 14px;
     }
   </style>
 
@@ -33,17 +22,9 @@
     .view-screen { display: none; width: 100%; }
     .view-screen.active-view { display: block; }
 
-    /* LAYOUT MONITOR DISPLAY UTAMA */
-    #main-display-screen {
-      width: 100%; height: 100vh; max-height: 1080px;
-      display: grid; grid-template-rows: 110px 1fr; grid-template-columns: 55% 45%;
-      background-color: var(--dark-bg); position: relative;
-    }
-    .header-display {
-      grid-column: 1 / span 2; background: linear-gradient(90deg, var(--primary-color), #1e293b);
-      border-bottom: 4px solid var(--secondary-color); padding: 0 40px;
-      display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
+    /* ====== MONITOR DISPLAY UTAMA ====== */
+    #main-display-screen { width: 100%; height: 100vh; max-height: 1080px; display: grid; grid-template-rows: 110px 1fr; grid-template-columns: 55% 45%; background-color: var(--dark-bg); position: relative; }
+    .header-display { grid-column: 1 / span 2; background: linear-gradient(90deg, var(--primary-color), #1e293b); border-bottom: 4px solid var(--secondary-color); padding: 0 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
     .header-brand-section { display: flex; align-items: center; gap: 20px; }
     .header-logo-img { height: 75px; width: auto; object-fit: contain; }
     .header-display h1 { font-size: var(--font-size-title); font-weight: 800; color: #ffffff; text-transform: uppercase; }
@@ -52,21 +33,15 @@
     .left-panel { grid-column: 1; padding: 25px; display: flex; flex-direction: column; background-color: #0b0f19; border-right: 2px solid #1f2937; gap: 15px; }
     .video-and-queue-container { display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr; flex-grow: 1; }
     .queue-display-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
-    .queue-ticket-card {
-      background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #374151; border-radius: 8px;
-      padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;
-    }
+    .queue-ticket-card { background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #374151; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
     .queue-ticket-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; }
-    .card-type-a::before { background-color: var(--secondary-color); }
-    .card-type-b::before { background-color: var(--accent-blue); }
-    .card-type-c::before { background-color: var(--accent-green); }
+    .card-type-a::before { background-color: var(--secondary-color); } .card-type-b::before { background-color: var(--accent-blue); } .card-type-c::before { background-color: var(--accent-green); }
     .queue-label { font-size: var(--font-size-queue-label); font-weight: 700; color: #9ca3af; text-transform: uppercase; }
     .queue-number-value { font-size: var(--font-size-queue-num); font-weight: 900; color: #ffffff; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
 
     .video-box-container { width: 100%; height: 100%; background-color: #000000; border-radius: 12px 12px 0 0; border: 2px solid #374151; overflow: hidden; position: relative; }
     #yt-player { width: 100%; height: 100%; border: none; }
     .playlist-indicator { position: absolute; bottom: 10px; left: 10px; background: rgba(0, 0, 0, 0.7); padding: 4px 10px; border-radius: 4px; font-size: 12px; z-index: 50; }
-
     .video-audio-controls { background-color: #111827; border: 2px solid #374151; border-radius: 0 0 12px 12px; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
     .audio-btn { background-color: #374151; color: #fff; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: var(--font-size-body); transition: background 0.2s; }
     .audio-btn:hover { background-color: #4b5563; }
@@ -83,7 +58,6 @@
     .slide-big-number { font-size: 50px; font-weight: 800; color: #ffffff; }
     .slide-details-list { font-size: var(--font-size-body); color: #9ca3af; line-height: 1.6; }
     .slide-chart-mini { width: 100px; height: 100px; position: relative; }
-
     .slide-nav-buttons { display: flex; gap: 6px; }
     .btn-slide-nav { background-color: #1e293b; color: #fff; border: 1px solid #334155; padding: 4px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     .btn-slide-nav:hover { background-color: var(--secondary-color); color: #000; }
@@ -103,7 +77,7 @@
     .bottom-trigger-control-zone { position: fixed; bottom: 15px; right: 25px; z-index: 99999; display: flex; gap: 15px; }
     .btn-trigger-public { background: #1f2937; color: #d1d5db; border: 2px solid #4b5563; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
-    /* ====== LOGIN & PANELS ====== */
+    /* ====== LOGIN & PANELS OPERATOR ====== */
     .auth-view-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); padding: 20px; }
     .auth-card { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); border: 2px solid #1e293b; border-radius: 16px; width: 100%; max-width: 450px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
     .auth-card h2 { font-size: 26px; font-weight: 800; text-align: center; color: #fff; margin-bottom: 30px; }
@@ -138,6 +112,10 @@
     .customizer-field { display: flex; flex-direction: column; gap: 8px; }
     .input-color-picker { width: 100%; height: 42px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; background: transparent; }
     .btn-reset-theme { background-color: var(--accent-red); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 20px; width: 100%; }
+    
+    .volume-box-panel { background-color: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .vol-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; font-size: 14px; }
+    .vol-slider-admin { flex-grow: 1; accent-color: var(--secondary-color); cursor: pointer; }
   </style>
 </head>
 <body>
@@ -156,7 +134,7 @@
           </div>
           <div style="text-align: right;">
             <div style="display: flex; gap: 15px; font-size: 30px; font-weight: 600; align-items: center;">
-              <div id="live-date">Kamis, 25 Jun 2026</div>
+              <div id="live-date">Memuat Tanggal...</div>
               <div id="live-clock">00:00:00</div>
             </div>
             <div style="font-size: 18px; color: var(--secondary-color); font-weight: bold; margin-top: 2px;">ZONA INTEGRITAS WBK/WBBM</div>
@@ -181,7 +159,7 @@
               <button class="audio-btn" onclick="toggleMute()">🔊 Unmute / Suara</button>
             </div>
             <div class="volume-slider-container">
-              <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
+              <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolumeManualLocal(this.value)">
             </div>
             <div style="display: flex; gap: 8px;">
               <button class="audio-btn" onclick="nextVideoManual()">>>>> Lewati</button>
@@ -195,10 +173,7 @@
             <div class="slide-container active" id="slide-global-1">
               <div class="slide-header-flex">
                 <div class="slide-title">📊 TOTAL CAPAIAN LITMAS (SELURUH PK)</div>
-                <div class="slide-nav-buttons">
-                  <button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button>
-                  <button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button>
-                </div>
+                <div class="slide-nav-buttons"><button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button><button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button></div>
               </div>
               <div class="slide-content-grid">
                 <div class="slide-details-list">
@@ -212,10 +187,7 @@
             <div class="slide-container" id="slide-global-2">
               <div class="slide-header-flex">
                 <div class="slide-title">👥 TOTAL KEPATUHAN WAJIB LAPOR KLIEN</div>
-                <div class="slide-nav-buttons">
-                  <button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button>
-                  <button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button>
-                </div>
+                <div class="slide-nav-buttons"><button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button><button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button></div>
               </div>
               <div class="slide-content-grid">
                 <div class="slide-details-list">
@@ -229,10 +201,7 @@
             <div class="slide-container" id="slide-global-3">
               <div class="slide-header-flex">
                 <div class="slide-title">💰 PERSENTASE REALISASI ANGGARAN BAPAS</div>
-                <div class="slide-nav-buttons">
-                  <button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button>
-                  <button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button>
-                </div>
+                <div class="slide-nav-buttons"><button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button><button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button></div>
               </div>
               <div class="slide-content-grid">
                 <div class="slide-details-list">
@@ -246,10 +215,7 @@
             <div class="slide-container" id="slide-global-4">
               <div class="slide-header-flex">
                 <div class="slide-title">🏢 KEDISIPLINAN & KEHADIRAN PEGAWAI HARI INI</div>
-                <div class="slide-nav-buttons">
-                  <button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button>
-                  <button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button>
-                </div>
+                <div class="slide-nav-buttons"><button class="btn-slide-nav" onclick="gantiSlideManual(-1)">◀ Prev</button><button class="btn-slide-nav" onclick="gantiSlideManual(1)">Next ▶</button></div>
               </div>
               <div class="slide-content-grid">
                 <div class="slide-details-list">
@@ -266,7 +232,7 @@
             <h3>STATISTIK PERFORMA PEMBIMBING KEMASYARAKATAN (PK)</h3>
             <div class="infographic-carousel-container">
               <div class="pk-profile-header">
-                <div class="pk-name-tag"><span id="infografis-nama">MEMUAT DATA...</span></div>
+                <div class="pk-name-tag"><span id="infografis-nama">MEMUAT DATA PK...</span></div>
                 <div class="slide-nav-buttons">
                   <button class="btn-slide-nav" onclick="gantiPKManual(-1)">◀ Prev</button>
                   <div class="pk-index-tag" id="infografis-index" style="display:inline-block; margin:0 5px;">PK [0/0]</div>
@@ -289,7 +255,6 @@
           </div>
         </div>
       </div>
-
       <div class="bottom-trigger-control-zone">
         <button class="btn-trigger-public" onclick="switchView('view-login-admin')">⚙️ Log Masuk Admin</button>
       </div>
@@ -311,14 +276,14 @@
     <div id="view-admin-dashboard" class="view-screen">
       <div class="admin-dashboard-view">
         <div class="admin-navbar">
-          <h2>⚙️ PANEL MANAJEMEN INDUK DISPLAY & PLAYLIST</h2>
-          <button class="audio-btn" style="background-color:var(--accent-red); padding:12px 24px;" onclick="switchView('view-main-display')">Keluar Panel</button>
+          <h2>⚙️ PANEL MANAJEMEN INDUK (MODE BISU/SILENT)</h2>
+          <button class="audio-btn" style="background-color:var(--accent-red); padding:12px 24px;" onclick="switchView('view-main-display')">Keluar & Mode Pengunjung</button>
         </div>
 
         <div class="admin-container">
           <div>
             <div class="admin-card-panel">
-              <h3>📌 MANIPULASI NOMOR ANTREAN AKTIF (DUAL-WINDOW SYNC)</h3>
+              <h3>📌 MANIPULASI NOMOR ANTREAN AKTIF</h3>
               <div class="grid-control-antrean" style="margin-bottom:20px;">
                 <div class="loket-control-box">
                   <div>Meja Konsultasi 1</div><div class="loket-number" id="admin-num-a">A-000</div>
@@ -345,7 +310,7 @@
                   </div>
                 </div>
               </div>
-              <button class="btn-block" style="background-color: var(--accent-red); padding:15px; font-size:16px; font-weight:800;" onclick="resetSeluruhAntreanAksi()">
+              <button class="btn-block" style="background-color: var(--accent-red); padding:15px; font-size:16px; font-weight:800; margin-bottom:20px;" onclick="resetSeluruhAntreanAksi()">
                 🔄 RESET SEMUA NOMOR ANTREAN MENJADI 000
               </button>
             </div>
@@ -353,6 +318,7 @@
             <div class="admin-card-panel">
               <h3>🎬 PLAYLIST VIDEO YOUTUBE & THUMBNAIL (SHEET SYNC)</h3>
               <div class="video-manager-list" id="admin-playlist-dom"></div>
+              
               <div style="display: flex; gap: 12px;">
                 <input type="text" id="txt-new-video-url" class="form-control" placeholder="Masukkan URL YouTube Baru...">
                 <button class="audio-btn" style="background-color:var(--accent-green); white-space:nowrap; padding:0 25px;" onclick="tambahVideoKePlaylist()">➕ Tambah</button>
@@ -363,10 +329,29 @@
           <div>
             <div class="admin-card-panel">
               <h3>📺 MULTI-WINDOW TELEVISI MONITOR</h3>
-              <button class="btn-block" style="padding:15px; margin-bottom:20px; font-size:16px; background-color:var(--accent-blue);" onclick="bukaJendelaDisplayPengunjung()">🖥️ Lontarkan Pop-up Layar Pengunjung</button>
+              <button class="btn-block" style="padding:15px; margin-bottom:12px; font-size:16px; background-color:var(--accent-blue);" onclick="bukaJendelaDisplayPengunjung()">🖥️ Buka Layar Pengunjung Baru</button>
+              <button class="btn-block" style="padding:15px; margin-bottom:20px; font-size:16px; background-color:#8b5cf6;" onclick="pemicuRemoteFullscreenLayarKedua()">
+                🖥️ Paksa Layar Pengunjung Masuk Fullscreen
+              </button>
               <a href="https://docs.google.com/spreadsheets/d/1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c/edit" target="_blank" class="btn-shortcut">
                 📊 Buka Lembar Kerja Google Sheets
               </a>
+            </div>
+
+            <div class="admin-card-panel">
+              <h3>🔊 SOUND & AUDIO CONTROLLER (REMOTE VOLUME)</h3>
+              <div class="volume-box-panel">
+                <div class="vol-row">
+                  <span style="width:130px; font-weight:bold; color:#cbd5e1;">Volume YouTube:</span>
+                  <input type="range" class="vol-slider-admin" id="admin-vol-yt" min="0" max="100" value="80" oninput="pemicuVolumeRemote('YT', this.value)">
+                  <span style="width:40px; text-align:right;" id="lbl-admin-vol-yt">80%</span>
+                </div>
+                <div class="vol-row">
+                  <span style="width:130px; font-weight:bold; color:#cbd5e1;">Volume Antrean:</span>
+                  <input type="range" class="vol-slider-admin" id="admin-vol-tts" min="0.1" max="1" step="0.1" value="1" oninput="pemicuVolumeRemote('TTS', this.value)">
+                  <span style="width:40px; text-align:right;" id="lbl-admin-vol-tts">100%</span>
+                </div>
+              </div>
             </div>
 
             <div class="admin-card-panel">
@@ -390,7 +375,7 @@
             </div>
 
             <div class="admin-card-panel" style="font-size:13px; color:#94a3b8;">
-              Status Hubungan Cloud: <span id="sync-status-text" style="color:var(--accent-blue); font-weight:bold;">Menghubungkan...</span>
+              Status Hubungan Cloud: <span id="sync-status-text" style="color:var(--accent-red); font-weight:bold;">Menghubungkan Ke Cloud...</span>
             </div>
           </div>
         </div>
@@ -400,8 +385,13 @@
   </div>
 
   <script>
+    // MASUKKAN URL APP SCRIPT BARU ANDA DI SINI
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
     
+    // Status Proteksi Data Awal
+    let isDataLoaded = false;
+    let isDisplayMode = true; // Jika True = Suara TTS Boleh Nyala (Mode Pengunjung)
+
     let dataAntreanLokal = { A: 0, B: 0, C: 0 };
     let localVideoQueue = [];
     let currentQueueIndex = 0;
@@ -410,21 +400,47 @@
     let currentSlide = 1;
     let idxPK = 0;
     let autoSlideTimer = null;
+    
+    let globalVolumeYTAudio = 80;
+    let globalVolumeTTSAudio = 1;
 
+    // FUNGSI TANGGAL DINAMIS OTOMATIS BERJALAN
+    function startClockAndDate() {
+      const now = new Date();
+      if(document.getElementById('live-clock')) {
+        document.getElementById('live-clock').textContent = now.toLocaleTimeString('id-ID', {hour12: false});
+      }
+      if(document.getElementById('live-date')) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('live-date').textContent = now.toLocaleDateString('id-ID', options);
+      }
+    }
+    setInterval(startClockAndDate, 1000);
+    startClockAndDate();
+
+    // ENGINE BROADCAST (Untuk Antar Tab dalam 1 Komputer)
     const broadcastEngine = new BroadcastChannel('bapas_purwokerto_broadcast_system');
 
     broadcastEngine.onmessage = (event) => {
       if (event.data.type === 'SYNC_ALL_STATE') {
         dataAntreanLokal = event.data.antrean;
         localVideoQueue = event.data.playlist;
-        renderSeluruhDataKeLayar();
+        if (isDataLoaded) renderSeluruhDataKeLayar();
       }
-      if (event.data.type === 'TRIGGER_VOICE_CALL') {
-        eksekusiSuaraLokal(event.data.loket);
+      if (event.data.type === 'TRIGGER_VOICE_CALL' && isDisplayMode) {
+        eksekusiSuaraLokal(event.data.loket, dataAntreanLokal[event.data.loket]); 
       }
-      if (event.data.type === 'THEME_CHANGED') {
-        document.getElementById('custom-theme-styles').innerHTML = event.data.styles;
+      if (event.data.type === 'THEME_CHANGED') { document.getElementById('custom-theme-styles').innerHTML = event.data.styles; }
+      if (event.data.type === 'VOLUME_REMOTE_SET') {
+        if (event.data.audioJenis === 'YT') {
+          globalVolumeYTAudio = event.data.value;
+          if (document.getElementById('volume-control')) document.getElementById('volume-control').value = globalVolumeYTAudio;
+          setVolumeVideoEngine(globalVolumeYTAudio);
+        } else if (event.data.audioJenis === 'TTS') {
+          globalVolumeTTSAudio = event.data.value;
+        }
       }
+      if (event.data.type === 'FORCE_FULLSCREEN_WINDOW' && isDisplayMode) { openFullscreenDisplay(); }
     };
 
     function pancarkanStateKeJendelaLain(triggerVoice = false, loketVoice = '') {
@@ -432,68 +448,66 @@
       if(triggerVoice) broadcastEngine.postMessage({ type: 'TRIGGER_VOICE_CALL', loket: loketVoice });
     }
 
-    function bukaJendelaDisplayPengunjung() {
-      window.open(window.location.href, '_blank', 'width=1920,height=1080,menubar=no,status=no');
-      setTimeout(() => { pancarkanStateKeJendelaLain(); aplikasikanAtributTema(); }, 1000);
+    function pemicuVolumeRemote(jenis, val) {
+      if(jenis === 'YT') document.getElementById('lbl-admin-vol-yt').textContent = val + "%";
+      if(jenis === 'TTS') document.getElementById('lbl-admin-vol-tts').textContent = (val * 100) + "%";
+      broadcastEngine.postMessage({ type: 'VOLUME_REMOTE_SET', audioJenis: jenis, value: parseFloat(val) });
     }
 
-    function openFullscreenDisplay() {
-      const el = document.getElementById("main-display-screen");
-      if (el.requestFullscreen) el.requestFullscreen();
-      else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-    }
-
-    setInterval(() => {
-      if(document.getElementById('live-clock')) document.getElementById('live-clock').textContent = new Date().toLocaleTimeString('id-ID');
-    }, 1000);
+    function pemicuRemoteFullscreenLayarKedua() { broadcastEngine.postMessage({ type: 'FORCE_FULLSCREEN_WINDOW' }); }
 
     function switchView(viewId) {
       document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active-view'));
       document.getElementById(viewId).classList.add('active-view');
-      if(viewId === 'view-main-display') renderSeluruhDataKeLayar();
+      
+      if(viewId === 'view-main-display') {
+        isDisplayMode = true;
+        if (isDataLoaded) renderSeluruhDataKeLayar();
+      } else {
+        isDisplayMode = false; // Mode Bisu di Admin Panel
+      }
     }
 
     function changeAntreanLokal(loket, step) {
+      if(!isDataLoaded) return;
       dataAntreanLokal[loket] += step;
       if (dataAntreanLokal[loket] < 0) dataAntreanLokal[loket] = 0;
+      
       renderSeluruhDataKeLayar();
-      pancarkanStateKeJendelaLain();
-      if(step > 0) pemicuSuaraPanggil(loket);
       komitDataKeCloud({ aksi: 'update_antrean', data: dataAntreanLokal });
+      
+      if(step > 0) { pancarkanStateKeJendelaLain(true, loket); }
+      else { pancarkanStateKeJendelaLain(false); }
     }
 
     function resetSeluruhAntreanAksi() {
       if(!confirm("Apakah Anda yakin ingin mereset seluruh nomor antrean menjadi 000?")) return;
       dataAntreanLokal = { A: 0, B: 0, C: 0 };
-      renderSeluruhDataKeLayar();
-      pancarkanStateKeJendelaLain();
+      renderSeluruhDataKeLayar(); pancarkanStateKeJendelaLain();
       komitDataKeCloud({ aksi: 'reset_antrean', data: dataAntreanLokal });
     }
 
     function pemicuSuaraPanggil(loket) {
-      eksekusiSuaraLokal(loket);
-      pancarkanStateKeJendelaLain(true, loket);
+      pancarkanStateKeJendelaLain(true, loket); // Trigger panggil ulang tanpa menambah nomor
     }
 
+    // MANAJEMEN YOUTUBE
     function ekstrakIDYoutube(url) {
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-      const match = url.match(regExp);
-      return (match && match[2].length === 11) ? match[2] : null;
+      const match = url.match(regExp); return (match && match[2].length === 11) ? match[2] : null;
     }
 
     function tambahVideoKePlaylist() {
-      const input = document.getElementById('txt-new-video-url');
-      const url = input.value.trim();
+      const input = document.getElementById('txt-new-video-url'); const url = input.value.trim();
       if(!url) return;
-      localVideoQueue.push(url);
-      input.value = '';
-      renderSeluruhDataKeLayar();
-      pancarkanStateKeJendelaLain();
+      localVideoQueue.push(url); input.value = '';
+      if(isDataLoaded) renderSeluruhDataKeLayar(); pancarkanStateKeJendelaLain();
       komitDataKeCloud({ aksi: 'tambah_video', url: url });
       if(localVideoQueue.length === 1) memuatInstalasiVideoYouTube();
     }
 
     function renderSeluruhDataKeLayar() {
+      if(!isDataLoaded) return; // Lindungi jika data dari server belum tiba
       const pad = (n) => n.toString().padStart(3, '0');
       ['A', 'B', 'C'].forEach(k => {
         const teks = `${k}-${pad(dataAntreanLokal[k])}`;
@@ -521,58 +535,55 @@
       resetSlideTimer();
       document.querySelectorAll('.global-slideshow-box .slide-container').forEach(s => s.classList.remove('active'));
       currentSlide = currentSlide + arah;
-      if (currentSlide > 4) currentSlide = 1;
-      if (currentSlide < 1) currentSlide = 4;
+      if (currentSlide > 4) currentSlide = 1; if (currentSlide < 1) currentSlide = 4;
       if(document.getElementById(`slide-global-${currentSlide}`)) document.getElementById(`slide-global-${currentSlide}`).classList.add('active');
     }
 
     function gantiPKManual(arah) {
       if(dbPK.length === 0) return;
       idxPK = idxPK + arah;
-      if (idxPK >= dbPK.length) idxPK = 0;
-      if (idxPK < 0) idxPK = dbPK.length - 1;
+      if (idxPK >= dbPK.length) idxPK = 0; if (idxPK < 0) idxPK = dbPK.length - 1;
       renderProfilPKSpesifik();
     }
 
     function renderProfilPKSpesifik() {
-      if(dbPK.length === 0 || !dbPK[idxPK]) return;
+      if(dbPK.length === 0 || !dbPK[idxPK]) {
+        document.getElementById('infografis-nama').textContent = "BELUM ADA DATA PK";
+        return;
+      }
       const pk = dbPK[idxPK];
       document.getElementById('infografis-nama').textContent = pk.nama;
       document.getElementById('infografis-index').textContent = `PK [${idxPK + 1}/${dbPK.length}]`;
       
       const totL = pk.litmasOk + pk.litmasNo;
       document.getElementById('text-persen-litmas').textContent = (totL > 0 ? ((pk.litmasOk / totL) * 100).toFixed(0) : 0) + "%";
-      document.getElementById('ind-litmas-ok').textContent = pk.litmasOk;
-      document.getElementById('ind-litmas-no').textContent = pk.litmasNo;
+      document.getElementById('ind-litmas-ok').textContent = pk.litmasOk; document.getElementById('ind-litmas-no').textContent = pk.litmasNo;
       cLitmas.data.datasets[0].data = [pk.litmasOk, pk.litmasNo]; cLitmas.update();
 
       const totK = pk.klienOk + pk.klienNo;
       document.getElementById('text-persen-klien').textContent = (totK > 0 ? ((pk.klienOk / totK) * 100).toFixed(0) : 0) + "%";
-      document.getElementById('ind-klien-ok').textContent = pk.klienOk;
-      document.getElementById('ind-klien-no').textContent = pk.klienNo;
+      document.getElementById('ind-klien-ok').textContent = pk.klienOk; document.getElementById('ind-klien-no').textContent = pk.klienNo;
       cKlien.data.datasets[0].data = [pk.klienOk, pk.klienNo]; cKlien.update();
     }
 
     function komitDataKeCloud(payload) {
       if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Mengirim...";
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain' }, 
-        body: JSON.stringify(payload)
-      }).then(() => {
-        if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Tersinkronisasi";
-      });
+      fetch(SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(payload) })
+      .then(() => { if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Sinkron"; })
+      .catch((e) => console.log("Gagal post data", e));
     }
 
+    // PENARIKAN DATA POLLING & SENSOR MULTI-KOMPUTER
     function unduhDataTerbaruDariCloud() {
-      fetch(SCRIPT_URL)
-        .then(res => res.json())
+      fetch(SCRIPT_URL, { redirect: 'follow' })
+        .then(res => { if (!res.ok) throw new Error("Akses URL Gagal. HTTP " + res.status); return res.json(); })
         .then(res => {
-          if (res.status !== "success") return;
+          if (res.status !== "success") throw new Error(res.message);
           
+          let priorQueueState = { A: dataAntreanLokal.A, B: dataAntreanLokal.B, C: dataAntreanLokal.C };
+
           if (res.antrean) dataAntreanLokal = res.antrean;
           if (res.videos && res.videos.length > 0) {
-            // Cek jika jumlah playlist berubah dari cloud untuk re-init player youtube
             const isChanged = localVideoQueue.length !== res.videos.length;
             localVideoQueue = res.videos;
             if(isChanged && isYtApiReady) memuatInstalasiVideoYouTube();
@@ -581,19 +592,30 @@
           
           dbPK = res.data_pk || [];
           aplikasikanDataKeGrafikChart(res.global);
-          renderSeluruhDataKeLayar();
           
-          if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Cloud Online";
-        }).catch(() => {
-          if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Offline Mode";
+          // Sistem cerdas deteksi perubahan data (Beda Komputer)
+          if (isDataLoaded && isDisplayMode) {
+             if (res.antrean.A > priorQueueState.A) eksekusiSuaraLokal('A', res.antrean.A);
+             else if (res.antrean.B > priorQueueState.B) eksekusiSuaraLokal('B', res.antrean.B);
+             else if (res.antrean.C > priorQueueState.C) eksekusiSuaraLokal('C', res.antrean.C);
+          }
+
+          isDataLoaded = true; // Tandai data pertama sukses ditarik (Ganti dari 000 ke Data DB)
+          renderSeluruhDataKeLayar(); 
+          
+          let textStatus = document.getElementById('sync-status-text');
+          if(textStatus) { textStatus.textContent = "Data Berhasil Terhubung (Polling ON)"; textStatus.style.color = "var(--accent-green)"; }
+        }).catch((err) => {
+          let textStatus = document.getElementById('sync-status-text');
+          if(textStatus) { textStatus.textContent = "Error: Cek Deploy Akses = 'Anyone'"; textStatus.style.color = "var(--accent-red)"; }
         });
     }
 
-    // ENGINE YOUTUBE
     let ytPlayerObj = null; let isYtApiReady = false;
     window.addEventListener('DOMContentLoaded', () => {
       const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(tag);
-      inisialisasiNilaiDefaultCustomizer(); inisialisasiGrafikMulaMula(); unduhDataTerbaruDariCloud();
+      inisialisasiNilaiDefaultCustomizer(); inisialisasiGrafikMulaMula(); 
+      unduhDataTerbaruDariCloud();
       setInterval(unduhDataTerbaruDariCloud, 10000); 
     });
 
@@ -611,7 +633,7 @@
         ytPlayerObj = new YT.Player('yt-player', {
           videoId: videoId, playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'origin': window.location.origin },
           events: {
-            'onReady': (e) => { e.target.mute(); e.target.playVideo(); updateQueueIndicator(); },
+            'onReady': (e) => { e.target.setVolume(globalVolumeYTAudio); e.target.playVideo(); updateQueueIndicator(); },
             'onStateChange': (e) => { if (e.data === 0) { currentQueueIndex++; memuatInstalasiVideoYouTube(); } if (e.data === -1) e.target.playVideo(); },
             'onError': () => { currentQueueIndex++; memuatInstalasiVideoYouTube(); }
           }
@@ -624,10 +646,15 @@
       if(label && localVideoQueue.length > 0) label.textContent = `Memutar Video [${(currentQueueIndex % localVideoQueue.length) + 1}/${localVideoQueue.length}]`;
     }
 
-    function nextVideoManual() { if(localVideoQueue.length > 0) { currentQueueIndex++; memuatInstalasiVideoYouTube(); } }
+    function nextVideoManual() {
+      if (localVideoQueue.length === 0) return;
+      currentQueueIndex++; if (currentQueueIndex >= localVideoQueue.length) currentQueueIndex = 0; memuatInstalasiVideoYouTube();
+    }
+    
     function togglePlayPause() { if(ytPlayerObj) ytPlayerObj.getPlayerState() === 1 ? ytPlayerObj.pauseVideo() : ytPlayerObj.playVideo(); }
     function toggleMute() { if(ytPlayerObj) ytPlayerObj.isMuted() ? ytPlayerObj.unMute() : ytPlayerObj.mute(); }
-    function setVolume(v) { if(ytPlayerObj) ytPlayerObj.setVolume(v); }
+    function setVolumeManualLocal(v) { globalVolumeYTAudio = v; setVolumeVideoEngine(v); }
+    function setVolumeVideoEngine(v) { if(ytPlayerObj && typeof ytPlayerObj.setVolume === 'function') ytPlayerObj.setVolume(v); }
 
     function processLogin() {
       const u = document.getElementById('txt-username').value.trim(); const p = document.getElementById('txt-password').value.trim();
@@ -637,14 +664,18 @@
       else { document.getElementById('login-error-msg').style.display = 'block'; }
     }
 
-    function eksekusiSuaraLokal(loket) {
-      const nomorInt = dataAntreanLokal[loket]; let namaLoket = loket === 'A' ? "Meja Konsultasi 1" : loket === 'B' ? "Meja Konsultasi 2" : "Ruang Registrasi";
+    // TTS PANGGILAN SUARA (DIISOLASI)
+    function eksekusiSuaraLokal(loket, nomorInt) {
+      if (!isDisplayMode) return; // Aman: Bisu di Admin Panel
+      let namaLoket = loket === 'A' ? "Meja Konsultasi 1" : loket === 'B' ? "Meja Konsultasi 2" : "Ruang Registrasi";
       try {
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
         osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.2);
         setTimeout(() => {
           let kalimat = `Nomor antrean ${loket} ${nomorInt.toString().split("").join(" ")}, silahkan menuju ke ${namaLoket}`;
-          let utterance = new SpeechSynthesisUtterance(kalimat); utterance.lang = 'id-ID'; utterance.rate = 0.85; window.speechSynthesis.speak(utterance);
+          let utterance = new SpeechSynthesisUtterance(kalimat); 
+          utterance.lang = 'id-ID'; utterance.rate = 0.85; utterance.volume = globalVolumeTTSAudio; 
+          window.speechSynthesis.speak(utterance);
         }, 300);
       } catch(e){}
     }
@@ -662,6 +693,15 @@
 
     function resetAtributTemaKeAwal() {
       inisialisasiNilaiDefaultCustomizer(); document.getElementById('cp-font').value = "'Segoe UI', sans-serif"; document.getElementById('size-title').value = 30; document.getElementById('size-queue').value = 54; aplikasikanAtributTema();
+    }
+
+    function bukaJendelaDisplayPengunjung() {
+      window.open(window.location.href, '_blank', 'width=1920,height=1080,menubar=no,status=no');
+      setTimeout(() => { pancarkanStateKeJendelaLain(); aplikasikanAtributTema(); }, 1000);
+    }
+    function openFullscreenDisplay() {
+      const el = document.getElementById("main-display-screen");
+      if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
     }
 
     let cGLitmas, cGKlien, cGAnggaran, cGPegawai, cLitmas, cKlien;
@@ -716,11 +756,7 @@
         cGPegawai.data.datasets[0].data = [hadir, absen]; cGPegawai.update();
       }
       
-      // Amankan eksekusi render PK jika array belum siap
-      if(dbPK.length > 0) {
-        if(!dbPK[idxPK]) idxPK = 0; 
-        renderProfilPKSpesifik();
-      }
+      if(dbPK.length > 0) { if(!dbPK[idxPK]) idxPK = 0; renderProfilPKSpesifik(); }
     }
   </script>
 </body>
