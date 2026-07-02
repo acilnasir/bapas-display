@@ -103,7 +103,7 @@
     .bottom-trigger-control-zone { position: fixed; bottom: 15px; right: 25px; z-index: 99999; display: flex; gap: 15px; }
     .btn-trigger-public { background: #1f2937; color: #d1d5db; border: 2px solid #4b5563; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 6px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
 
-    /* ====== LOGIN & OPERATOR PANELS ====== */
+    /* ====== LOGIN & PANELS ====== */
     .auth-view-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); padding: 20px; }
     .auth-card { background: rgba(17, 24, 39, 0.8); backdrop-filter: blur(12px); border: 2px solid #1e293b; border-radius: 16px; width: 100%; max-width: 450px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
     .auth-card h2 { font-size: 26px; font-weight: 800; text-align: center; color: #fff; margin-bottom: 30px; }
@@ -138,10 +138,6 @@
     .customizer-field { display: flex; flex-direction: column; gap: 8px; }
     .input-color-picker { width: 100%; height: 42px; border: 1px solid #334155; border-radius: 8px; cursor: pointer; background: transparent; }
     .btn-reset-theme { background-color: var(--accent-red); color: white; border: none; padding: 14px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 20px; width: 100%; }
-    
-    .volume-box-panel { background-color: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-    .vol-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; font-size: 14px; }
-    .vol-slider-admin { flex-grow: 1; accent-color: var(--secondary-color); cursor: pointer; }
   </style>
 </head>
 <body>
@@ -185,7 +181,7 @@
               <button class="audio-btn" onclick="toggleMute()">🔊 Unmute / Suara</button>
             </div>
             <div class="volume-slider-container">
-              <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolumeManualLocal(this.value)">
+              <input type="range" class="volume-slider" id="volume-control" min="0" max="100" step="5" value="80" oninput="setVolume(this.value)">
             </div>
             <div style="display: flex; gap: 8px;">
               <button class="audio-btn" onclick="nextVideoManual()">>>>> Lewati</button>
@@ -349,7 +345,7 @@
                   </div>
                 </div>
               </div>
-              <button class="btn-block" style="background-color: var(--accent-red); padding:15px; font-size:16px; font-weight:800; margin-bottom:20px;" onclick="resetSeluruhAntreanAksi()">
+              <button class="btn-block" style="background-color: var(--accent-red); padding:15px; font-size:16px; font-weight:800;" onclick="resetSeluruhAntreanAksi()">
                 🔄 RESET SEMUA NOMOR ANTREAN MENJADI 000
               </button>
             </div>
@@ -357,15 +353,9 @@
             <div class="admin-card-panel">
               <h3>🎬 PLAYLIST VIDEO YOUTUBE & THUMBNAIL (SHEET SYNC)</h3>
               <div class="video-manager-list" id="admin-playlist-dom"></div>
-              
-              <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; gap: 12px;">
                 <input type="text" id="txt-new-video-url" class="form-control" placeholder="Masukkan URL YouTube Baru...">
-                
-                <div style="display: flex; gap: 10px; width: 100%;">
-                  <button class="audio-btn" style="background-color:var(--accent-green); flex-grow: 2;" onclick="tambahVideoKePlaylist()">➕ Tambah Video</button>
-                  <button class="audio-btn" style="background-color:#475569; flex-grow: 1;" onclick="pemicuNavigasiVideoRemote(-1)">⏮ Video Sblmnya</button>
-                  <button class="audio-btn" style="background-color:#475569; flex-grow: 1;" onclick="pemicuNavigasiVideoRemote(1)">⏭ Video Slanjutnya</button>
-                </div>
+                <button class="audio-btn" style="background-color:var(--accent-green); white-space:nowrap; padding:0 25px;" onclick="tambahVideoKePlaylist()">➕ Tambah</button>
               </div>
             </div>
           </div>
@@ -373,29 +363,10 @@
           <div>
             <div class="admin-card-panel">
               <h3>📺 MULTI-WINDOW TELEVISI MONITOR</h3>
-              <button class="btn-block" style="padding:15px; margin-bottom:12px; font-size:16px; background-color:var(--accent-blue);" onclick="bukaJendelaDisplayPengunjung()">🖥️ Lontarkan Pop-up Layar Pengunjung</button>
-              <button class="btn-block" style="padding:15px; margin-bottom:20px; font-size:16px; background-color:#8b5cf6;" onclick="pemicuRemoteFullscreenLayarKedua()">
-                🖥️ Paksa Layar Pengunjung Masuk Fullscreen
-              </button>
+              <button class="btn-block" style="padding:15px; margin-bottom:20px; font-size:16px; background-color:var(--accent-blue);" onclick="bukaJendelaDisplayPengunjung()">🖥️ Lontarkan Pop-up Layar Pengunjung</button>
               <a href="https://docs.google.com/spreadsheets/d/1RrXrPVrguqbWElAIwJSidam1r0X_i646_oNgnMF9I-c/edit" target="_blank" class="btn-shortcut">
                 📊 Buka Lembar Kerja Google Sheets
               </a>
-            </div>
-
-            <div class="admin-card-panel">
-              <h3>🔊 SOUND & AUDIO CONTROLLER (REMOTE VOLUME)</h3>
-              <div class="volume-box-panel">
-                <div class="vol-row">
-                  <span style="width:130px; font-weight:bold; color:#cbd5e1;">Volume YouTube:</span>
-                  <input type="range" class="vol-slider-admin" id="admin-vol-yt" min="0" max="100" value="80" oninput="pemicuVolumeRemote('YT', this.value)">
-                  <span style="width:40px; text-align:right;" id="lbl-admin-vol-yt">80%</span>
-                </div>
-                <div class="vol-row">
-                  <span style="width:130px; font-weight:bold; color:#cbd5e1;">Volume Antrean:</span>
-                  <input type="range" class="vol-slider-admin" id="admin-vol-tts" min="0.1" max="1" step="0.1" value="1" oninput="pemicuVolumeRemote('TTS', this.value)">
-                  <span style="width:40px; text-align:right;" id="lbl-admin-vol-tts">100%</span>
-                </div>
-              </div>
             </div>
 
             <div class="admin-card-panel">
@@ -429,6 +400,8 @@
   </div>
 
   <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwuFESEjOk1sY3uvhm6b9cbogilnt7vLHzlMUSYPQHHkbVGVg9D6PV300XF1MbWeUDHeA/exec";
+    
     let dataAntreanLokal = { A: 0, B: 0, C: 0 };
     let localVideoQueue = [];
     let currentQueueIndex = 0;
@@ -437,9 +410,6 @@
     let currentSlide = 1;
     let idxPK = 0;
     let autoSlideTimer = null;
-    
-    let globalVolumeYTAudio = 80;
-    let globalVolumeTTSAudio = 1;
 
     const broadcastEngine = new BroadcastChannel('bapas_purwokerto_broadcast_system');
 
@@ -455,50 +425,11 @@
       if (event.data.type === 'THEME_CHANGED') {
         document.getElementById('custom-theme-styles').innerHTML = event.data.styles;
       }
-      if (event.data.type === 'VOLUME_REMOTE_SET') {
-        if (event.data.audioJenis === 'YT') {
-          globalVolumeYTAudio = event.data.value;
-          if (document.getElementById('volume-control')) document.getElementById('volume-control').value = globalVolumeYTAudio;
-          setVolumeVideoEngine(globalVolumeYTAudio);
-        } else if (event.data.audioJenis === 'TTS') {
-          globalVolumeTTSAudio = event.data.value;
-        }
-      }
-      if (event.data.type === 'FORCE_FULLSCREEN_WINDOW') {
-        openFullscreenDisplay();
-      }
-      
-      // Sinyal Navigasi Video Jarak Jauh Diterima Oleh Monitor Display Pengunjung
-      if (event.data.type === 'NAVIGATE_VIDEO_REMOTE') {
-        gantiVideoManualJarakJauh(event.data.direction);
-      }
     };
 
     function pancarkanStateKeJendelaLain(triggerVoice = false, loketVoice = '') {
       broadcastEngine.postMessage({ type: 'SYNC_ALL_STATE', antrean: dataAntreanLokal, playlist: localVideoQueue });
       if(triggerVoice) broadcastEngine.postMessage({ type: 'TRIGGER_VOICE_CALL', loket: loketVoice });
-    }
-
-    function pemicuVolumeRemote(jenis, val) {
-      if(jenis === 'YT') document.getElementById('lbl-admin-vol-yt').textContent = val + "%";
-      if(jenis === 'TTS') document.getElementById('lbl-admin-vol-tts').textContent = (val * 100) + "%";
-      broadcastEngine.postMessage({ type: 'VOLUME_REMOTE_SET', audioJenis: jenis, value: parseFloat(val) });
-    }
-
-    function pemicuRemoteFullscreenLayarKedua() {
-      broadcastEngine.postMessage({ type: 'FORCE_FULLSCREEN_WINDOW' });
-    }
-
-    // Fungsi Pemicu Broadcast Navigasi Video Jarak Jauh dari Sisi Admin Panel
-    function pemicuNavigasiVideoRemote(arah) {
-      broadcastEngine.postMessage({ type: 'NAVIGATE_VIDEO_REMOTE', direction: arah });
-    }
-
-    function gantiVideoManualJarakJauh(arah) {
-      if (localVideoQueue.length === 0) return;
-      currentQueueIndex = currentQueueIndex + arah;
-      if (currentQueueIndex < 0) currentQueueIndex = localVideoQueue.length - 1;
-      memuatInstalasiVideoYouTube();
     }
 
     function bukaJendelaDisplayPengunjung() {
@@ -638,8 +569,10 @@
         .then(res => res.json())
         .then(res => {
           if (res.status !== "success") return;
+          
           if (res.antrean) dataAntreanLokal = res.antrean;
           if (res.videos && res.videos.length > 0) {
+            // Cek jika jumlah playlist berubah dari cloud untuk re-init player youtube
             const isChanged = localVideoQueue.length !== res.videos.length;
             localVideoQueue = res.videos;
             if(isChanged && isYtApiReady) memuatInstalasiVideoYouTube();
@@ -649,6 +582,7 @@
           dbPK = res.data_pk || [];
           aplikasikanDataKeGrafikChart(res.global);
           renderSeluruhDataKeLayar();
+          
           if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Cloud Online";
         }).catch(() => {
           if(document.getElementById('sync-status-text')) document.getElementById('sync-status-text').textContent = "Offline Mode";
@@ -677,7 +611,7 @@
         ytPlayerObj = new YT.Player('yt-player', {
           videoId: videoId, playerVars: { 'autoplay': 1, 'controls': 0, 'rel': 0, 'origin': window.location.origin },
           events: {
-            'onReady': (e) => { e.target.setVolume(globalVolumeYTAudio); e.target.playVideo(); updateQueueIndicator(); },
+            'onReady': (e) => { e.target.mute(); e.target.playVideo(); updateQueueIndicator(); },
             'onStateChange': (e) => { if (e.data === 0) { currentQueueIndex++; memuatInstalasiVideoYouTube(); } if (e.data === -1) e.target.playVideo(); },
             'onError': () => { currentQueueIndex++; memuatInstalasiVideoYouTube(); }
           }
@@ -690,11 +624,10 @@
       if(label && localVideoQueue.length > 0) label.textContent = `Memutar Video [${(currentQueueIndex % localVideoQueue.length) + 1}/${localVideoQueue.length}]`;
     }
 
-    function nextVideoManual() { gantiVideoManualJarakJauh(1); }
+    function nextVideoManual() { if(localVideoQueue.length > 0) { currentQueueIndex++; memuatInstalasiVideoYouTube(); } }
     function togglePlayPause() { if(ytPlayerObj) ytPlayerObj.getPlayerState() === 1 ? ytPlayerObj.pauseVideo() : ytPlayerObj.playVideo(); }
     function toggleMute() { if(ytPlayerObj) ytPlayerObj.isMuted() ? ytPlayerObj.unMute() : ytPlayerObj.mute(); }
-    function setVolumeManualLocal(v) { globalVolumeYTAudio = v; setVolumeVideoEngine(v); }
-    function setVolumeVideoEngine(v) { if(ytPlayerObj && typeof ytPlayerObj.setVolume === 'function') ytPlayerObj.setVolume(v); }
+    function setVolume(v) { if(ytPlayerObj) ytPlayerObj.setVolume(v); }
 
     function processLogin() {
       const u = document.getElementById('txt-username').value.trim(); const p = document.getElementById('txt-password').value.trim();
@@ -711,10 +644,7 @@
         osc.connect(g); g.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.2);
         setTimeout(() => {
           let kalimat = `Nomor antrean ${loket} ${nomorInt.toString().split("").join(" ")}, silahkan menuju ke ${namaLoket}`;
-          let utterance = new SpeechSynthesisUtterance(kalimat); 
-          utterance.lang = 'id-ID'; utterance.rate = 0.85; 
-          utterance.volume = globalVolumeTTSAudio; 
-          window.speechSynthesis.speak(utterance);
+          let utterance = new SpeechSynthesisUtterance(kalimat); utterance.lang = 'id-ID'; utterance.rate = 0.85; window.speechSynthesis.speak(utterance);
         }, 300);
       } catch(e){}
     }
@@ -757,7 +687,8 @@
 
     function aplikasikanDataKeGrafikChart(global) {
       if(!global) return;
-      let lOk = 0, lNo = 0, kOk = 0, kNo = 0; dbPK.forEach(p => { lOk += p.litmasOk; lNo += p.litmasNo; kOk += p.klienOk; kNo += p.klienNo; });
+      let lOk = 0, lNo = 0, kOk = 0, kNo = 0; 
+      dbPK.forEach(p => { lOk += p.litmasOk; lNo += p.litmasNo; kOk += p.klienOk; kNo += p.klienNo; });
       
       const totalL = lOk + lNo;
       document.getElementById('lbl-g-litmas-persen').textContent = (totalL > 0 ? ((lOk / totalL) * 100).toFixed(0) : 0) + "%";
@@ -784,7 +715,12 @@
         document.getElementById('lbl-g-hadir-absen').textContent = `Absen: ${absen} (Cuti: ${cuti}, Izin: ${izin}, DL: ${dl})`;
         cGPegawai.data.datasets[0].data = [hadir, absen]; cGPegawai.update();
       }
-      if(dbPK.length > 0) { if(!dbPK[idxPK]) idxPK = 0; renderProfilPKSpesifik(); }
+      
+      // Amankan eksekusi render PK jika array belum siap
+      if(dbPK.length > 0) {
+        if(!dbPK[idxPK]) idxPK = 0; 
+        renderProfilPKSpesifik();
+      }
     }
   </script>
 </body>
