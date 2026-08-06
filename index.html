@@ -114,8 +114,8 @@
         <div class="header-brand-section">
           <img id="display-header-logo" src="https://lh3.googleusercontent.com/d/1xHFp8MzEzoQ-Ron8SgP38U9D5-1e2M83" class="header-logo-img" alt="Logo">
           <div>
-            <h1 id="disp-nama-instansi">BALAI PEMASYARAKATAN KELAS II PURWOKERTO</h1>
-            <p id="disp-alamat-instansi">Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Jawa Tengah</p>
+            <h1 id="disp-nama-instansi">Memuat Nama Instansi...</h1>
+            <p id="disp-alamat-instansi">Memuat Alamat...</p>
           </div>
         </div>
         <div style="text-align: right;">
@@ -303,13 +303,13 @@
             <div class="admin-card-panel">
               <h3>🏢 PROFIL INSTANSI BALAI PEMASYARAKATAN</h3>
               <div class="customizer-grid">
-                <div class="customizer-field"><label>Nama Instansi</label><input type="text" id="inp-nama" class="form-control"></div>
-                <div class="customizer-field"><label>Alamat / Instansi Induk</label><input type="text" id="inp-alamat" class="form-control"></div>
-                <div class="customizer-field"><label>Nama Kepala Kantor</label><input type="text" id="inp-kepala" class="form-control"></div>
-                <div class="customizer-field"><label>Nomor Telepon</label><input type="text" id="inp-telp" class="form-control"></div>
-                <div class="customizer-field"><label>Website Resmi</label><input type="text" id="inp-web" class="form-control"></div>
-                <div class="customizer-field"><label>Email Kantor</label><input type="text" id="inp-email" class="form-control"></div>
-                <div class="customizer-field"><label>Nomor Fax</label><input type="text" id="inp-fax" class="form-control"></div>
+                <div class="customizer-field"><label>Nama Instansi</label><input type="text" id="inp-nama" class="form-control" placeholder="Memuat..."></div>
+                <div class="customizer-field"><label>Alamat / Instansi Induk</label><input type="text" id="inp-alamat" class="form-control" placeholder="Memuat..."></div>
+                <div class="customizer-field"><label>Nama Kepala Kantor</label><input type="text" id="inp-kepala" class="form-control" placeholder="Memuat..."></div>
+                <div class="customizer-field"><label>Nomor Telepon</label><input type="text" id="inp-telp" class="form-control" placeholder="Memuat..."></div>
+                <div class="customizer-field"><label>Website Resmi</label><input type="text" id="inp-web" class="form-control" placeholder="Memuat..."></div>
+                <div class="customizer-field"><label>Email Kantor</label><input type="text" id="inp-email" class="form-control" placeholder="Memuat..."></div>
+                <div class="customizer-field"><label>Nomor Fax</label><input type="text" id="inp-fax" class="form-control" placeholder="Memuat..."></div>
               </div>
               <button class="btn-block" style="background-color: var(--accent-blue); margin-top: 15px;" onclick="simpanProfilInstansi()">💾 Simpan & Terapkan Profil</button>
             </div>
@@ -361,20 +361,14 @@
   </div>
 
   <script>
-    // MASUKKAN URL APP SCRIPT HASIL DEPLOY BARU ANDA DI SINI!
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmZItKoM5AMOkkoarsy7sanCKYGdTDioJfD4eIFAC94-Hzq1D-R_jX9W5uuSaUUCEgsA/exec";
+    // MASUKKAN URL APP SCRIPT HASIL DEPLOY BARU ANDA DI SINI
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6Dm7YNGeDlsNxsGPmQjH35TKDa_V9h3TkDJq3kQsZr46bCn1-EiJkTqQOlehF21s7FA/exec";
     
     let isDataLoaded = false;
     let isLoggedIn = false;
 
-    let profilInstansiLokal = {
-      nama: "BALAI PEMASYARAKATAN KELAS II PURWOKERTO",
-      alamat: "Kementerian Imigrasi dan Pemasyarakatan RI - Kanwil Jawa Tengah",
-      kepala: "Nasirudin, S.H., M.H.",
-      telp: "(0281) -", website: "bapas.kemenkumham.go.id", email: "bapas@kemenkumham.go.id", fax: "-"
-    };
-
-    let dataAntreanLokal = { A: 0, B: 0, C: 0 };
+    let profilInstansiLokal = null;
+    let dataAntreanLokal = null;
     let localVideoQueue = [];
     let currentQueueIndex = 0;
     let dbUserAkun = [];
@@ -445,6 +439,8 @@
     }
 
     function terapkanProfilKeLayar() {
+      if (!profilInstansiLokal) return;
+
       if(document.getElementById('disp-nama-instansi')) document.getElementById('disp-nama-instansi').textContent = profilInstansiLokal.nama;
       if(document.getElementById('disp-alamat-instansi')) document.getElementById('disp-alamat-instansi').textContent = profilInstansiLokal.alamat;
       if(document.getElementById('disp-kepala-kantor')) document.getElementById('disp-kepala-kantor').textContent = profilInstansiLokal.kepala;
@@ -463,6 +459,7 @@
     }
 
     function simpanProfilInstansi() {
+      if(!profilInstansiLokal) profilInstansiLokal = {};
       profilInstansiLokal.nama = document.getElementById('inp-nama').value.trim();
       profilInstansiLokal.alamat = document.getElementById('inp-alamat').value.trim();
       profilInstansiLokal.kepala = document.getElementById('inp-kepala').value.trim();
@@ -477,7 +474,7 @@
     }
 
     function changeAntreanLokal(loket, step) {
-      if(!isDataLoaded) return;
+      if(!isDataLoaded || !dataAntreanLokal) return;
       dataAntreanLokal[loket] += step;
       if (dataAntreanLokal[loket] < 0) dataAntreanLokal[loket] = 0;
       
@@ -494,7 +491,7 @@
     }
 
     function pemicuSuaraPanggil(loket) {
-      eksekusiSuaraLokal(loket, dataAntreanLokal[loket]);
+      if(dataAntreanLokal) eksekusiSuaraLokal(loket, dataAntreanLokal[loket]);
     }
 
     function eksekusiSuaraLokal(loket, nomorInt) {
@@ -527,7 +524,9 @@
     }
 
     function renderSeluruhDataKeLayar() {
-      if(!isDataLoaded) return; // Mencegah reset visual saat awal
+      // DILARANG RENDER JIKA DATA DARI SERVER BELUM TIBA
+      if(!isDataLoaded || !dataAntreanLokal) return;
+
       const pad = (n) => n.toString().padStart(3, '0');
       ['A', 'B', 'C'].forEach(k => {
         const teks = `${k}-${pad(dataAntreanLokal[k])}`;
@@ -575,7 +574,7 @@
           dbPK = res.data_pk || [];
           aplikasikanDataKeGrafikChart(res.global);
           
-          isDataLoaded = true;
+          isDataLoaded = true; // HANYA AKTIFKAN RENDER SETELAH DATA BERHASIL DITARIK
           renderSeluruhDataKeLayar();
           
           let textStatus = document.getElementById('sync-status-text');
@@ -590,7 +589,7 @@
     window.addEventListener('DOMContentLoaded', () => {
       const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(tag);
       inisialisasiNilaiDefaultCustomizer(); inisialisasiGrafikMulaMula(); 
-      terapkanProfilKeLayar(); checkLoginSession();
+      checkLoginSession();
       unduhDataTerbaruDariCloud();
       setInterval(unduhDataTerbaruDariCloud, 10000); 
     });
