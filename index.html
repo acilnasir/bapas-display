@@ -363,7 +363,7 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0OqoZzwh9HqjSmmmS0hndP9ZCdUq7h5_RDrSMd7hxQPV6z9G-ppu6b7zAGGssfj6Z7Q/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlYxYqFVJFqCAoSFWr96NaLoFA3zrcoTVsJR5ulxFHHiQW_etyLy8Y7BlnYQ7-PgQYmQ/exec";
     
     let isDataLoaded = false;
     let isLoggedIn = false;
@@ -582,8 +582,6 @@
               B: parseInt(res.antrean.B) || 0,
               C: parseInt(res.antrean.C) || 0
             };
-          } else if (!dataAntreanLokal) {
-            dataAntreanLokal = { A: 0, B: 0, C: 0 };
           }
 
           if (res.videos && res.videos.length > 0) {
@@ -613,7 +611,9 @@
       inisialisasiNilaiDefaultCustomizer(); inisialisasiGrafikMulaMula(); 
       checkLoginSession();
       unduhDataTerbaruDariCloud();
-      setInterval(unduhDataTerbaruDariCloud, 10000); 
+      
+      // AUTO UPDATE PERKALA SETIAP 5 DETIK
+      setInterval(unduhDataTerbaruDariCloud, 5000); 
     });
 
     function onYouTubeIframeAPIReady() { isYtApiReady = true; memuatInstalasiVideoYouTube(); }
