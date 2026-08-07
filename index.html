@@ -316,10 +316,15 @@
               <button class="btn-block" style="background-color: var(--accent-blue); margin-top: 15px;" onclick="simpanProfilInstansi()">💾 Simpan & Terapkan Profil</button>
             </div>
 
+            <!-- AKSI KONTROL ANTREAN -->
             <div class="admin-card-panel">
-              <h3>📌 AKSI RESET ANTREAN</h3>
+              <h3>📌 KONTROL & SINKRONISASI ANTREAN</h3>
+              <!-- TOMBOL MANUAL SINKRONISASI ANTREAN -->
+              <button class="btn-block" style="background-color: var(--accent-green); padding:12px; font-weight:800; margin-bottom: 12px;" onclick="pemicuSinkronisasiManual()">
+                🔄 Sinkronkan Antrean dari Sheets
+              </button>
               <button class="btn-block" style="background-color: var(--accent-red); padding:12px; font-weight:800;" onclick="resetSeluruhAntreanAksi()">
-                🔄 RESET SEMUA NOMOR ANTREAN MENJADI 000
+                ⚠️ RESET SEMUA NOMOR ANTREAN MENJADI 000
               </button>
             </div>
           </div>
@@ -474,6 +479,13 @@
       alert("Profil berhasil dikirim dan disimpan ke Google Sheets!");
     }
 
+    // PEMICU SINKRONISASI MANUAL VIA TOMBOL
+    function pemicuSinkronisasiManual() {
+      let textStatus = document.getElementById('sync-status-text');
+      if(textStatus) { textStatus.textContent = "Mengunduh..."; textStatus.style.color = "var(--secondary-color)"; }
+      unduhDataTerbaruDariCloud();
+    }
+
     function changeAntreanLokal(loket, step) {
       if(!dataAntreanLokal) dataAntreanLokal = { A: 0, B: 0, C: 0 };
       dataAntreanLokal[loket] = (dataAntreanLokal[loket] || 0) + step;
@@ -612,7 +624,6 @@
       checkLoginSession();
       unduhDataTerbaruDariCloud();
       
-      // AUTO UPDATE PERKALA SETIAP 5 DETIK
       setInterval(unduhDataTerbaruDariCloud, 5000); 
     });
 
